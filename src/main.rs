@@ -1,4 +1,5 @@
 // http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust
+
 extern crate rand_chacha;
 extern crate rand_core;
 extern crate rand;
@@ -7,7 +8,6 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use rand_chacha::{ChaChaCore, ChaChaRng};
 use rand_core::{SeedableRng,RngCore};
-
 
 type Cell = (i32, i32);
 type Colony = HashSet<Cell>;
@@ -54,14 +54,13 @@ fn generation(col: Colony) -> Colony {
 
 fn life(init: Vec<Cell>, iters: i32, width: i32, height: i32) {
     let mut col: Colony = init.into_iter().collect(); 
-    for i in 0..iters+1
-    {
+    for i in 0..iters+1 {
         println!("({})", &i);
         if i != 0 {
             col = generation(col);
         }
-        print_colony(&col, width, height);
     }
+    print_colony(&col, width, height);
 }
 
 fn generate_seed(fixed: bool) -> <ChaChaCore as SeedableRng>::Seed {
@@ -88,24 +87,15 @@ fn generate_seed(fixed: bool) -> <ChaChaCore as SeedableRng>::Seed {
 
 fn main() {
 
-    //let glider = vec![
-    //            (1,0),
-    //                    (2,1),
-    //    (0,2),  (1,2),  (2,2)];
-
-    //life(glider, 20, 8, 8);
-
-
     let width = 50;
     let height = 50;
     let mut board: Vec<Cell> = Vec::new();
 
     let seed = generate_seed(false);
-
     let mut rng = ChaChaRng::from_seed(seed);
 
-    for w in 0..width {
-        for h in 0..height {
+    for h in 0..height {
+        for w in 0..width {
             if rng.next_u32() % 2 == 1 {
                 board.push((w,h));
             }
