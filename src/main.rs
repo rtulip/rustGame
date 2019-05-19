@@ -11,30 +11,56 @@ use std::env;
 use rand_chacha::{ChaChaCore, ChaChaRng};
 use rand_core::{SeedableRng,RngCore};
 
-enum Cell{
+/// Tile Enum
+/// 
+/// Used to represent different types of tiles which can be found in the map.
+/// Custom tiles can be created, but must contain a i32 which can be printed. 
+/// 
+/// Tiles implement fmt::Display so that a tile can be printed.
+enum Tile {
     Floor,
     Wall,
     Cust(i32),
 }
 
-impl fmt::Display for Cell{
+/// Tile Display implementation
+/// 
+/// Floors are written as a "."
+/// Walls are written as a "W"
+/// Custome tiles are written as whatever i32 is provided  
+impl fmt::Display for Tile{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
         match *self{
-            Cell::Floor => write!(f, "."),
-            Cell::Wall => write!(f, "0"),
-            Cell::Cust(i) => write!(f, "{}", i)
+            Tile::Floor => write!(f, "."),
+            Tile::Wall => write!(f, "W"),
+            Tile::Cust(i) => write!(f, "{}", i)
         }
     }
 }
 
+/// Pos Type
+/// 
+/// Pos represents a position in 2D space. 
+/// Pos.0 is x and Pos.1 is y
 type Pos = (i32, i32);
-type Board = HashMap<Pos, Cell>;
+/// Map Type
+/// 
+/// A Map is a HashMap which associates positions to Tiles. 
+type Map = HashMap<Pos, Tile>;
 
-fn print_board(board: &Board, width: i32, height: i32) {
+/// print_map()
+/// 
+/// args: 
+///     map: &Map: The map to be printed.
+///     width: i32: The width of the map.
+///     height: i32: The height of the map. 
+///     
+/// Traverseses the map and prints out all Tiles in a grid.
+fn print_map(map: &Map, width: i32, height: i32) {
     for y in 0..height {
         for x in 0..width {
-            match board.get(&(x,y)){
-                Some(cell) => print!("{} ", cell),
+            match map.get(&(x,y)){
+                Some(tile) => print!("{} ", tile),
                 None => print!(". ")
             }
         }
@@ -42,6 +68,15 @@ fn print_board(board: &Board, width: i32, height: i32) {
     }
 }
 
+/// neighbours()
+/// 
+/// args:
+///     &(x,y): &Pos: A reference to a position.
+/// 
+/// return: A vector of all 8 positions which surround the input position.
+/// 
+/// Will go beyond width and height boundaries in edge cases. Ensure that edges
+/// are checked to avoid issues. 
 fn neighbours(&(x,y): &Pos) -> Vec<Pos> {
     vec![
         (x-1,y-1), (x,y-1), (x+1,y-1),
@@ -50,9 +85,20 @@ fn neighbours(&(x,y): &Pos) -> Vec<Pos> {
     ]
 }
 
-fn neighbour_counts(board: &Board) -> HashMap<Pos, i32> {
+/// neighbour_counts()
+/// 
+/// args:
+///     map: &Map: A reference to a Map.
+/// 
+/// returns: A HashMap relating each position in the input Map to the number of
+/// neighbours surrounding the point. 
+/// 
+/// Assumes that the input Map only contains Tile::Walls at this time. Should  
+/// be updated to count the surrounding number of Tile::Wall instead of number  
+/// of elements surrounding each point.
+fn neighbour_counts(map: &Map) -> HashMap<Pos, i32> {
     let mut ncnts = HashMap::new();
-    for (pos, _cell) in board.iter(){
+    for (pos, _tile) in map.iter(){
         for neighbour in neighbours(pos){
             *ncnts.entry(neighbour).or_insert(0) += 1;
         }
@@ -60,29 +106,63 @@ fn neighbour_counts(board: &Board) -> HashMap<Pos, i32> {
     ncnts
 }
 
-fn generation(board: Board) -> Board {
-    neighbour_counts(&board)
+/// generation()
+/// 
+/// args:
+///     map: Map: The Map to be progressed by a generation.
+/// 
+/// returns: A new Map as created by simulating a generation of Conway's Game
+/// of Life.
+/// 
+/// Assumes that the input Map only contains Tile::Walls at this time. Should  
+/// be updated to handle other Tile types within the Map.
+fn generation(map: Map) -> Map {
+    neighbour_counts(&map)
         .into_iter()
         .filter_map(|(pos, cnt)|
-            match (cnt, board.contains_key(&pos)) {
+            match (cnt, map.contains_key(&pos)) {
                 (2, true) |
-                (3, ..) => Some((pos, Cell::Wall)),
+                (3, ..) => Some((pos, Tile::Wall)),
                 _ => None
         })
         .collect()
 }
 
-fn life(init: Board, iters: i32, width: i32, height: i32) {
-    let mut board: Board = init; 
+/// iterate_map()
+/// 
+/// args:
+///     init: Map: The initial arangement of the Map to be generated.
+///     iters: i32: The number of iterations of Conway's Game of Life to run.
+///     width: i32: The width of the input Map.
+///     height: i32: The height of the input Map.
+///
+/// returns: The iterated Map 
+fn iterate_map(init: Map, iters: i32, width: i32, height: i32) -> Map {
+    let mut map: Map = init; 
     for i in 0..iters+1 {
         if i != 0 {
-            board = generation(board);
+            map = generation(map);
         }
     }
-    print_board(&board, width, height);
+    print_map(&map, width, height);
+    map
 }
 
-fn generate_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
+/// create_seed()
+/// 
+/// args:
+///     debug: bool: A flag to used a fixed debug seed
+/// 
+/// returns: A Seed which can be used for the ChaCha random number generator
+/// which will be used for the entirety of a game
+/// 
+/// The ChaCha random number generator requires [u8: 32] as input. If in debug
+/// mode, the seed defualts to [1,2,3,4,5,6,7,8,
+///                             1,1,1,1,1,1,1,1,
+///                             2,2,2,2,2,2,2,2,
+///                             1,2,3,4,5,6,7,8]. Otherwise, a new seed is 
+/// generated using rand::random::<u8>() 32 times to fill the array.
+fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
 
     if debug {
         let seed: <ChaChaCore as SeedableRng>::Seed = [1,2,3,4,5,6,7,8,
@@ -126,21 +206,21 @@ fn main() {
 
     let width = 50;
     let height = 50;
-    let mut board: Board = Board::new();
+    let mut map: Map = Map::new();
 
-    let seed = generate_seed(debug);
+    let seed = create_seed(debug);
     let mut rng = ChaChaRng::from_seed(seed);
 
     for h in 0..height {
         for w in 0..width {
             if rng.next_u32() % 2 == 1 {
-                board.insert((w,h), Cell::Wall);
+                map.insert((w,h), Tile::Wall);
             }
         }
     }
     
     let iters = 5;
 
-    life(board, iters, width, height);
+    iterate_map(map, iters, width, height);
 
 }
