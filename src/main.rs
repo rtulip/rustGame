@@ -61,7 +61,7 @@ fn print_map(map: &Map, width: i32, height: i32) {
         for x in 0..width {
             match map.get(&(x,y)){
                 Some(tile) => print!("{} ", tile),
-                None => print!(". ")
+                None => print!("  ")
             }
         }
         println!();
@@ -133,18 +133,15 @@ fn generation(map: Map) -> Map {
 /// args:
 ///     init: Map: The initial arangement of the Map to be generated.
 ///     iters: i32: The number of iterations of Conway's Game of Life to run.
-///     width: i32: The width of the input Map.
-///     height: i32: The height of the input Map.
 ///
 /// returns: The iterated Map 
-fn iterate_map(init: Map, iters: i32, width: i32, height: i32) -> Map {
+fn iterate_map(init: Map, iters: i32) -> Map {
     let mut map: Map = init; 
     for i in 0..iters+1 {
         if i != 0 {
             map = generation(map);
         }
     }
-    print_map(&map, width, height);
     map
 }
 
@@ -169,7 +166,7 @@ fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
                                                        1,1,1,1,1,1,1,1,
                                                        2,2,2,2,2,2,2,2,
                                                        1,2,3,4,5,6,7,8];
-        return seed;
+        seed
     } else {
         let seed: <ChaChaCore as SeedableRng>::Seed = [rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), 
                                                        rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), 
@@ -180,8 +177,48 @@ fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
                                                        rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), 
                                                        rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>()];   
 
-        return seed;
+        seed
     }
+}
+
+/// generate_map()
+/// 
+/// args: 
+///     rng: &mut ChaChaRng: A mutable reference to the global RNG.
+///     width: i32: The width of the Map to be created.
+///     height: i32: The height of the Map to be created.
+///     iters: i32: The number of iterations of Conway's Game of Life to run.
+/// 
+/// returns: The newly created Map.
+fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map{
+    let mut map: Map = Map::new(); 
+
+    // Add initial Tile::Walls to the Map.
+    for h in 0..height {
+        for w in 0..width {
+            // Any given tile has a 50/50 chance of being a wall initially.
+            if rng.next_u32() % 2 == 1 {
+                map.insert((w,h), Tile::Wall);
+            }
+        }
+    }
+
+    // Run Conway's Game of Life on the Tile::Walls in the Map
+    map = iterate_map(map, iters);
+
+    // Fill the empty spaces in the Map with Tile::Floor
+    for h in 0..height {
+        for w in 0..width {
+            match map.contains_key(&(w,h)){
+                false =>{
+                    map.insert((w,h), Tile::Floor);
+                } ,
+                _ => (),
+            }
+        }
+    }
+
+    map
 }
 
 fn main() {
@@ -189,11 +226,16 @@ fn main() {
     let mut debug = false;
     let args: Vec<String> = env::args().collect();
 
+    // Argument parsing
+    // cargo run -- *arguments go here*
+
+    // Arguments: 
+    //      -d | --debug: Use a constant known seed
     match args.len(){
         len if len > 1 => {
             for i in 1..args.len(){
                 match &args[i]{
-                    string if *string == String::from("-d") => {
+                    string if *string == String::from("-d") || *string == String::from("--debug") => {
                         debug = true;
                     },
                     _ => ()
@@ -204,23 +246,15 @@ fn main() {
 
     }
 
-    let width = 50;
-    let height = 50;
-    let mut map: Map = Map::new();
-
     let seed = create_seed(debug);
     let mut rng = ChaChaRng::from_seed(seed);
 
-    for h in 0..height {
-        for w in 0..width {
-            if rng.next_u32() % 2 == 1 {
-                map.insert((w,h), Tile::Wall);
-            }
-        }
-    }
-    
-    let iters = 5;
+    let width: i32 = 50;
+    let height: i32 = 50;
+    let iters: i32 = 5;
 
-    iterate_map(map, iters, width, height);
+    let map = generate_map(&mut rng, width, height, iters);
+    
+    print_map(&map, width, height);
 
 }
