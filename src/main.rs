@@ -181,19 +181,32 @@ fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
     }
 }
 
+/// generate_map()
+/// 
+/// args: 
+///     rng: &mut ChaChaRng: A mutable reference to the global RNG.
+///     width: i32: The width of the Map to be created.
+///     height: i32: The height of the Map to be created.
+///     iters: i32: The number of iterations of Conway's Game of Life to run.
+/// 
+/// returns: The newly created Map.
 fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map{
     let mut map: Map = Map::new(); 
 
+    // Add initial Tile::Walls to the Map.
     for h in 0..height {
         for w in 0..width {
+            // Any given tile has a 50/50 chance of being a wall initially.
             if rng.next_u32() % 2 == 1 {
                 map.insert((w,h), Tile::Wall);
             }
         }
     }
 
+    // Run Conway's Game of Life on the Tile::Walls in the Map
     map = iterate_map(map, iters);
 
+    // Fill the empty spaces in the Map with Tile::Floor
     for h in 0..height {
         for w in 0..width {
             match map.contains_key(&(w,h)){
@@ -213,11 +226,16 @@ fn main() {
     let mut debug = false;
     let args: Vec<String> = env::args().collect();
 
+    // Argument parsing
+    // cargo run -- *arguments go here*
+
+    // Arguments: 
+    //      -d | --debug: Use a constant known seed
     match args.len(){
         len if len > 1 => {
             for i in 1..args.len(){
                 match &args[i]{
-                    string if *string == String::from("-d") => {
+                    string if *string == String::from("-d") || *string == String::from("--debug") => {
                         debug = true;
                     },
                     _ => ()
