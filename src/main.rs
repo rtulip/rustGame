@@ -61,7 +61,7 @@ fn print_map(map: &Map, width: i32, height: i32) {
         for x in 0..width {
             match map.get(&(x,y)){
                 Some(tile) => print!("{} ", tile),
-                None => print!(". ")
+                None => print!("  ")
             }
         }
         println!();
@@ -133,18 +133,15 @@ fn generation(map: Map) -> Map {
 /// args:
 ///     init: Map: The initial arangement of the Map to be generated.
 ///     iters: i32: The number of iterations of Conway's Game of Life to run.
-///     width: i32: The width of the input Map.
-///     height: i32: The height of the input Map.
 ///
 /// returns: The iterated Map 
-fn iterate_map(init: Map, iters: i32, width: i32, height: i32) -> Map {
+fn iterate_map(init: Map, iters: i32) -> Map {
     let mut map: Map = init; 
     for i in 0..iters+1 {
         if i != 0 {
             map = generation(map);
         }
     }
-    print_map(&map, width, height);
     map
 }
 
@@ -195,8 +192,20 @@ fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map
         }
     }
 
-    iterate_map(map, iters, width, height)
+    map = iterate_map(map, iters);
 
+    for h in 0..height {
+        for w in 0..width {
+            match map.contains_key(&(w,h)){
+                false =>{
+                    map.insert((w,h), Tile::Floor);
+                } ,
+                _ => (),
+            }
+        }
+    }
+
+    map
 }
 
 fn main() {
@@ -228,4 +237,6 @@ fn main() {
 
     let map = generate_map(&mut rng, width, height, iters);
     
+    print_map(&map, width, height);
+
 }
