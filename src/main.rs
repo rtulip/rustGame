@@ -169,7 +169,7 @@ fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
                                                        1,1,1,1,1,1,1,1,
                                                        2,2,2,2,2,2,2,2,
                                                        1,2,3,4,5,6,7,8];
-        return seed;
+        seed
     } else {
         let seed: <ChaChaCore as SeedableRng>::Seed = [rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), 
                                                        rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), 
@@ -180,8 +180,23 @@ fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
                                                        rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), 
                                                        rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>(), rand::random::<u8>()];   
 
-        return seed;
+        seed
     }
+}
+
+fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map{
+    let mut map: Map = Map::new(); 
+
+    for h in 0..height {
+        for w in 0..width {
+            if rng.next_u32() % 2 == 1 {
+                map.insert((w,h), Tile::Wall);
+            }
+        }
+    }
+
+    iterate_map(map, iters, width, height)
+
 }
 
 fn main() {
@@ -204,23 +219,13 @@ fn main() {
 
     }
 
-    let width = 50;
-    let height = 50;
-    let mut map: Map = Map::new();
-
     let seed = create_seed(debug);
     let mut rng = ChaChaRng::from_seed(seed);
 
-    for h in 0..height {
-        for w in 0..width {
-            if rng.next_u32() % 2 == 1 {
-                map.insert((w,h), Tile::Wall);
-            }
-        }
-    }
+    let width: i32 = 50;
+    let height: i32 = 50;
+    let iters: i32 = 5;
+
+    let map = generate_map(&mut rng, width, height, iters);
     
-    let iters = 5;
-
-    iterate_map(map, iters, width, height);
-
 }
