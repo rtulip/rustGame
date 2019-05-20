@@ -1,4 +1,4 @@
-const STARTING_HEALTH
+const STARTING_HEALTH: i32 = 10;
 pub struct Player{
     pub position: [f64; 2],
     pub health: i32,
