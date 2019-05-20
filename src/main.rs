@@ -48,6 +48,21 @@ type Pos = (i32, i32);
 /// A Map is a HashMap which associates positions to Tiles. 
 type Map = HashMap<Pos, Tile>;
 
+struct Level {
+    map: Map,
+    width: i32,
+    height: i32
+
+}
+
+impl Level{
+
+    fn new(level_width: i32, level_height:i32) -> Self {
+       Self { map: Map::new(), width: level_width, height: level_height}
+    }
+
+}
+
 /// print_map()
 /// 
 /// args: 
@@ -56,10 +71,10 @@ type Map = HashMap<Pos, Tile>;
 ///     height: i32: The height of the map. 
 ///     
 /// Traverseses the map and prints out all Tiles in a grid.
-fn print_map(map: &Map, width: i32, height: i32) {
-    for y in 0..height {
-        for x in 0..width {
-            match map.get(&(x,y)){
+fn print_lvl(lvl: &Level) {
+    for y in 0..lvl.height {
+        for x in 0..lvl.width {
+            match lvl.map.get(&(x,y)){
                 Some(tile) => print!("{} ", tile),
                 None => print!("  ")
             }
@@ -288,8 +303,9 @@ fn fill_walls(mut map: Map, width: i32, height:i32) -> Map {
 ///     iters: i32: The number of iterations of Conway's Game of Life to run.
 /// 
 /// returns: The newly created Map.
-fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map{
+fn generate_level(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Level {
     let mut map: Map = Map::new(); 
+    let mut lvl: Level = Level::new(width, height);
 
     // Add initial Tile::Walls to the Map.
     for h in 0..height {
@@ -319,7 +335,9 @@ fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map
     // Fill untraversable space with walls
     map = fill_walls(map, width, height);
 
-    map
+    lvl.map = map;
+    lvl
+    
 }
 
 fn main() {
@@ -354,8 +372,8 @@ fn main() {
     let height: i32 = 50;
     let iters: i32 = 5;
 
-    let map = generate_map(&mut rng, width, height, iters);
+    let lvl = generate_level(&mut rng, width, height, iters);
     
-    print_map(&map, width, height);
+    print_lvl(&lvl);
 
 }
