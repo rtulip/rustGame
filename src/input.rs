@@ -3,11 +3,11 @@ use std::env;
 /// init_config
 /// 
 /// Structure to contain all the initial configurations
-pub struct init_config {
+pub struct InitConfig {
     pub debug: bool,
 }
 
-impl init_config{
+impl InitConfig{
 
     fn new() -> Self {
         Self {debug: false}
@@ -22,8 +22,8 @@ impl init_config{
 /// 
 /// returns: A newly created init_config after parsing command line inputs
 /// 
-pub fn handle_init_input() -> init_config {
-        let mut config = init_config::new();
+pub fn handle_init_input() -> InitConfig {
+        let mut config = InitConfig::new();
         let args: Vec<String> = env::args().collect();
 
         // Argument parsing
