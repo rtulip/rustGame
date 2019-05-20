@@ -76,9 +76,12 @@ impl Level{
     }
     /// get_map()
     /// 
-    /// Getter function for self.map
+    /// Getter function for self.map immutably
     pub fn get_map(&self) -> &Map {
         &self.map
+    }
+    pub fn get_mut_map(&mut self) -> &mut Map {
+        &mut self.map
     }
     /// get_width()
     /// 

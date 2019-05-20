@@ -18,6 +18,10 @@ impl LevelController {
     pub fn get_map(&self) -> &Map {
         self.level.get_map()
     }
+    
+    pub fn get_mut_map(&mut self) -> &mut Map {
+        self.level.get_mut_map()
+    }
 
     pub fn get_width(&self) -> i32 {
         self.level.get_width()
@@ -42,7 +46,7 @@ impl LevelController {
         for h in 0..self.get_height() {
             for w in 0..self.get_width(){
                 match self.get_map().get(&(w,h)) {
-                    Some(Tile::Wall) => {
+                    Some(Tile::Floor) => {
                         spawnable_spaces.push((w,h));
                     },
                     _ => (),
@@ -55,7 +59,8 @@ impl LevelController {
         }
 
         let idx = self.next_u32() as usize % spawnable_spaces.len();
-        spawnable_spaces.remove(idx)
+        let idx = spawnable_spaces.remove(idx);
+        idx
 
     }
     // pub fn event<E: GenericEvent>(&mut self, e: &E) {
