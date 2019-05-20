@@ -72,19 +72,27 @@ impl Level{
         Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
 
     }
-
+    /// get_map()
+    /// 
+    /// Getter function for self.map
     pub fn get_map(&self) -> &Map {
         &self.map
     }
-
+    /// get_width()
+    /// 
+    /// Getter function for self.width
     pub fn get_width(&self) -> i32 {
         self.width
     }
-
+    /// get_height()
+    /// 
+    /// Getter function for self.height
     pub fn get_height(&self) -> i32 {
         self.height
     }
-
+    /// get_rng()
+    /// 
+    /// Getter function for self.rng
     pub fn get_rng(&self) -> &RNG {
         &self.rng
     }

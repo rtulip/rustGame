@@ -1,12 +1,15 @@
 use crate::level::{Level, Map};
 use crate::misc::random;
 
+///LevelController
+/// 
+/// The controller of a Model-View-Controller design for a level.
 pub struct LevelController {
     level: Level,
 }
 
 impl LevelController {
-
+    
     pub fn new(level: Level) -> Self {
         Self {level: level}
     } 
