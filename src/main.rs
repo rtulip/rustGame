@@ -181,6 +181,67 @@ fn create_seed(debug: bool) -> <ChaChaCore as SeedableRng>::Seed {
     }
 }
 
+fn fill_walls(mut map: Map, width: i32, height:i32) -> Map {
+
+    fn flood_fill(mut map: &mut Map, start: &Pos, new_val: &i32, sets: &mut HashMap<i32, i32>){
+        match map.get(start){
+            Some(Tile::Floor) => {
+                map.remove(start);
+                map.insert(*start, Tile::Cust(*new_val));
+                *sets.entry(*new_val).or_insert(1) += 1;
+                flood_fill(&mut map, &(start.0, start.1-1), new_val, sets);
+                flood_fill(&mut map, &(start.0, start.1+1), new_val, sets);
+                flood_fill(&mut map, &(start.0-1, start.1), new_val, sets);
+                flood_fill(&mut map, &(start.0+1, start.1), new_val, sets);
+            },
+            _ => ()
+        }
+    }
+
+    let mut count = 0;
+    let mut sets: HashMap<i32, i32> = HashMap::new();
+    for h in 0..height {
+        for w in 0..width {
+
+            match map.get(&(w,h)){
+                Some(Tile::Floor) => {
+                    flood_fill(&mut map, &(w,h), &count, &mut sets);
+                    count += 1;
+                },
+                _ => ()
+            }
+
+        }
+    }
+
+    let mut max = (-1,-1);
+    for (id, count) in sets {
+        if count > max.1 {
+            max = (id, count);
+        }
+    }
+
+    for h in 0..height {
+        for w in 0..width {
+            
+            match map.get(&(w,h)) {
+                Some(Tile::Cust(max_val)) if *max_val == max.0 => {
+                    map.remove(&(w,h));
+                    map.insert((w,h), Tile::Floor);
+                },
+                Some(Tile::Cust(_val)) => {
+                    map.remove(&(w,h));
+                    map.insert((w,h), Tile::Wall);
+                },
+                _ => ()
+                 
+            }
+        }
+    }
+
+    map
+}
+
 /// generate_map()
 /// 
 /// args: 
@@ -217,9 +278,14 @@ fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map
             }
         }
     }
+    
+    // Fill untraversable space with walls
+    map = fill_walls(map, width, height);
 
     map
 }
+
+
 
 fn main() {
 
