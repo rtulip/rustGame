@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "First Devlog"
 date: 2019-04-19
 ---
