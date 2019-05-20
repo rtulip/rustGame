@@ -3,8 +3,6 @@ title: "First Devlog"
 date: 2019-04-19
 ---
 
-April 19 2019
-
 Today was the first day actually sitting down and getting stuff done.
 
 I started with the GoL implementation from http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust. 
