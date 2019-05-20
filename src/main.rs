@@ -23,9 +23,11 @@ fn main() {
     let config = input::handle_init_input();
     let seed = random::create_seed(config.debug);
     let lvl: Level = Level::new(seed);
-    let lvlctrl: LevelController = LevelController::new(lvl);
+    let mut lvlctrl: LevelController = LevelController::new(lvl);
     lvlctrl.print_level();
 
+    let player_spawn = lvlctrl.find_player_spawn();
+    println!("Player Spawn: ({}, {})", player_spawn.0, player_spawn.1);
     let settings = LevelViewSettings::new();
     let lvlview = LevelView::new(settings);
 

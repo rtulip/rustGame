@@ -27,7 +27,6 @@ pub struct Level {
 }
 
 impl Level{
-
     // Referenced http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust for Game of Life
     // implementation.
 
@@ -93,11 +92,11 @@ impl Level{
     pub fn get_height(&self) -> i32 {
         self.height
     }
-    /// get_rng()
+    /// next_u32()
     /// 
     /// Getter function for self.rng
-    pub fn get_rng(&self) -> &RNG {
-        &self.rng
+    pub fn next_u32(&mut self) -> u32 {
+        next_u32(&mut self.rng)
     }
 
     /// print_level()
