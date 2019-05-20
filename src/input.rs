@@ -1,5 +1,8 @@
 use std::env;
 
+/// init_config
+/// 
+/// Structure to contain all the initial configurations
 pub struct init_config {
     pub debug: bool,
 }
@@ -12,6 +15,13 @@ impl init_config{
 
 }
 
+/// handle_init_input()
+/// 
+/// args:
+///     None
+/// 
+/// returns: A newly created init_config after parsing command line inputs
+/// 
 pub fn handle_init_input() -> init_config {
         let mut config = init_config::new();
         let args: Vec<String> = env::args().collect();

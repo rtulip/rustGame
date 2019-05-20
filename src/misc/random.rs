@@ -7,6 +7,7 @@ pub use rand_core::RngCore;
 
 pub type Seed = <ChaChaCore as SeedableRng>::Seed;
 pub type RNG = ChaChaRng;
+
 /// create_seed()
 /// 
 /// args:
@@ -42,11 +43,26 @@ pub fn create_seed(debug: bool) -> Seed {
         seed
     }
 }
-
+/// from_seed()
+/// 
+/// args: 
+///     seed: Seed: The seed used to create the random number generator.
+/// 
+/// returns: A newly created RNG from the input seed.
+/// 
+/// Wrapper function for RNG::from_seed(seed: Seed)
 pub fn from_seed(seed: Seed) -> RNG {
     RNG::from_seed(seed)
 }
 
+/// next_u32()
+/// 
+/// args:
+///     rng: &mut RNG: A RNG.
+/// 
+/// returns: The next u32 in sequence for the input RNG.
+/// 
+/// Wrapper function for RNG.next_u32().
 pub fn next_u32(rng: &mut RNG) -> u32 {
     rng.next_u32()
 }
