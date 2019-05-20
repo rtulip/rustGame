@@ -1,3 +1,6 @@
+use graphics::types::Color;
+use graphics::{Context, Graphics};
+
 pub struct LevelViewSettings {
 
     pub graphics_position: [f64; 2],
@@ -17,7 +20,6 @@ impl LevelViewSettings {
         }
     }
 }
-
 
 pub struct LevelView {
 
