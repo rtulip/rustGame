@@ -1,3 +1,7 @@
+#![deny(missing_docs)]
+
+//! A roguelike tower-defense game.
+
 extern crate rust_game;
 use rust_game::level::{Level,LevelController,LevelView, LevelViewSettings};
 use rust_game::misc::random;
