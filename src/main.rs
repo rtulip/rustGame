@@ -48,6 +48,10 @@ type Pos = (i32, i32);
 /// A Map is a HashMap which associates positions to Tiles. 
 type Map = HashMap<Pos, Tile>;
 
+/// Level Struct
+/// 
+/// Encapsulates all information for a level.
+/// Includes a Map, the width and height of the level, and the ChaChaRng. 
 struct Level {
     map: Map,
     width: i32,
