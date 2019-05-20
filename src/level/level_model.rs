@@ -1,9 +1,11 @@
 use crate::position::Pos;
 use crate::entity::tile::Tile;
+use crate::misc::random::{Seed,RNG,from_seed, next_u32};
 
 use std::collections::HashMap;
-use rand_chacha::{ChaChaCore, ChaChaRng};
-use rand_core::{SeedableRng,RngCore};
+const WIDTH: i32 = 50;
+const HEIGHT: i32 = 50;
+const ITERS: i32 = 5;
 
 /// Map Type
 /// 
@@ -18,7 +20,7 @@ pub struct Level {
     map: Map,
     width: i32,
     height: i32,
-    rng: ChaChaRng
+    rng: RNG
 }
 
 impl Level{
@@ -36,26 +38,26 @@ impl Level{
     ///         generator. 
     /// 
     /// returns: The newly created Level.
-    pub fn new(width: i32, height:i32, iters:i32, seed: <ChaChaCore as SeedableRng>::Seed) -> Self {
+    pub fn new(seed: Seed) -> Self {
         let mut map: Map = Map::new();
-        let mut rng = ChaChaRng::from_seed(seed);
+        let mut rng = from_seed(seed);
 
         // Add initial Tile::Walls to the Map.
-        for h in 0..height {
-            for w in 0..width {
+        for h in 0..HEIGHT {
+            for w in 0..WIDTH {
                 // Any given tile has a 50/50 chance of being a wall initially.
-                if rng.next_u32() % 2 == 1 {
+                if next_u32(&mut rng) % 2 == 1 {
                     map.insert((w,h), Tile::Wall);
                 }
             }
         }
 
         // Run Conway's Game of Life on the Tile::Walls in the Map
-        map = Level::iterate_map(map, iters);
+        map = Level::iterate_map(map, ITERS);
 
         // Fill the empty spaces in the Map with Tile::Floor
-        for h in 0..height {
-            for w in 0..width {
+        for h in 0..HEIGHT {
+            for w in 0..WIDTH {
                 match map.contains_key(&(w,h)){
                     false =>{
                         map.insert((w,h), Tile::Floor);
@@ -66,8 +68,8 @@ impl Level{
         }
         
         // Fill untraversable space with walls
-        map = Level::fill_walls(map, width, height);
-        Level {map: map, width: width, height: height, rng: rng}
+        map = Level::fill_walls(map, WIDTH, HEIGHT);
+        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
 
     }
 

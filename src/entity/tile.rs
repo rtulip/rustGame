@@ -1,5 +1,4 @@
 use std::fmt;
-use std::env;
 
 /// Tile Enum
 /// 
