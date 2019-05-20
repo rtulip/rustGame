@@ -9,7 +9,7 @@ extern crate rust_game;
 
 use rust_game::level::{Level,LevelController,LevelView, LevelViewSettings};
 use rust_game::level::{WINDOW_WIDTH, WINDOW_HEIGHT};
-use rust_game::entity::player;
+use rust_game::entity::player::{Player, PlayerController};
 use rust_game::misc::random;
 use rust_game::input;
 
@@ -31,7 +31,8 @@ fn main() {
 
     let player_spawn = lvlctrl.find_player_spawn();
     let player_spawn = lvlview.convert_idx(player_spawn);
-    let mut player = player::Player::new(player_spawn);
+    let player = Player::new(player_spawn);
+    let player_controller = PlayerController::new(player);
     
     let opengl = OpenGL::V3_2;
 
