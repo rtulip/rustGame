@@ -2,6 +2,10 @@ extern crate rand_chacha;
 extern crate rand_core;
 extern crate rand;
 
+extern crate rust_game;
+use rust_game::position::Pos;
+
+
 use std::collections::HashMap;
 use std::fmt;
 use std::env;
@@ -36,11 +40,7 @@ impl fmt::Display for Tile{
     }
 }
 
-/// Pos Type
-/// 
-/// Pos represents a position in 2D space. 
-/// Pos.0 is x and Pos.1 is y
-type Pos = (i32, i32);
+
 /// Map Type
 /// 
 /// A Map is a HashMap which associates positions to Tiles. 
