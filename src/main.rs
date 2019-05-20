@@ -1,5 +1,3 @@
-// http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust
-
 extern crate rand_chacha;
 extern crate rand_core;
 extern crate rand;
@@ -60,6 +58,9 @@ struct Level {
 }
 
 impl Level{
+
+    // Referenced http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust for Game of Life
+    // implementation.
 
     /// new()
     /// 
