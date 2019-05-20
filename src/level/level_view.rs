@@ -17,9 +17,8 @@ pub struct LevelViewSettings {
 }
 
 impl LevelViewSettings {
-
+    
     pub fn new() -> LevelViewSettings {
-
         LevelViewSettings{
             tile_size: 20.0,
             background_color: [0.0, 0.0, 0.0, 1.0],
@@ -28,7 +27,6 @@ impl LevelViewSettings {
             floor_color: [0.2, 0.13, 0.08, 1.0],
         }
     }
-
 
 }
 
@@ -49,8 +47,10 @@ impl LevelView {
 
         let settings = &self.settings;
         
+        // Traverse the controller's map.
         for h in 0..controller.get_height(){
             for w in 0..controller.get_width(){
+                // Draw a different colors for walls floors, and errors.
                 match controller.get_map().get(&(w,h)){
                     Some(Tile::Floor) => {
                         Rectangle::new(settings.floor_color)
