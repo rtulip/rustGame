@@ -1,6 +1,6 @@
 use graphics::types::Color;
 use graphics::{Context, Graphics};
-use crate::level::LevelController;
+use crate::level::{LevelController, MapIdx};
 use crate::entity::tile::Tile;
 
 pub const WINDOW_WIDTH: f64 = 1000.0;
@@ -54,17 +54,17 @@ impl LevelView {
                 match controller.get_map().get(&(w,h)){
                     Some(Tile::Floor) => {
                         Rectangle::new(settings.floor_color)
-                            .draw([w as f64 * settings.tile_size, h as f64 * settings.tile_size, settings.tile_size,settings.tile_size], 
+                            .draw([self.convert_idx((w,h))[0], self.convert_idx((w,h))[1], settings.tile_size,settings.tile_size], 
                                   &c.draw_state, c.transform, g);
                     },
                     Some(Tile::Wall) => {
                         Rectangle::new(settings.wall_color)
-                            .draw([w as f64 * settings.tile_size, h as f64 * settings.tile_size, settings.tile_size,settings.tile_size], 
+                            .draw([self.convert_idx((w,h))[0], self.convert_idx((w,h))[1], settings.tile_size,settings.tile_size], 
                                   &c.draw_state, c.transform, g);
                     },
                     _ => {
                         Rectangle::new(settings.error_color)
-                            .draw([w as f64 * settings.tile_size, h as f64 * settings.tile_size, settings.tile_size,settings.tile_size], 
+                            .draw([self.convert_idx((w,h))[0], self.convert_idx((w,h))[1], settings.tile_size,settings.tile_size], 
                                   &c.draw_state, c.transform, g);
                     },
                 }; 
@@ -73,4 +73,9 @@ impl LevelView {
 
     }
 
+    pub fn convert_idx(&self, idx: MapIdx) -> [f64;2] {
+        [idx.0 as f64 * self.settings.tile_size, idx.1 as f64 * self.settings.tile_size]
+    }
+
 }
+
