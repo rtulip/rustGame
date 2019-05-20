@@ -322,8 +322,6 @@ fn generate_map(rng: &mut ChaChaRng, width: i32, height: i32, iters: i32) -> Map
     map
 }
 
-
-
 fn main() {
 
     let mut debug = false;
