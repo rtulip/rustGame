@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Template Post"
 date: 2019-05-20
 ---
