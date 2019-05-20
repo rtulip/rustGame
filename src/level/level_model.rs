@@ -10,7 +10,7 @@ const ITERS: i32 = 5;
 /// Map Type
 /// 
 /// A Map is a HashMap which associates positions to Tiles. 
-type Map = HashMap<Pos, Tile>;
+pub type Map = HashMap<Pos, Tile>;
 
 /// Level Struct
 /// 
@@ -71,6 +71,22 @@ impl Level{
         map = Level::fill_walls(map, WIDTH, HEIGHT);
         Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
 
+    }
+
+    pub fn get_map(&self) -> &Map {
+        &self.map
+    }
+
+    pub fn get_width(&self) -> i32 {
+        self.width
+    }
+
+    pub fn get_height(&self) -> i32 {
+        self.height
+    }
+
+    pub fn get_rng(&self) -> &RNG {
+        &self.rng
     }
 
     /// print_level()
