@@ -1,6 +1,6 @@
 use crate::entity::player::Player;
 pub struct PlayerController {
-    player: Player,
+    pub player: Player,
 }
 
 impl PlayerController {
