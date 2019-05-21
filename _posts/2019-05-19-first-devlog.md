@@ -1,4 +1,7 @@
-April 19 2019
+---
+title: "First Devlog"
+date: 2019-05-19
+---
 
 Today was the first day actually sitting down and getting stuff done.
 
@@ -50,10 +53,12 @@ reachable from a given starting position. I was really impressed with how well t
 this. The hardest challenge I faced at this time was differenciating between different Tile::Cust(i32) by 
 their value, and this was easily resolved with match.
 
+```rust
     match Map.get(Pos) {
         Some(Tile::Cust(val)) if val == target_val => { /* ... */ },
         _ => ()
     }
+```
 
 By the end I had figured out a three step process to have only one connected component in a Map. First I 
 found all the connected components using the flood-fill and replaced the Tile::Floor with a Tile::Cust(i32)
@@ -73,22 +78,26 @@ of time. I learnt a lot about how iterators worked and how to implement traits f
 problem with the idea of converting the Map into a struct was more an issue of perspective rather than a 
 design flaw I think. Here's what I was trying to do:
 
+```rust
     struct Map {
         tiles: HashMap<Pos, Tile>
         width: i32,
         height: i32
     }
+```
 
 The issue is that I then wanted to try and iterate over a Map, or collect() over a Map. This led down some
 rabbit holes of implementing iterators and collections, only to realize that another perspective would make
 more sense:
 
+```rust
     struct Level {
         map: Map,
         width: i32, 
         height: i32,
         rng: ChaChaRng
     }
+```
 
 By going up a level of abstraction, it was making a lot more sense to me as to how everything was going to 
 fit together. Suddenly all the operations I wanted to perform on Maps were still easy because I wasn't 
@@ -100,7 +109,9 @@ By structuring my code in this way, it also gave me a logical place to put all t
 code. The last thing I did today was to implement Level, and move all the Game of Life specific stuff inside
 the Level implementation. As such by the end of today, I have level generation into one line of code:
 
+```rust
     let lvl: Level = Level::new(width, height, iters, seed);
+```
 
 Overall today has been quite the success. I feel as if I've made a bunch of progress and have gotten to be a 
 lot more familiar with rust, which should only help increase the speed of development.
@@ -110,4 +121,5 @@ looking at graphics. I should also do some more formal planning now that things 
 up. 
 
 Thats all for tonight.
+
 Robbie
