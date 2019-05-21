@@ -1,7 +1,7 @@
 use crate::level::{Level, Map, MapIdx};
 use crate::entity::tile::Tile;
 use crate::misc::random::Seed;
-use crate::traits::{Model, Controller};
+use crate::traits;
 
 use piston::input::GenericEvent;
 
@@ -68,7 +68,7 @@ impl LevelController {
 
 }
 
-impl Controller<Seed, Level> for LevelController {
+impl traits::Controller<Seed, Level> for LevelController {
 
     fn new(level: Level) -> Self {
         Self {level: level}
