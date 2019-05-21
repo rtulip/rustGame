@@ -64,7 +64,6 @@ impl LevelController {
         idx
 
     }
-     
 
 }
 
