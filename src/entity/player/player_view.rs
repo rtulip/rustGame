@@ -4,9 +4,11 @@ use graphics::types::Color;
 use graphics::{Context, Graphics};
 
 const PLAYER_SIZE: f64 = 16.0;
+const PLAYER_RADIUS: f64 = 8.0;
 
 pub struct PlayerViewSettings {
     pub size: f64,
+    pub radius: f64,
     pub player_color: Color,
     pub clear_color: Color,
 }
@@ -14,7 +16,8 @@ pub struct PlayerViewSettings {
 impl PlayerViewSettings {
 
     pub fn new() -> PlayerViewSettings {
-        PlayerViewSettings { size: PLAYER_SIZE, 
+        PlayerViewSettings { size: PLAYER_SIZE,
+                             radius: PLAYER_RADIUS,
                              player_color: [0.75, 0.12, 0.08,1.0],
                              clear_color: [0.0, 0.0, 0.0, 0.0] }
     }
@@ -41,8 +44,9 @@ impl traits::View<[f64; 2], Player, PlayerController> for PlayerView {
         use graphics::{Rectangle};
         let settings = &self.settings;
 
-            Rectangle::new(settings.player_color)
-                .draw([controller.get_position()[0], controller.get_position()[1], settings.size, settings.size], &c.draw_state, c.transform, g);
-
+        Rectangle::new_round(settings.player_color, settings.radius)
+            .draw([controller.get_position()[0], controller.get_position()[1], settings.size, settings.size],
+                  &c.draw_state, c.transform, g);
+        
     }
 }
