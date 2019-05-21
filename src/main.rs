@@ -52,6 +52,7 @@ fn main() {
 
                 clear([1.0; 4], g);
                 lvlview.draw(&lvlctrl, &c, g);
+                player_view.draw(&player_controller, &c, g)
             });
         }
     }
