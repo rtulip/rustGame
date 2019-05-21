@@ -1,8 +1,9 @@
 use graphics::types::Color;
 use graphics::{Context, Graphics};
-use crate::level::{LevelController, MapIdx};
+use crate::level::{Level, LevelController, MapIdx};
 use crate::entity::tile::Tile;
-
+use crate::traits;
+use crate::misc::random;
 pub const WINDOW_WIDTH: f64 = 1000.0;
 pub const WINDOW_HEIGHT: f64 = 1000.0;
 
@@ -42,8 +43,15 @@ impl LevelView {
         LevelView {settings: settings}
     }
     
-    pub fn draw<G: Graphics>(&self, controller: &LevelController, c: &Context, g: &mut G) {
-        use graphics::{Line, Rectangle};
+    pub fn convert_idx(&self, idx: MapIdx) -> [f64;2] {
+        [idx.0 as f64 * self.settings.tile_size, idx.1 as f64 * self.settings.tile_size]
+    }
+
+}
+
+impl traits::View<random::Seed, Level, LevelController> for LevelView{
+    fn draw<G: Graphics>(&self, controller: &LevelController, c: &Context, g: &mut G) {
+        use graphics::{Rectangle};
 
         let settings = &self.settings;
         
@@ -72,10 +80,4 @@ impl LevelView {
         }
 
     }
-
-    pub fn convert_idx(&self, idx: MapIdx) -> [f64;2] {
-        [idx.0 as f64 * self.settings.tile_size, idx.1 as f64 * self.settings.tile_size]
-    }
-
 }
-

@@ -1,6 +1,9 @@
 use crate::level::{Level, Map, MapIdx};
 use crate::entity::tile::Tile;
-use crate::misc::random;
+use crate::misc::random::Seed;
+use crate::traits;
+
+use piston::input::GenericEvent;
 
 ///LevelController
 /// 
@@ -11,9 +14,7 @@ pub struct LevelController {
 
 impl LevelController {
     
-    pub fn new(level: Level) -> Self {
-        Self {level: level}
-    } 
+     
 
     pub fn get_map(&self) -> &Map {
         self.level.get_map()
@@ -63,8 +64,18 @@ impl LevelController {
         idx
 
     }
-    // pub fn event<E: GenericEvent>(&mut self, e: &E) {
-    //     TODO
-    // } 
+     
+
+}
+
+impl traits::Controller<Seed, Level> for LevelController {
+
+    fn new(level: Level) -> Self {
+        Self {level: level}
+    }
+
+    fn event<E: GenericEvent>(&mut self, e: &E) {
+        // TODO
+    }
 
 }

@@ -1,4 +1,5 @@
-use crate::entity::player::PlayerController;
+use crate::entity::player::{Player, PlayerController};
+use crate::traits;
 use graphics::types::Color;
 use graphics::{Context, Graphics};
 
@@ -28,8 +29,12 @@ impl PlayerView {
     pub fn new(settings: PlayerViewSettings) -> PlayerView {
         PlayerView { settings: settings }
     }
+    
+}
 
-    pub fn draw<G: Graphics>(&self, controller: &PlayerController, c: &Context, g: &mut G) {
+impl traits::View<[f64; 2], Player, PlayerController> for PlayerView {
+
+    fn draw<G: Graphics>(&self, controller: &PlayerController, c: &Context, g: &mut G) {
         // Todo
     }
 

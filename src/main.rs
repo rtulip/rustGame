@@ -7,6 +7,7 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate rust_game;
 
+use rust_game::traits::{Model, View, Controller};
 use rust_game::level::{Level,LevelController,LevelView, LevelViewSettings};
 use rust_game::level::{WINDOW_WIDTH, WINDOW_HEIGHT};
 use rust_game::entity::player::{Player, PlayerController, PlayerView, PlayerViewSettings};
