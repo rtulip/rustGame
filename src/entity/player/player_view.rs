@@ -35,7 +35,7 @@ impl PlayerView {
     pub fn new(settings: PlayerViewSettings) -> PlayerView {
         PlayerView { settings: settings }
     }
-
+    
 }
 
 impl traits::View<[f64; 2], Player, PlayerController> for PlayerView {
