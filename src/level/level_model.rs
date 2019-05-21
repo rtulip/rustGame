@@ -1,6 +1,6 @@
-use crate::position::Pos;
 use crate::entity::tile::Tile;
 use crate::misc::random::{Seed,RNG,from_seed, next_u32};
+use crate::traits;
 
 use std::collections::HashMap;
 const WIDTH: i32 = 50;
@@ -10,8 +10,12 @@ const ITERS: i32 = 5;
 /// Map Type
 /// 
 /// A Map is a HashMap which associates positions to Tiles. 
-pub type Map = HashMap<Pos, Tile>;
-
+pub type Map = HashMap<MapIdx, Tile>;
+/// MapIdx Type
+/// 
+/// MapIdx represents a grid position in 2D space. 
+/// MapIdx.0 is x and MapIdx.1 is y
+pub type MapIdx = (i32, i32);
 /// Level Struct
 /// 
 /// Encapsulates all information for a level.
@@ -24,59 +28,18 @@ pub struct Level {
 }
 
 impl Level{
-
     // Referenced http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust for Game of Life
     // implementation.
 
-    /// new()
-    /// 
-    /// args: 
-    ///     width: i32: The width of the Map to be created.
-    ///     height: i32: The height of the Map to be created.
-    ///     iters: i32: The number of iterations of Conway's Game of Life to run.
-    ///     seed: <ChaChaCore as SeedableRng::Seed>: The seed used to create a new random number
-    ///         generator. 
-    /// 
-    /// returns: The newly created Level.
-    pub fn new(seed: Seed) -> Self {
-        let mut map: Map = Map::new();
-        let mut rng = from_seed(seed);
-
-        // Add initial Tile::Walls to the Map.
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
-                // Any given tile has a 50/50 chance of being a wall initially.
-                if next_u32(&mut rng) % 2 == 1 {
-                    map.insert((w,h), Tile::Wall);
-                }
-            }
-        }
-
-        // Run Conway's Game of Life on the Tile::Walls in the Map
-        map = Level::iterate_map(map, ITERS);
-
-        // Fill the empty spaces in the Map with Tile::Floor
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
-                match map.contains_key(&(w,h)){
-                    false =>{
-                        map.insert((w,h), Tile::Floor);
-                    } ,
-                    _ => (),
-                }
-            }
-        }
-        
-        // Fill untraversable space with walls
-        map = Level::fill_walls(map, WIDTH, HEIGHT);
-        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
-
-    }
+    
     /// get_map()
     /// 
-    /// Getter function for self.map
+    /// Getter function for self.map immutably
     pub fn get_map(&self) -> &Map {
         &self.map
+    }
+    pub fn get_mut_map(&mut self) -> &mut Map {
+        &mut self.map
     }
     /// get_width()
     /// 
@@ -90,11 +53,11 @@ impl Level{
     pub fn get_height(&self) -> i32 {
         self.height
     }
-    /// get_rng()
+    /// next_u32()
     /// 
     /// Getter function for self.rng
-    pub fn get_rng(&self) -> &RNG {
-        &self.rng
+    pub fn next_u32(&mut self) -> u32 {
+        next_u32(&mut self.rng)
     }
 
     /// print_level()
@@ -120,13 +83,13 @@ impl Level{
     /// neighbours()
     /// 
     /// args:
-    ///     &(x,y): &Pos: A reference to a position.
+    ///     &(x,y): &MapIdx: A reference to a position.
     /// 
     /// return: A vector of all 8 positions which surround the input position.
     /// 
     /// Will go beyond width and height boundaries in edge cases. Ensure that edges
     /// are checked to avoid issues. 
-    fn neighbours(&(x,y): &Pos) -> Vec<Pos> {
+    fn neighbours(&(x,y): &MapIdx) -> Vec<MapIdx> {
         vec![
             (x-1,y-1), (x,y-1), (x+1,y-1),
             (x-1,y),            (x+1,y),
@@ -145,10 +108,10 @@ impl Level{
     /// Assumes that the input Map only contains Tile::Walls at this time. Should  
     /// be updated to count the surrounding number of Tile::Wall instead of number  
     /// of elements surrounding each point.
-    fn neighbour_counts(map: &Map) -> HashMap<Pos, i32> {
+    fn neighbour_counts(map: &Map) -> HashMap<MapIdx, i32> {
         let mut ncnts = HashMap::new();
-        for (pos, _tile) in map.iter(){
-            for neighbour in Level::neighbours(pos){
+        for (idx, _tile) in map.iter(){
+            for neighbour in Level::neighbours(idx){
                 *ncnts.entry(neighbour).or_insert(0) += 1;
             }
         }
@@ -168,10 +131,10 @@ impl Level{
     fn generation(map: Map) -> Map {
         Level::neighbour_counts(&map)
             .into_iter()
-            .filter_map(|(pos, cnt)|
-                match (cnt, map.contains_key(&pos)) {
+            .filter_map(|(idx, cnt)|
+                match (cnt, map.contains_key(&idx)) {
                     (2, true) |
-                    (3, ..) => Some((pos, Tile::Wall)),
+                    (3, ..) => Some((idx, Tile::Wall)),
                     _ => None
             })
             .collect()
@@ -217,13 +180,13 @@ impl Level{
         /// 
         /// args:
         ///     mut map: &mut Map: The Map which is being traversed.
-        ///     start: &Pos: The starting position of the flood fill.
+        ///     start: &MapIdx: The starting position of the flood fill.
         ///     new_val: &i32: The replacement value of the flood fill.
         ///     sets: &mut HashMap<i32, i32>: A hashmap to track the sets of 
         ///         traversable area and their sizes.
         /// 
         /// Convertes all reachable Tile::Floor from start to Tile::Cust(new_val)
-        fn flood_fill(mut map: &mut Map, start: &Pos, new_val: &i32, sets: &mut HashMap<i32, i32>){
+        fn flood_fill(mut map: &mut Map, start: &MapIdx, new_val: &i32, sets: &mut HashMap<i32, i32>){
             match map.get(start){
                 Some(Tile::Floor) => {
                     map.remove(start);
@@ -290,6 +253,55 @@ impl Level{
         }
 
         map
+    }
+
+}
+
+impl traits::Model<Seed> for Level{
+
+    /// new()
+    /// 
+    /// args: 
+    ///     width: i32: The width of the Map to be created.
+    ///     height: i32: The height of the Map to be created.
+    ///     iters: i32: The number of iterations of Conway's Game of Life to run.
+    ///     seed: <ChaChaCore as SeedableRng::Seed>: The seed used to create a new random number
+    ///         generator. 
+    /// 
+    /// returns: The newly created Level.
+    fn new(init: Seed) -> Self {
+        let mut map: Map = Map::new();
+        let mut rng = from_seed(init);
+
+        // Add initial Tile::Walls to the Map.
+        for h in 0..HEIGHT {
+            for w in 0..WIDTH {
+                // Any given tile has a 50/50 chance of being a wall initially.
+                if next_u32(&mut rng) % 2 == 1 {
+                    map.insert((w,h), Tile::Wall);
+                }
+            }
+        }
+
+        // Run Conway's Game of Life on the Tile::Walls in the Map
+        map = Level::iterate_map(map, ITERS);
+
+        // Fill the empty spaces in the Map with Tile::Floor
+        for h in 0..HEIGHT {
+            for w in 0..WIDTH {
+                match map.contains_key(&(w,h)){
+                    false =>{
+                        map.insert((w,h), Tile::Floor);
+                    } ,
+                    _ => (),
+                }
+            }
+        }
+        
+        // Fill untraversable space with walls
+        map = Level::fill_walls(map, WIDTH, HEIGHT);
+        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
+
     }
 
 }
