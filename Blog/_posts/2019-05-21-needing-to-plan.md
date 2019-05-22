@@ -1,5 +1,5 @@
 ---
-title: "Giving Structure"
+title: "Needing to Plan"
 date: 2019-05-21
 ---
 
