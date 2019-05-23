@@ -1,4 +1,3 @@
-use crate::traits;
 use crate::shape;
 const STARTING_HEALTH: i32 = 10;
 pub struct Player{
@@ -6,8 +5,8 @@ pub struct Player{
     pub health: i32,
 }
 
-impl traits::Model<[f64; 2]> for Player {
-    fn new(start_position: [f64; 2]) -> Self {
+impl Player {
+    pub fn new(start_position: [f64; 2]) -> Self {
         Player{position: start_position, health: STARTING_HEALTH}
     }
 }
