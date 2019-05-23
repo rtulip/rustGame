@@ -4,7 +4,7 @@ use crate::misc::random::Seed;
 use piston::input::GenericEvent;
 
 pub struct GameController {
-    model: GameModel;
+    model: GameModel,
 }
 
 impl GameController {
