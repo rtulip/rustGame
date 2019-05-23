@@ -39,6 +39,7 @@ impl Game {
                     use graphics::{clear};
 
                     clear([1.0; 4], g);
+                    self.view.draw(&self.controller.model, &c, g)
                 });
             }
         }
