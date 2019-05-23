@@ -1,4 +1,5 @@
-//use crate::game::{GameController, GameView};
+use crate::game::{GameController};
+use crate::misc::random::Seed;
 use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings};
 use piston::input::RenderEvent;
@@ -12,15 +13,16 @@ const OPEN_GL_VERSION: OpenGL = OpenGL::V3_2;
 pub struct Game {
     opengl: OpenGL,
     window_settings: WindowSettings,
-    // controller: GameController,
+    controller: GameController,
     // view: GameView,
 }
 
 impl Game {
     
-    pub fn new() -> Self {
+    pub fn new(seed: Seed) -> Self {
         Self { opengl: OPEN_GL_VERSION,
                window_settings: WindowSettings::new("Game", [WINDOW_WIDTH, WINDOW_HEIGHT]).opengl(OPEN_GL_VERSION).exit_on_esc(true),
+               controller: GameController::new(seed)
              }
     }
 
