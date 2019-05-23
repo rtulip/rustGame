@@ -1,5 +1,7 @@
 use crate::level::Level;
-use crate::misc::random::{Seed, RNG, from_seed}
+use crate::misc::random::{Seed, RNG, from_seed};
+use crate::traits::Model;
+
 pub struct GameModel {
     // beacon: Beacon,
     // entities: Vec<Entity>,
