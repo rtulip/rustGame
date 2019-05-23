@@ -1,5 +1,5 @@
 use std::fmt;
-use crate::shape;
+use crate::traits::shape;
 /// Tile Enum
 /// 
 /// Used to represent different types of tiles which can be found in the map.

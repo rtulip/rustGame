@@ -1,5 +1,5 @@
 use crate::game::GameModel;
-use crate::shape::Shape;
+use crate::traits::shape::Shape;
 use crate::entity::tile::Tile;
 use graphics::{Context, Graphics};
 use graphics::types::Color;

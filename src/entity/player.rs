@@ -1,4 +1,4 @@
-use crate::shape;
+use crate::traits::shape;
 const STARTING_HEALTH: i32 = 10;
 pub struct Player{
     pub position: [f64; 2],
