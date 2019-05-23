@@ -4,3 +4,4 @@ pub mod level;
 pub mod misc;
 pub mod traits;
 pub mod game;
+pub mod shape;
