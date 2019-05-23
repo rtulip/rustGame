@@ -1,6 +1,5 @@
 use crate::entity::tile::Tile;
 use crate::misc::random::{Seed,RNG,from_seed, next_u32};
-use crate::traits;
 
 use std::collections::HashMap;
 const WIDTH: i32 = 50;
@@ -31,6 +30,50 @@ impl Level{
     // Referenced http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust for Game of Life
     // implementation.
 
+    /// new()
+    /// 
+    /// args: 
+    ///     width: i32: The width of the Map to be created.
+    ///     height: i32: The height of the Map to be created.
+    ///     iters: i32: The number of iterations of Conway's Game of Life to run.
+    ///     seed: <ChaChaCore as SeedableRng::Seed>: The seed used to create a new random number
+    ///         generator. 
+    /// 
+    /// returns: The newly created Level.
+    pub fn new(init: Seed) -> Self {
+        let mut map: Map = Map::new();
+        let mut rng = from_seed(init);
+
+        // Add initial Tile::Walls to the Map.
+        for h in 0..HEIGHT {
+            for w in 0..WIDTH {
+                // Any given tile has a 50/50 chance of being a wall initially.
+                if next_u32(&mut rng) % 2 == 1 {
+                    map.insert((w,h), Tile::Wall);
+                }
+            }
+        }
+
+        // Run Conway's Game of Life on the Tile::Walls in the Map
+        map = Level::iterate_map(map, ITERS);
+
+        // Fill the empty spaces in the Map with Tile::Floor
+        for h in 0..HEIGHT {
+            for w in 0..WIDTH {
+                match map.contains_key(&(w,h)){
+                    false =>{
+                        map.insert((w,h), Tile::Floor);
+                    } ,
+                    _ => (),
+                }
+            }
+        }
+        
+        // Fill untraversable space with walls
+        map = Level::fill_walls(map, WIDTH, HEIGHT);
+        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
+
+    }
     
     /// get_map()
     /// 
@@ -257,51 +300,4 @@ impl Level{
 
 }
 
-impl traits::Model<Seed> for Level{
 
-    /// new()
-    /// 
-    /// args: 
-    ///     width: i32: The width of the Map to be created.
-    ///     height: i32: The height of the Map to be created.
-    ///     iters: i32: The number of iterations of Conway's Game of Life to run.
-    ///     seed: <ChaChaCore as SeedableRng::Seed>: The seed used to create a new random number
-    ///         generator. 
-    /// 
-    /// returns: The newly created Level.
-    fn new(init: Seed) -> Self {
-        let mut map: Map = Map::new();
-        let mut rng = from_seed(init);
-
-        // Add initial Tile::Walls to the Map.
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
-                // Any given tile has a 50/50 chance of being a wall initially.
-                if next_u32(&mut rng) % 2 == 1 {
-                    map.insert((w,h), Tile::Wall);
-                }
-            }
-        }
-
-        // Run Conway's Game of Life on the Tile::Walls in the Map
-        map = Level::iterate_map(map, ITERS);
-
-        // Fill the empty spaces in the Map with Tile::Floor
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
-                match map.contains_key(&(w,h)){
-                    false =>{
-                        map.insert((w,h), Tile::Floor);
-                    } ,
-                    _ => (),
-                }
-            }
-        }
-        
-        // Fill untraversable space with walls
-        map = Level::fill_walls(map, WIDTH, HEIGHT);
-        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
-
-    }
-
-}

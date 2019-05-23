@@ -1,6 +1,5 @@
 use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
-use crate::traits::Model;
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 
