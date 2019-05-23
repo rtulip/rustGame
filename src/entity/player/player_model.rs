@@ -1,4 +1,5 @@
 use crate::traits;
+use crate::shape;
 const STARTING_HEALTH: i32 = 10;
 pub struct Player{
     pub position: [f64; 2],
@@ -10,3 +11,11 @@ impl traits::Model<[f64; 2]> for Player {
         Player{position: start_position, health: STARTING_HEALTH}
     }
 }
+
+impl shape::Shape for Player {
+    type ShapeVairant = shape::CircleType;
+    fn get_shape(&self) -> Self::ShapeVairant {
+        shape::CircleType {}
+    }
+}
+
