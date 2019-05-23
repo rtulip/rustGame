@@ -29,4 +29,7 @@ impl fmt::Display for Tile{
 
 impl shape::Shape for Tile {
     type ShapeVairant = shape::RectangleType;
+    fn get_shape(&self) -> Self::ShapeVairant {
+        shape::RectangleType {}
+    }
 }

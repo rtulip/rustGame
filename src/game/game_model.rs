@@ -5,7 +5,7 @@ use crate::traits::Model;
 pub struct GameModel {
     // beacon: Beacon,
     // entities: Vec<Entity>,
-    level: Level,
+    pub level: Level,
     rng: RNG,
 }
 
