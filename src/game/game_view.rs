@@ -4,18 +4,36 @@ use crate::entity::tile::Tile;
 use graphics::{Context, Graphics};
 use graphics::types::Color;
 
+const TILE_SIZE: f64 = 20.0;
+const PLAYER_SIZE: f64 = 16.0;
+const PLAYER_RADIUS: f64 = 8.0;
+const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
+const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
+const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
+const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
+
+
 struct GameViewSettings {
     pub tile_size: f64,
-    pub error_color: Color,
     pub floor_color: Color,
     pub wall_color: Color,
+    pub player_size: f64,
+    pub player_radius: f64,
+    pub player_color: Color,
+    pub error_color: Color,
+    
 }
 impl GameViewSettings {
     fn new() -> Self {
-        Self {  tile_size: 20.0,
-                error_color: [1.0, 0.0, 0.0, 1.0],
-                wall_color: [0.3, 0.3, 0.2, 1.0],
-                floor_color: [0.2, 0.13, 0.08, 1.0], }
+        Self {  
+            tile_size: TILE_SIZE,
+            floor_color: FLOOR_COLOR,
+            wall_color: WALL_COLOR,
+            player_size: PLAYER_SIZE,
+            player_radius: PLAYER_RADIUS,
+            player_color: PLAYER_COLOR,
+            error_color: ERROR_COLOR
+        }
     }
 }
 
@@ -30,6 +48,11 @@ impl GameView {
     }
 
     pub fn draw<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
+        self.draw_level(model, c, g);
+        self.draw_player(model, c, g);
+    }
+
+    fn draw_level<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         let settings = &self.settings;
         for h in 0..model.level.get_height() {
             for w in 0..model.level.get_width() {
@@ -64,5 +87,18 @@ impl GameView {
                 };
             }
         }
+    }
+
+    fn draw_player<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
+        model.player.get_shape().draw(
+            PLAYER_COLOR,
+            PLAYER_RADIUS,
+            model.player.position[0],
+            model.player.position[1],
+            PLAYER_SIZE,
+            PLAYER_SIZE,
+            c,
+            g
+        )
     }
 }
