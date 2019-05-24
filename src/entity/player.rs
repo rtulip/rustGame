@@ -76,9 +76,9 @@ impl Player {
 }
 
 impl shape::Shape for Player {
-    type ShapeVairant = shape::CircleType;
+    type ShapeVairant = shape::EllipseType;
     fn get_shape(&self) -> Self::ShapeVairant {
-        shape::CircleType {}
+        shape::EllipseType {}
     }
 }
 
