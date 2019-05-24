@@ -3,6 +3,9 @@ use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 
+/// GameModel 
+/// 
+/// A model of the games entities and controls game logic
 pub struct GameModel {
     // beacon: Beacon,
     // entities: Vec<Entity>,
@@ -24,6 +27,16 @@ impl GameModel {
         }
     }
 
+    /// find_player_spawn()
+    /// 
+    /// args:
+    ///     level: &Level: A reference to the level to serach for a player 
+    ///         spwan point
+    ///     rng: &mut RNG: A mutable reference to a random number generator
+    ///         which is used to decide which of the open spaces is to be the
+    ///         spawn point
+    /// 
+    /// Chooses a spawn point randomly from any Tile::Floor spaces in the Level
     fn find_player_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
