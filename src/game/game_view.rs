@@ -97,9 +97,9 @@ impl GameView {
     /// Map.
     fn draw_level<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         let settings = &self.settings;
-        for h in 0..model.level.get_height() {
-            for w in 0..model.level.get_width() {
-                match model.level.get_map().get(&(w,h)){
+        for h in 0..model.level.height {
+            for w in 0..model.level.width {
+                match model.level.map.get(&(w,h)){
                     Some(Tile::Floor) => {
                         Tile::Floor.get_shape().draw(settings.floor_color,
                                                      w as f64 * settings.tile_size, 

@@ -27,13 +27,13 @@ impl EllipseType {
     ///     g: &mut Graphics: A mutable Graphics
     /// 
     /// Draws an Ellipse in the specified Color at the specified location 
-    pub fn draw<G: Graphics>(&self, color: Color, radius: f64, x: f64, y: f64, width: f64, height: f64, c: &Context, g: &mut G){
+    pub fn draw<G: Graphics>(&self, color: Color, radius: f64, x: f64, y: f64, width: f64, height: f64, c: &Context, g: &mut G) {
         Rectangle::new_round(color, radius).draw([x, y, width, height], &c.draw_state, c.transform, g);
     }
 }
 
 /// Implementation of EllipseType reveals how to draw the type
-impl RectangleType{
+impl RectangleType {
     /// draw()
     /// 
     /// args:
@@ -48,7 +48,7 @@ impl RectangleType{
     ///     g: &mut Graphics: A mutable Graphics
     /// 
     /// Draws an Rectangle in the specified Color at the specified location
-    pub fn draw<G: Graphics>(&self, color: Color, x: f64, y: f64, width: f64, height: f64, c: &Context, g: &mut G){
+    pub fn draw<G: Graphics>(&self, color: Color, x: f64, y: f64, width: f64, height: f64, c: &Context, g: &mut G) {
         Rectangle::new(color).draw([x, y, width, height], &c.draw_state, c.transform, g);
     }
 }

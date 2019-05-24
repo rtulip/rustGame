@@ -43,7 +43,7 @@ impl Game {
         while let Some(e) = events.next(&mut window) {
             self.controller.handle_event(&e);
             self.controller.tick();
-            if let Some(args) = e.render_args(){
+            if let Some(args) = e.render_args() {
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
 

@@ -2,6 +2,7 @@ use crate::entity::tile::Tile;
 use crate::misc::random::{Seed,RNG,from_seed, next_u32};
 
 use std::collections::HashMap;
+
 const WIDTH: i32 = 50;
 const HEIGHT: i32 = 50;
 const ITERS: i32 = 5;
@@ -20,13 +21,13 @@ pub type MapIdx = (i32, i32);
 /// Encapsulates all information for a level.
 /// Includes a Map, the width and height of the level, and the ChaChaRng. 
 pub struct Level {
-    map: Map,
-    width: i32,
-    height: i32,
-    rng: RNG
+    pub map: Map,
+    pub width: i32,
+    pub height: i32,
+    pub rng: RNG
 }
 
-impl Level{
+impl Level {
     // Referenced http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust for Game of Life
     // implementation.
 
@@ -60,8 +61,8 @@ impl Level{
         // Fill the empty spaces in the Map with Tile::Floor
         for h in 0..HEIGHT {
             for w in 0..WIDTH {
-                match map.contains_key(&(w,h)){
-                    false =>{
+                match map.contains_key(&(w,h)) {
+                    false => {
                         map.insert((w,h), Tile::Floor);
                     } ,
                     _ => (),
@@ -73,34 +74,6 @@ impl Level{
         map = Level::fill_walls(map, WIDTH, HEIGHT);
         Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
 
-    }
-    
-    /// get_map()
-    /// 
-    /// Getter function for self.map immutably
-    pub fn get_map(&self) -> &Map {
-        &self.map
-    }
-    pub fn get_mut_map(&mut self) -> &mut Map {
-        &mut self.map
-    }
-    /// get_width()
-    /// 
-    /// Getter function for self.width
-    pub fn get_width(&self) -> i32 {
-        self.width
-    }
-    /// get_height()
-    /// 
-    /// Getter function for self.height
-    pub fn get_height(&self) -> i32 {
-        self.height
-    }
-    /// next_u32()
-    /// 
-    /// Getter function for self.rng
-    pub fn next_u32(&mut self) -> u32 {
-        next_u32(&mut self.rng)
     }
 
     /// neighbours()
@@ -133,8 +106,8 @@ impl Level{
     /// of elements surrounding each point.
     fn neighbour_counts(map: &Map) -> HashMap<MapIdx, i32> {
         let mut ncnts = HashMap::new();
-        for (idx, _tile) in map.iter(){
-            for neighbour in Level::neighbours(idx){
+        for (idx, _tile) in map.iter() {
+            for neighbour in Level::neighbours(idx) {
                 *ncnts.entry(neighbour).or_insert(0) += 1;
             }
         }
@@ -209,8 +182,8 @@ impl Level{
         ///         traversable area and their sizes.
         /// 
         /// Convertes all reachable Tile::Floor from start to Tile::Cust(new_val)
-        fn flood_fill(mut map: &mut Map, start: &MapIdx, new_val: &i32, sets: &mut HashMap<i32, i32>){
-            match map.get(start){
+        fn flood_fill(mut map: &mut Map, start: &MapIdx, new_val: &i32, sets: &mut HashMap<i32, i32>) {
+            match map.get(start) {
                 Some(Tile::Floor) => {
                     map.remove(start);
                     map.insert(*start, Tile::Cust(*new_val));
@@ -234,7 +207,7 @@ impl Level{
         for h in 0..height {
             for w in 0..width {
 
-                match map.get(&(w,h)){
+                match map.get(&(w,h)) {
                     Some(Tile::Floor) => {
                         flood_fill(&mut map, &(w,h), &region, &mut sets);
                         // increment region counter.

@@ -41,9 +41,9 @@ impl GameModel {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
 
-        for h in 0..level.get_height() {
-            for w in 0..level.get_width(){
-                match level.get_map().get(&(w,h)) {
+        for h in 0..level.height {
+            for w in 0..level.width {
+                match level.map.get(&(w,h)) {
                     Some(Tile::Floor) => {
                         spawnable_spaces.push((w,h));
                     },
