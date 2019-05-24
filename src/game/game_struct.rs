@@ -28,12 +28,14 @@ impl Game {
              }
     }
 
-    pub fn run(&self) {
+    pub fn run(&mut self) {
         let mut window: GlutinWindow = self.window_settings.build().expect("Couldn't create window!");
         let mut events = Events::new(EventSettings::new());
         let mut gl = GlGraphics::new(self.opengl);
         
         while let Some(e) = events.next(&mut window) {
+            self.controller.tick();
+
             if let Some(args) = e.render_args(){
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
