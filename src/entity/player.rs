@@ -1,4 +1,4 @@
-use crate::traits::shape;
+use crate::traits::{shape, entity};
 const STARTING_HEALTH: i32 = 10;
 pub struct Player{
     pub position: [f64; 2],
@@ -15,6 +15,12 @@ impl shape::Shape for Player {
     type ShapeVairant = shape::CircleType;
     fn get_shape(&self) -> Self::ShapeVairant {
         shape::CircleType {}
+    }
+}
+
+impl entity::Entity for Player {
+    fn tick(&mut self) {
+        self.position[1] += 1.0;
     }
 }
 

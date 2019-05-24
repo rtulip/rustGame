@@ -2,6 +2,6 @@ use crate::traits::shape::Shape;
 
 pub trait Entity: Shape {
 
-    fn tick(&self);
+    fn tick(&mut self);
 
 }

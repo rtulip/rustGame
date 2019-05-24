@@ -36,5 +36,5 @@ impl shape::Shape for Tile {
 }
 
 impl entity::Entity for Tile {
-    fn tick(&self) {}
+    fn tick(&mut self) {}
 }

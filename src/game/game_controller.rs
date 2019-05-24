@@ -1,5 +1,6 @@
 use crate::game::GameModel;
 use crate::misc::random::Seed;
+use crate::traits::entity::Entity;
 
 use piston::input::GenericEvent;
 
@@ -16,8 +17,8 @@ impl GameController {
         // TODO
     }
 
-    pub fn tick(&self) {
-        // TODO
+    pub fn tick(&mut self) {
+        self.model.player.tick();
     }
 
 }

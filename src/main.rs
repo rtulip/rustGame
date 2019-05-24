@@ -16,7 +16,7 @@ fn main() {
     let config = input::handle_init_input();
     let seed = random::create_seed(config.debug);
 
-    let game = Game::new(seed);
+    let mut game = Game::new(seed);
     game.run();
 
 }
