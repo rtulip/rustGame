@@ -11,6 +11,11 @@ const WINDOW_WIDTH: f64 = 1000.0;
 const WINDOW_HEIGHT: f64 = 1000.0;
 const OPEN_GL_VERSION: OpenGL = OpenGL::V3_2;
 
+/// Game 
+/// 
+/// A structure to enclose the entirety of the Game Logic
+/// The Game struct starts the game loop, which keeps the game going
+/// A game has a GameController which controlls all the game Logic and graphics
 pub struct Game {
     opengl: OpenGL,
     window_settings: WindowSettings,
@@ -27,6 +32,9 @@ impl Game {
         }
     }
 
+    /// run()
+    /// 
+    /// A function to start the game loop.
     pub fn run(&mut self) {
         let mut window: GlutinWindow = self.window_settings.build().expect("Couldn't create window!");
         let mut events = Events::new(EventSettings::new());
@@ -35,7 +43,7 @@ impl Game {
         while let Some(e) = events.next(&mut window) {
             self.controller.handle_event(&e);
             self.controller.tick();
-            if let Some(args) = e.render_args(){
+            if let Some(args) = e.render_args() {
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
 

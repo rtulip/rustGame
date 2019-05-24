@@ -7,6 +7,10 @@ use std::collections::HashSet;
 
 use piston::input::{GenericEvent, Button, Key};
 
+/// GameController
+/// 
+/// A struct to control the game processes including user input, graphics and
+/// game ticks
 pub struct GameController {
     pub model: GameModel,
     pub view: GameView,
@@ -24,6 +28,13 @@ impl GameController {
         }
     }
 
+    /// handle_event()
+    /// 
+    /// args:
+    ///     e: &GenericEvent: The generic event to be handled
+    /// 
+    /// Parses the event for cursor position, Keyboard presses and keyboard
+    /// relseases
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
             self.cursor_pos = pos;
@@ -39,6 +50,9 @@ impl GameController {
         }
     }
 
+    /// tick()
+    /// 
+    /// Executes a single game tick
     pub fn tick(&mut self) {
         match [
             self.keys_pressed.contains(&Key::W),

@@ -7,8 +7,13 @@ pub struct InitConfig {
     pub debug: bool,
 }
 
-impl InitConfig{
-
+impl InitConfig {
+    /// new() 
+    /// 
+    /// args:
+    ///     None
+    /// returns: A new InitConfig struct.
+    /// default debug value is false.
     fn new() -> Self {
         Self {debug: false}
     }
@@ -31,10 +36,10 @@ pub fn handle_init_input() -> InitConfig {
 
         // Arguments: 
         //      -d | --debug: Use a constant known seed
-        match args.len(){
+        match args.len() {
             len if len > 1 => {
-                for i in 1..args.len(){
-                    match &args[i]{
+                for i in 1..args.len() {
+                    match &args[i] {
                         string if *string == String::from("-d") || *string == String::from("--debug") => {
                             config.debug = true;
                         },
