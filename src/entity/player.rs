@@ -1,4 +1,5 @@
 use crate::traits::{shape, entity, state};
+use std::f64;
 const STARTING_HEALTH: i32 = 10;
 const PLAYER_SPEED: f64 = 0.1;
 
@@ -12,6 +13,7 @@ pub struct Player{
     pub health: i32,
     pub state: PlayerState,
     pub direction: [f64; 2],
+    pub backwards: bool
 }
 
 impl Player {
@@ -21,23 +23,27 @@ impl Player {
             health: STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: [0.0, 1.0],
+            backwards: false,
         }
     }
 
     pub fn update_position(&mut self) {
-
-        self.position[0] += self.direction[0] * PLAYER_SPEED;
-        self.position[1] += self.direction[1] * PLAYER_SPEED;
-
-    }
-
-    pub fn update_direction(&mut self, cursor_pos: [f64; 2], player_size: f64) {
-
-        self.direction = self.convert_to_unit_vector(
-                    [
-                        cursor_pos[0] - self.position[0] + player_size/2.0,
-                        cursor_pos[1] - self.position[1] + player_size/2.0
-                    ]);
+        match self.state {
+            PlayerState::Moving => {
+                match self.backwards {
+                    true => {
+                        self.position[0] += self.direction[0] * PLAYER_SPEED * -1.0;
+                        self.position[1] += self.direction[1] * PLAYER_SPEED * -1.0;
+                    },
+                    false => {
+                        self.position[0] += self.direction[0] * PLAYER_SPEED;
+                        self.position[1] += self.direction[1] * PLAYER_SPEED;
+                    }
+                }
+                
+            },
+            _ => {}
+        }
     }
 
     fn convert_to_unit_vector(&self, vector: [f64; 2]) -> [f64;2] {
@@ -57,6 +63,16 @@ impl Player {
 
         
     }
+
+    pub fn update_direction(&mut self, cursor_pos: [f64; 2], player_size: f64) {
+
+        self.direction = self.convert_to_unit_vector(
+                    [
+                        cursor_pos[0] - self.position[0] + player_size/2.0,
+                        cursor_pos[1] - self.position[1] + player_size/2.0
+                    ]);
+    }
+
 }
 
 impl shape::Shape for Player {
