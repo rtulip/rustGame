@@ -13,7 +13,7 @@ const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
 const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
 
 
-struct GameViewSettings {
+pub struct GameViewSettings {
     pub tile_size: f64,
     pub floor_color: Color,
     pub wall_color: Color,
@@ -38,7 +38,7 @@ impl GameViewSettings {
 }
 
 pub struct GameView {
-    settings: GameViewSettings,
+    pub settings: GameViewSettings,
 }
 
 impl GameView {
