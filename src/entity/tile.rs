@@ -1,5 +1,6 @@
 use std::fmt;
-use crate::traits::shape;
+use crate::traits::{shape, entity};
+
 /// Tile Enum
 /// 
 /// Used to represent different types of tiles which can be found in the map.
@@ -32,4 +33,8 @@ impl shape::Shape for Tile {
     fn get_shape(&self) -> Self::ShapeVairant {
         shape::RectangleType {}
     }
+}
+
+impl entity::Entity for Tile {
+    fn tick(&self) {}
 }
