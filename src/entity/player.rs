@@ -30,7 +30,7 @@ impl shape::Shape for Player {
 
 impl entity::Entity for Player {
     fn tick(&mut self) {
-        self.position[1] += 1.0;
+        // TODO
     }
 }
 
