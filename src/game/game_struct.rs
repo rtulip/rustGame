@@ -1,4 +1,4 @@
-use crate::game::{GameController, GameView};
+use crate::game::GameController;
 use crate::misc::random::Seed;
 
 use piston::window::WindowSettings;
@@ -15,17 +15,16 @@ pub struct Game {
     opengl: OpenGL,
     window_settings: WindowSettings,
     controller: GameController,
-    view: GameView,
 }
 
 impl Game {
     
     pub fn new(seed: Seed) -> Self {
-        Self { opengl: OPEN_GL_VERSION,
-               window_settings: WindowSettings::new("Game", [WINDOW_WIDTH, WINDOW_HEIGHT]).opengl(OPEN_GL_VERSION).exit_on_esc(true),
-               controller: GameController::new(seed),
-               view: GameView::new(),
-             }
+        Self { 
+            opengl: OPEN_GL_VERSION,
+            window_settings: WindowSettings::new("Game", [WINDOW_WIDTH, WINDOW_HEIGHT]).opengl(OPEN_GL_VERSION).exit_on_esc(true),
+            controller: GameController::new(seed),
+        }
     }
 
     pub fn run(&mut self) {
@@ -34,14 +33,14 @@ impl Game {
         let mut gl = GlGraphics::new(self.opengl);
         
         while let Some(e) = events.next(&mut window) {
+            self.controller.handle_event(&e);
             self.controller.tick();
-
             if let Some(args) = e.render_args(){
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
 
                     clear([1.0; 4], g);
-                    self.view.draw(&self.controller.model, &c, g)
+                    self.controller.view.draw(&self.controller.model, &c, g)
                 });
             }
         }
