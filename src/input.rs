@@ -8,7 +8,12 @@ pub struct InitConfig {
 }
 
 impl InitConfig{
-
+    /// new() 
+    /// 
+    /// args:
+    ///     None
+    /// returns: A new InitConfig struct.
+    /// default debug value is false.
     fn new() -> Self {
         Self {debug: false}
     }
