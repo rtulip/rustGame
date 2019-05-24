@@ -103,26 +103,6 @@ impl Level{
         next_u32(&mut self.rng)
     }
 
-    /// print_level()
-    /// 
-    /// args: 
-    ///     map: &Map: The map to be printed.
-    ///     width: i32: The width of the map.
-    ///     height: i32: The height of the map. 
-    ///     
-    /// Traverseses the map and prints out all Tiles in a grid.
-    pub fn print_level(&self) {
-        for y in 0..self.height {
-            for x in 0..self.width {
-                match self.map.get(&(x,y)){
-                    Some(tile) => print!("{} ", tile),
-                    None => print!("  ")
-                }
-            }
-            println!();
-        }
-    }
-
     /// neighbours()
     /// 
     /// args:
