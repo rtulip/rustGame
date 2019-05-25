@@ -9,6 +9,8 @@ const PLAYER_SPEED: f64 = 0.1;
 pub enum PlayerState{
     Stationary,
     Moving,
+    Attacking,
+    FinishedAttacking,
 }
 
 /// Player
@@ -111,6 +113,20 @@ impl entity::Entity for Player {
 impl state::State for Player {
     type StateEnum = PlayerState;
     fn change_state(&mut self, new_state: Self::StateEnum) {
-        self.state = new_state;
+        match [&self.state, &new_state] {
+            [PlayerState::Attacking, PlayerState::FinishedAttacking] => {
+                self.state = new_state;
+            },
+            [PlayerState::FinishedAttacking, _] => {
+                self.state = new_state;
+            },
+            [PlayerState::Moving, _] => {
+                self.state = new_state;
+            },[PlayerState::Stationary, _] => {
+                self.state = new_state;
+            },
+            _ => ()
+            
+        }
     }
 }

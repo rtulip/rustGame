@@ -1,4 +1,4 @@
-use crate::game::{GameModel, GameView};
+use crate::game::{GameModel, GameView, AnimationEnum};
 use crate::misc::random::Seed;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
@@ -47,6 +47,13 @@ impl GameController {
         if let Some(Button::Keyboard(key)) = e.release_args() {
             if self.keys_pressed.contains(&key) {
                 self.keys_pressed.remove(&key);
+                match key {
+                    Key::Space => {
+                        self.view.settings.player_attack_animation.change_state(AnimationEnum::Finished);
+                        self.model.player.change_state(player::PlayerState::FinishedAttacking);
+                    },
+                    _ => (),
+                }
             }
         }
     }
@@ -55,17 +62,17 @@ impl GameController {
     /// 
     /// Executes a single game tick
     pub fn tick(&mut self) {
-        match [
-            self.keys_pressed.contains(&Key::W),
-        ] {
-            [true] => {
-                self.model.player.change_state(player::PlayerState::Moving);
-            },
-            [false] => {
-                self.model.player.change_state(player::PlayerState::Stationary);
-            },
+        if self.keys_pressed.contains(&Key::W) {
+            self.model.player.change_state(player::PlayerState::Moving);
+        } else {
+            self.model.player.change_state(player::PlayerState::Stationary);
         }
-        
+
+        if self.keys_pressed.contains(&Key::Space) {
+            self.view.settings.player_attack_animation.change_state(AnimationEnum::Active);
+            self.model.player.change_state(player::PlayerState::Attacking);
+        }
+
         self.model.player.tick();
         self.check_player_collision();
     }
