@@ -72,6 +72,7 @@ impl Level {
         
         // Fill untraversable space with walls
         map = Level::fill_walls(map, WIDTH, HEIGHT);
+        map = Level::fill_edge(map, WIDTH, HEIGHT);
         Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
 
     }
@@ -249,6 +250,34 @@ impl Level {
         }
 
         map
+    }
+
+    /// fill_edge()
+    /// 
+    /// args:
+    ///     map: Map: A mutable map of which the edges will be filled
+    ///     width: i32: The width of the Map
+    ///     height: i32 The height of the Map
+    /// 
+    /// Fills in the edges of the Map with Walls, to prevent anyone from exiting
+    /// the Level.
+    fn fill_edge(mut map: Map, width: i32, height:i32) -> Map {
+
+        for w in 0..width {
+            map.remove(&(w,0));
+            map.insert((w,0), Tile::Wall);
+            map.remove(&(w,height-1));
+            map.insert((w,height-1), Tile::Wall);
+        }
+        for h in 0..height {
+            map.remove(&(0,h));
+            map.insert((0,h), Tile::Wall);
+            map.remove(&(width-1,h));
+            map.insert((width-1,h), Tile::Wall);
+        }
+
+        map
+
     }
 
 }
