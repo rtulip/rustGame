@@ -13,8 +13,6 @@ pub enum AnimationEnum {
 }
 
 pub struct MeleeAnimation {
-    pub num_frames: i32,
-    pub frame: i32,
     pub animation_width: f64,
     pub animation_height: f64,
     pub animation_color: Color,
@@ -29,7 +27,6 @@ impl State for MeleeAnimation {
         match [&self.state, &new_state] {
             [AnimationEnum::Active, AnimationEnum::Finished] => {
                 self.state = new_state;
-                self.frame = 0;
             },
             [AnimationEnum::Finished, _] => {
                 self.state = new_state;
@@ -68,8 +65,6 @@ const ANIMATION_COLOR: Color = [0.5, 0.5, 0.5 ,1.0];
 
 const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation 
     {
-        num_frames: PLAYER_SIZE as i32 * 4,
-        frame: 0,
         animation_width: PLAYER_SIZE,
         animation_height: PLAYER_SIZE / 3.0,
         animation_color: ANIMATION_COLOR,
@@ -252,23 +247,5 @@ impl GameView {
             _ => ()
         }
         
-    }
-
-    pub fn tick_animation(&mut self) -> Option<AnimationEnum>{
-
-        match self.settings.player_attack_animation.state {
-            AnimationEnum::Active => {
-                self.settings.player_attack_animation.frame += 1;
-                if self.settings.player_attack_animation.frame == self.settings.player_attack_animation.num_frames {
-                    self.settings.player_attack_animation.change_state(AnimationEnum::Finished);
-                    Some(AnimationEnum::Finished)
-                } else {
-                    None
-                }
-                
-            },
-            _ => None
-        }
-
     }
 }
