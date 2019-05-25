@@ -70,6 +70,16 @@ impl GameController {
         self.check_player_collision();
     }
 
+    /// check_player_collision()
+    /// 
+    /// Checks the position of the player against the level walls. If the bounding
+    /// box of the player overlaps with a wall, the position of the player is 
+    /// corrected by the smallest move. Will take two game ticks to resolve corner
+    /// collisions, as the player is only every moved in one direction at a time. 
+    /// 
+    /// The player's position is approximated as a square despite actually being a
+    /// circle. This is only noticeable on corners. Can improve this to compare 
+    /// circle's to rectangles in the future.
     fn check_player_collision(&mut self) {
         let tile_size = self.view.settings.tile_size;
         let player_size = self.view.settings.player_size;
@@ -105,7 +115,6 @@ impl GameController {
                         } else {
                             self.model.player.position[1] += min_move;
                         }
-                        
 
                     },
                     _ => {}
