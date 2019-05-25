@@ -18,6 +18,8 @@ pub struct MeleeAnimation {
     pub animation_width: f64,
     pub animation_height: f64,
     pub animation_color: Color,
+    pub animation_position: [f64;2],
+    pub animation_rotation: f64,
     pub state: AnimationEnum,
 }
 
@@ -68,9 +70,11 @@ const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation
     {
         num_frames: PLAYER_SIZE as i32 * 4,
         frame: 0,
-        animation_width: PLAYER_SIZE / 3.0,
-        animation_height: PLAYER_SIZE,
+        animation_width: PLAYER_SIZE,
+        animation_height: PLAYER_SIZE / 3.0,
         animation_color: ANIMATION_COLOR,
+        animation_position: [0.0, 0.0],
+        animation_rotation: 0.0,
         state: AnimationEnum::Ready,
     };
 
@@ -132,7 +136,7 @@ impl GameView {
     ///     g: &mut Graphics: A mutable reference to the Graphics
     /// 
     /// Draws the GameModel
-    pub fn draw<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
+    pub fn draw<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         self.draw_level(model, c, g);
         self.draw_player(model, c, g);
     }
@@ -196,7 +200,7 @@ impl GameView {
     ///     g: &mut Graphics: A mutable reference to the Graphics
     /// 
     /// Draws the Player of the GameModel
-    fn draw_player<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
+    fn draw_player<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         model.player.get_shape().draw(
             self.settings.player_color,
             self.settings.player_radius,
@@ -211,24 +215,39 @@ impl GameView {
             AnimationEnum::Active => {
                 let shape = attack::Attack {};
                 let shape = shape.get_shape();
-                let mut extension = self.settings.player_attack_animation.frame;
-                if extension > self.settings.player_attack_animation.num_frames / 2 {
-                    extension = self.settings.player_attack_animation.num_frames - extension;
+                let pi = f64::consts::PI;
+                let dir = model.player.direction;
+                let mut rad = model.player.direction[1] / model.player.direction[0];
+                rad = rad.atan();
+                
+                match [dir[0] < 0.0, dir[1] < 0.0] {
+                    [true, true] => rad = pi * 2.0 - rad,
+                    [true, false] => rad = rad * -1.0,
+                    [false, true] => rad = pi + rad * -1.0,
+                    [false, false] => rad = pi - rad
                 }
-                let mut rad = (model.player.direction[1]/ model.player.direction[0]).atan();
-                if model.player.direction[0] < 0.0 {
-                    rad += f64::consts::PI;
-                }
-                rad -= f64::consts::PI / 2.0;
 
+                rad = pi - rad;
+
+                let player_center = [model.player.position[0] + self.settings.player_size / 2.0,
+                                     model.player.position[1] + self.settings.player_size / 2.0];
+                
+                let tangent_point = [player_center[0] + self.settings.player_radius * rad.cos(),
+                                     player_center[1] + self.settings.player_radius * rad.sin()];
+
+                let animation_corner = [tangent_point[0] - self.settings.player_attack_animation.animation_height / 2.0,
+                                        tangent_point[1] - self.settings.player_attack_animation.animation_height / 2.0];
+                
                 shape.draw( self.settings.player_attack_animation.animation_color,
-                            model.player.position[0] + self.settings.player_attack_animation.animation_width, 
-                            model.player.position[1] + extension as f64 / 2.0, 
+                            animation_corner[0],
+                            animation_corner[1],
                             self.settings.player_attack_animation.animation_width,
                             self.settings.player_attack_animation.animation_height,
                             rad, 
                             c, 
-                            g)
+                            g);                
+                self.settings.player_attack_animation.animation_position = animation_corner;
+                self.settings.player_attack_animation.animation_rotation = rad;
             },
             _ => ()
         }
