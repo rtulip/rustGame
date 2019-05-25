@@ -1,4 +1,4 @@
-use crate::game::{GameModel, GameView};
+use crate::game::{GameModel, GameView, AnimationEnum};
 use crate::misc::random::Seed;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
@@ -57,16 +57,27 @@ impl GameController {
     pub fn tick(&mut self) {
         match [
             self.keys_pressed.contains(&Key::W),
+            self.keys_pressed.contains(&Key::Space),
         ] {
-            [true] => {
+            [_, true] => {
+                self.model.player.change_state(player::PlayerState::Attacking);
+                self.view.settings.player_attack_animation.change_state(AnimationEnum::Active);
+            }
+            [true, _] => {
                 self.model.player.change_state(player::PlayerState::Moving);
             },
-            [false] => {
+            [false, _] => {
                 self.model.player.change_state(player::PlayerState::Stationary);
             },
         }
         
         self.model.player.tick();
+        match self.view.tick_animation() {
+            Some(_state) => {
+                self.model.player.change_state(player::PlayerState::FinishedAttacking);
+            },
+            _ => ()
+        }
         self.check_player_collision();
     }
 

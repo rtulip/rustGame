@@ -1,9 +1,10 @@
 use crate::game::GameModel;
 use crate::traits::shape::Shape;
-use crate::traits::state;
+use crate::traits::state::State;
 use crate::entity::{tile, attack};
-use graphics::{Context, Graphics};
+use graphics::{Context, Graphics,Transformed};
 use graphics::types::Color;
+use std::f64;
 
 pub enum AnimationEnum {
     Active,
@@ -12,18 +13,21 @@ pub enum AnimationEnum {
 }
 
 pub struct MeleeAnimation {
-    pub frame_count: i32,
+    pub num_frames: i32,
+    pub frame: i32,
     pub animation_width: f64,
     pub animation_height: f64,
+    pub animation_color: Color,
     pub state: AnimationEnum,
 }
 
-impl state::State for MeleeAnimation {
+impl State for MeleeAnimation {
     type StateEnum = AnimationEnum;
     fn change_state(&mut self, new_state: Self::StateEnum) {
         match [&self.state, &new_state] {
             [AnimationEnum::Active, AnimationEnum::Finished] => {
                 self.state = new_state;
+                self.frame = 0;
             },
             [AnimationEnum::Finished, _] => {
                 self.state = new_state;
@@ -58,11 +62,15 @@ const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
 /// The color of an unrecognized Shape
 const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
 
+const ANIMATION_COLOR: Color = [0.5, 0.5, 0.5 ,1.0];
+
 const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation 
     {
-        frame_count: PLAYER_SIZE as i32 * 2,
+        num_frames: PLAYER_SIZE as i32 * 4,
+        frame: 0,
         animation_width: PLAYER_SIZE / 3.0,
         animation_height: PLAYER_SIZE,
+        animation_color: ANIMATION_COLOR,
         state: AnimationEnum::Ready,
     };
 
@@ -149,7 +157,8 @@ impl GameView {
                                                      w as f64 * settings.tile_size, 
                                                      h as f64 * settings.tile_size, 
                                                      settings.tile_size,
-                                                     settings.tile_size, 
+                                                     settings.tile_size,
+                                                     0.0, 
                                                      c, 
                                                      g)
                     },
@@ -158,7 +167,8 @@ impl GameView {
                                                      w as f64 * settings.tile_size, 
                                                      h as f64 * settings.tile_size, 
                                                      settings.tile_size,
-                                                     settings.tile_size, 
+                                                     settings.tile_size,
+                                                     0.0, 
                                                      c, 
                                                      g)
                     },
@@ -167,7 +177,8 @@ impl GameView {
                                                      w as f64 * settings.tile_size, 
                                                      h as f64 * settings.tile_size, 
                                                      settings.tile_size,
-                                                     settings.tile_size, 
+                                                     settings.tile_size,
+                                                     0.0,
                                                      c, 
                                                      g)
                     },
@@ -200,15 +211,44 @@ impl GameView {
             AnimationEnum::Active => {
                 let shape = attack::Attack {};
                 let shape = shape.get_shape();
-                shape.draw( self.settings.error_color,
+                let mut extension = self.settings.player_attack_animation.frame;
+                if extension > self.settings.player_attack_animation.num_frames / 2 {
+                    extension = self.settings.player_attack_animation.num_frames - extension;
+                }
+                let mut rad = (model.player.direction[1]/ model.player.direction[0]).atan();
+                if model.player.direction[0] < 0.0 {
+                    rad += f64::consts::PI;
+                }
+                rad -= f64::consts::PI / 2.0;
+
+                shape.draw( self.settings.player_attack_animation.animation_color,
                             model.player.position[0] + self.settings.player_attack_animation.animation_width, 
-                            model.player.position[1] + self.settings.player_attack_animation.animation_height, 
+                            model.player.position[1] + extension as f64 / 2.0, 
                             self.settings.player_attack_animation.animation_width,
-                            self.settings.player_attack_animation.animation_width, 
+                            self.settings.player_attack_animation.animation_height,
+                            rad, 
                             c, 
-                            g);
+                            g)
             },
             _ => ()
+        }
+        
+    }
+
+    pub fn tick_animation(&mut self) -> Option<AnimationEnum>{
+
+        match self.settings.player_attack_animation.state {
+            AnimationEnum::Active => {
+                self.settings.player_attack_animation.frame += 1;
+                if self.settings.player_attack_animation.frame == self.settings.player_attack_animation.num_frames {
+                    self.settings.player_attack_animation.change_state(AnimationEnum::Finished);
+                    Some(AnimationEnum::Finished)
+                } else {
+                    None
+                }
+                
+            },
+            _ => None
         }
 
     }
