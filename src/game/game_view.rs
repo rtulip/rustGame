@@ -1,12 +1,13 @@
 use crate::game::GameModel;
 use crate::traits::shape::Shape;
 use crate::traits::state;
-use crate::entity::tile::Tile;
+use crate::entity::{tile, attack};
 use graphics::{Context, Graphics};
 use graphics::types::Color;
 
 pub enum AnimationEnum {
     Active,
+    Finished,
     Ready,
 }
 
@@ -20,7 +21,18 @@ pub struct MeleeAnimation {
 impl state::State for MeleeAnimation {
     type StateEnum = AnimationEnum;
     fn change_state(&mut self, new_state: Self::StateEnum) {
-        self.state = new_state;
+        match [&self.state, &new_state] {
+            [AnimationEnum::Active, AnimationEnum::Finished] => {
+                self.state = new_state;
+            },
+            [AnimationEnum::Finished, _] => {
+                self.state = new_state;
+            },
+            [AnimationEnum::Ready, _] => {
+                self.state = new_state;
+            },
+            _ => ()
+        }
     }
 }
 
@@ -132,8 +144,8 @@ impl GameView {
         for h in 0..model.level.height {
             for w in 0..model.level.width {
                 match model.level.map.get(&(w,h)){
-                    Some(Tile::Floor) => {
-                        Tile::Floor.get_shape().draw(settings.floor_color,
+                    Some(tile::Tile::Floor) => {
+                        tile::Tile::Floor.get_shape().draw(settings.floor_color,
                                                      w as f64 * settings.tile_size, 
                                                      h as f64 * settings.tile_size, 
                                                      settings.tile_size,
@@ -141,8 +153,8 @@ impl GameView {
                                                      c, 
                                                      g)
                     },
-                    Some(Tile::Wall) => {
-                        Tile::Floor.get_shape().draw(settings.wall_color,
+                    Some(tile::Tile::Wall) => {
+                        tile::Tile::Floor.get_shape().draw(settings.wall_color,
                                                      w as f64 * settings.tile_size, 
                                                      h as f64 * settings.tile_size, 
                                                      settings.tile_size,
@@ -151,7 +163,7 @@ impl GameView {
                                                      g)
                     },
                     _ => {
-                        Tile::Floor.get_shape().draw(settings.error_color,
+                        tile::Tile::Floor.get_shape().draw(settings.error_color,
                                                      w as f64 * settings.tile_size, 
                                                      h as f64 * settings.tile_size, 
                                                      settings.tile_size,
@@ -183,6 +195,21 @@ impl GameView {
             self.settings.player_size,
             c,
             g
-        )
+        );
+        match self.settings.player_attack_animation.state {
+            AnimationEnum::Active => {
+                let shape = attack::Attack {};
+                let shape = shape.get_shape();
+                shape.draw( self.settings.error_color,
+                            model.player.position[0] + self.settings.player_attack_animation.animation_width, 
+                            model.player.position[1] + self.settings.player_attack_animation.animation_height, 
+                            self.settings.player_attack_animation.animation_width,
+                            self.settings.player_attack_animation.animation_width, 
+                            c, 
+                            g);
+            },
+            _ => ()
+        }
+
     }
 }
