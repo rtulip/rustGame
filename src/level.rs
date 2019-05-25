@@ -252,6 +252,15 @@ impl Level {
         map
     }
 
+    /// fill_edge()
+    /// 
+    /// args:
+    ///     map: Map: A mutable map of which the edges will be filled
+    ///     width: i32: The width of the Map
+    ///     height: i32 The height of the Map
+    /// 
+    /// Fills in the edges of the Map with Walls, to prevent anyone from exiting
+    /// the Level.
     fn fill_edge(mut map: Map, width: i32, height:i32) -> Map {
 
         for w in 0..width {
