@@ -57,24 +57,13 @@ impl GameController {
     pub fn tick(&mut self) {
         match [
             self.keys_pressed.contains(&Key::W),
-            self.keys_pressed.contains(&Key::S),
         ] {
-            [true, true] => {
-                self.model.player.backwards = false;
-                self.model.player.change_state(player::PlayerState::Stationary);
-            },
-            [true, false] => {
-                self.model.player.backwards = false;
+            [true] => {
                 self.model.player.change_state(player::PlayerState::Moving);
             },
-            [false, true] => {
-                self.model.player.backwards = true;
-                self.model.player.change_state(player::PlayerState::Moving);
-            },
-            [false, false] => {
-                self.model.player.backwards = false;
+            [false] => {
                 self.model.player.change_state(player::PlayerState::Stationary);
-            }
+            },
         }
         
         self.model.player.tick();
@@ -98,37 +87,28 @@ impl GameController {
                 match self.model.level.map.get(&(w,h)) {
                     Some(tile::Tile::Wall) => {
                         let tile_pos = [w as f64 * tile_size, h as f64 * tile_size];
-
-                        match [tile_pos[0] < player_pos[0], tile_pos[1] < player_pos[1]] {
-                            [true, true] => {
-                                self.model.player.position[0] += tile_pos[0] + tile_size - player_pos[0] + 0.1;
-                                self.model.player.position[1] += tile_pos[1] + tile_size - player_pos[1] + 0.1;
-                            },
-                            [false, true] => {
+                        match [
+                            self.model.player.direction[0].abs() > self.model.player.direction[1].abs(), 
+                            self.model.player.direction[0] > 0.0,
+                            self.model.player.direction[1] > 0.0,
+                        ] {
+                            [true, true, _] => {
                                 self.model.player.position[0] += tile_pos[0] - player_pos[0] - player_size - 0.1;
-                                self.model.player.position[1] += tile_pos[1] + tile_size - player_pos[1] + 0.1;
                             },
-                            [true, false] => {
+                            [true, false, _] => {
                                 self.model.player.position[0] += tile_pos[0] + tile_size - player_pos[0] + 0.1;
+                            },
+                            [false, _, true] => {
                                 self.model.player.position[1] += tile_pos[1] - player_pos[1] - player_size - 0.1;
-                            }, 
-                            [false, false] => {
-                                self.model.player.position[0] += tile_pos[0] - player_pos[0] - player_size - 0.1;
-                                self.model.player.position[1] += tile_pos[1] - player_pos[1] - player_size - 0.1;
+                            },
+                            [false, _, false] => {
+                                self.model.player.position[1] += tile_pos[1] + tile_size - player_pos[1] + 0.1;
                             }
-                        }
-                        
-                        found_collision = true;
+                        };
                     },
                     _ => {}
                 }
             }
-        }
-
-        if found_collision {
-            println!("Collision");
-        } else {
-            println!("No Collision");
         }
     }
 
