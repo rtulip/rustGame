@@ -1,8 +1,28 @@
 use crate::game::GameModel;
 use crate::traits::shape::Shape;
+use crate::traits::state;
 use crate::entity::tile::Tile;
 use graphics::{Context, Graphics};
 use graphics::types::Color;
+
+pub enum AnimationEnum {
+    Active,
+    Ready,
+}
+
+pub struct MeleeAnimation {
+    pub frame_count: i32,
+    pub animation_width: f64,
+    pub animation_height: f64,
+    pub state: AnimationEnum,
+}
+
+impl state::State for MeleeAnimation {
+    type StateEnum = AnimationEnum;
+    fn change_state(&mut self, new_state: Self::StateEnum) {
+        self.state = new_state;
+    }
+}
 
 /// TILE_SIZE Constant
 /// The size of a Tile in pixels
@@ -26,6 +46,15 @@ const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
 /// The color of an unrecognized Shape
 const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
 
+const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation 
+    {
+        frame_count: PLAYER_SIZE as i32 * 2,
+        animation_width: PLAYER_SIZE / 3.0,
+        animation_height: PLAYER_SIZE,
+        state: AnimationEnum::Ready,
+    };
+
+
 /// GameViewSettings 
 /// 
 /// A structure containing the needed information to draw each Entity and Shape
@@ -38,9 +67,11 @@ pub struct GameViewSettings {
     pub player_size: f64,
     pub player_radius: f64,
     pub player_color: Color,
+    pub player_attack_animation: MeleeAnimation,
     pub error_color: Color,
     
 }
+
 impl GameViewSettings {
     
     fn new() -> Self {
@@ -52,6 +83,7 @@ impl GameViewSettings {
             player_size: PLAYER_SIZE,
             player_radius: PLAYER_RADIUS,
             player_color: PLAYER_COLOR,
+            player_attack_animation: PLAYER_ATTACK_ANIMATION,  
             error_color: ERROR_COLOR
         }
 
