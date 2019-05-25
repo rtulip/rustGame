@@ -2,7 +2,8 @@ use crate::game::{GameModel, GameView};
 use crate::misc::random::Seed;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
-use crate::entity::player::PlayerState;
+use crate::entity::{player, tile};
+
 use std::collections::HashSet;
 
 use piston::input::{GenericEvent, Button, Key};
@@ -56,27 +57,70 @@ impl GameController {
     pub fn tick(&mut self) {
         match [
             self.keys_pressed.contains(&Key::W),
-            self.keys_pressed.contains(&Key::S),
         ] {
-            [true, true] => {
-                self.model.player.backwards = false;
-                self.model.player.change_state(PlayerState::Stationary);
+            [true] => {
+                self.model.player.change_state(player::PlayerState::Moving);
             },
-            [true, false] => {
-                self.model.player.backwards = false;
-                self.model.player.change_state(PlayerState::Moving);
+            [false] => {
+                self.model.player.change_state(player::PlayerState::Stationary);
             },
-            [false, true] => {
-                self.model.player.backwards = true;
-                self.model.player.change_state(PlayerState::Moving);
-            },
-            [false, false] => {
-                self.model.player.backwards = false;
-                self.model.player.change_state(PlayerState::Stationary);
-            }
         }
         
         self.model.player.tick();
+        self.check_player_collision();
+    }
+
+    /// check_player_collision()
+    /// 
+    /// Checks the position of the player against the level walls. If the bounding
+    /// box of the player overlaps with a wall, the position of the player is 
+    /// corrected by the smallest move. Will take two game ticks to resolve corner
+    /// collisions, as the player is only every moved in one direction at a time. 
+    /// 
+    /// The player's position is approximated as a square despite actually being a
+    /// circle. This is only noticeable on corners. Can improve this to compare 
+    /// circle's to rectangles in the future.
+    fn check_player_collision(&mut self) {
+        let tile_size = self.view.settings.tile_size;
+        let player_size = self.view.settings.player_size;
+        let player_pos = self.model.player.position;
+
+        let min_x = ( player_pos[0] / tile_size).floor() as i32;
+        let max_x = ((player_pos[0] + player_size) / tile_size).floor() as i32 + 1;
+
+        let min_y = ( player_pos[1] / tile_size).floor() as i32;
+        let max_y = ((player_pos[1] + player_size) / tile_size).floor() as i32 + 1;
+        
+        for h in min_y..max_y {
+            for w in min_x..max_x {
+                match self.model.level.map.get(&(w,h)) {
+                    Some(tile::Tile::Wall) => {
+                        let tile_pos = [w as f64 * tile_size, h as f64 * tile_size];
+                        let shift_left = tile_pos[0] - player_pos[0] - player_size - 0.1;
+                        let shift_right = tile_pos[0] + tile_size - player_pos[0] + 0.1;
+                        let shift_up = tile_pos[1] - player_pos[1] - player_size - 0.1;
+                        let shift_down = tile_pos[1] + tile_size - player_pos[1] + 0.1;
+    
+                        let moves = [shift_left, shift_right, shift_up, shift_down];
+                        let mut min_move = moves[0];
+
+                        for i in 0..4 {
+                            if moves[i].abs() < min_move.abs() {
+                                min_move = moves[i];
+                            }
+                        }
+
+                        if min_move == shift_left || min_move == shift_right {
+                            self.model.player.position[0] += min_move;
+                        } else {
+                            self.model.player.position[1] += min_move;
+                        }
+
+                    },
+                    _ => {}
+                }
+            }
+        }
     }
 
 }

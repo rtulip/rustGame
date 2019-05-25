@@ -12,7 +12,7 @@ const TILE_SIZE: f64 = 20.0;
 const PLAYER_SIZE: f64 = 16.0;
 /// PLAYER_RADIUS Constant
 /// The radius of the Player in pixels
-const PLAYER_RADIUS: f64 = 8.0;
+const PLAYER_RADIUS: f64 = PLAYER_SIZE/2.0;
 /// FLOOR_COLOR Constant
 /// The color of a Tile::Floor
 const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];

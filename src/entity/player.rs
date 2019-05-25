@@ -20,7 +20,6 @@ pub struct Player{
     pub health: i32,
     pub state: PlayerState,
     pub direction: [f64; 2],
-    pub backwards: bool
 }
 
 impl Player {
@@ -30,7 +29,6 @@ impl Player {
             health: STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: [0.0, 1.0],
-            backwards: false,
         }
     }
 
@@ -42,17 +40,8 @@ impl Player {
     pub fn update_position(&mut self) {
         match self.state {
             PlayerState::Moving => {
-                match self.backwards {
-                    true => {
-                        self.position[0] += self.direction[0] * PLAYER_SPEED * -1.0;
-                        self.position[1] += self.direction[1] * PLAYER_SPEED * -1.0;
-                    },
-                    false => {
-                        self.position[0] += self.direction[0] * PLAYER_SPEED;
-                        self.position[1] += self.direction[1] * PLAYER_SPEED;
-                    }
-                }
-                
+                self.position[0] += self.direction[0] * PLAYER_SPEED;
+                self.position[1] += self.direction[1] * PLAYER_SPEED;
             },
             _ => {}
         }
