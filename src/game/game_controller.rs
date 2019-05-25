@@ -62,21 +62,6 @@ impl GameController {
     /// 
     /// Executes a single game tick
     pub fn tick(&mut self) {
-        match [
-            self.keys_pressed.contains(&Key::W),
-            self.keys_pressed.contains(&Key::Space),
-        ] {
-            [_, true] => {
-                self.model.player.change_state(player::PlayerState::Attacking);
-                self.view.settings.player_attack_animation.change_state(AnimationEnum::Active);
-            }
-            [true, _] => {
-                self.model.player.change_state(player::PlayerState::Moving);
-            },
-            [false, _] => {
-                self.model.player.change_state(player::PlayerState::Stationary);
-            },
-        }
         if self.keys_pressed.contains(&Key::W) {
             self.model.player.change_state(player::PlayerState::Moving);
         } else {
