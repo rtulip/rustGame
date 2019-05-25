@@ -81,30 +81,32 @@ impl GameController {
         let min_y = ( player_pos[1] / tile_size).floor() as i32;
         let max_y = ((player_pos[1] + player_size) / tile_size).floor() as i32 + 1;
         
-        let mut found_collision = false;
         for h in min_y..max_y {
             for w in min_x..max_x {
                 match self.model.level.map.get(&(w,h)) {
                     Some(tile::Tile::Wall) => {
                         let tile_pos = [w as f64 * tile_size, h as f64 * tile_size];
-                        match [
-                            self.model.player.direction[0].abs() > self.model.player.direction[1].abs(), 
-                            self.model.player.direction[0] > 0.0,
-                            self.model.player.direction[1] > 0.0,
-                        ] {
-                            [true, true, _] => {
-                                self.model.player.position[0] += tile_pos[0] - player_pos[0] - player_size - 0.1;
-                            },
-                            [true, false, _] => {
-                                self.model.player.position[0] += tile_pos[0] + tile_size - player_pos[0] + 0.1;
-                            },
-                            [false, _, true] => {
-                                self.model.player.position[1] += tile_pos[1] - player_pos[1] - player_size - 0.1;
-                            },
-                            [false, _, false] => {
-                                self.model.player.position[1] += tile_pos[1] + tile_size - player_pos[1] + 0.1;
+                        let shift_left = tile_pos[0] - player_pos[0] - player_size - 0.1;
+                        let shift_right = tile_pos[0] + tile_size - player_pos[0] + 0.1;
+                        let shift_up = tile_pos[1] - player_pos[1] - player_size - 0.1;
+                        let shift_down = tile_pos[1] + tile_size - player_pos[1] + 0.1;
+    
+                        let moves = [shift_left, shift_right, shift_up, shift_down];
+                        let mut min_move = moves[0];
+
+                        for i in 0..4 {
+                            if moves[i].abs() < min_move.abs() {
+                                min_move = moves[i];
                             }
-                        };
+                        }
+
+                        if min_move == shift_left || min_move == shift_right {
+                            self.model.player.position[0] += min_move;
+                        } else {
+                            self.model.player.position[1] += min_move;
+                        }
+                        
+
                     },
                     _ => {}
                 }
