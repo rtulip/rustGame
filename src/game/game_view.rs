@@ -194,7 +194,8 @@ impl GameView {
     ///     c: &Context: The graphics Context
     ///     g: &mut Graphics: A mutable reference to the Graphics
     /// 
-    /// Draws the Player of the GameModel
+    /// Draws the Player of the GameModel. If the player is attacking, the 
+    /// Player's sword is drawn as well.
     fn draw_player<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         model.player.get_shape().draw(
             self.settings.player_color,
