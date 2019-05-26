@@ -16,3 +16,16 @@ impl shape::Shape for Enemy {
         shape::EllipseType {}
     }
 }
+
+impl entity::Entity for Enemy {
+    fn tick(&mut self) {
+        // Todo
+    }
+}
+
+impl state::State for Enemy {
+    type StateEnum = EnemyState;
+    fn change_state(&mut self, new_state: Self::StateEnum) {
+        self.state = new_state;
+    }
+}
