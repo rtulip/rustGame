@@ -54,6 +54,8 @@ const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
 /// WALL_COLOR Constant
 /// The color of a Tile::Wall
 const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
+const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
+const BEACON_SIZE: f64 = 18.0;
 /// PLAYER_COLOR Constant
 /// The color of a Player
 const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
@@ -83,6 +85,8 @@ pub struct GameViewSettings {
     pub tile_size: f64,
     pub floor_color: Color,
     pub wall_color: Color,
+    pub beacon_color: Color,
+    pub beacon_size: f64,
     pub player_size: f64,
     pub player_radius: f64,
     pub player_color: Color,
@@ -99,6 +103,8 @@ impl GameViewSettings {
             tile_size: TILE_SIZE,
             floor_color: FLOOR_COLOR,
             wall_color: WALL_COLOR,
+            beacon_color: BEACON_COLOR,
+            beacon_size: BEACON_SIZE,
             player_size: PLAYER_SIZE,
             player_radius: PLAYER_RADIUS,
             player_color: PLAYER_COLOR,
@@ -248,5 +254,17 @@ impl GameView {
             _ => ()
         }
         
+    }
+
+    fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+        model.beacon.get_shape().draw(
+            self.settings.beacon_color,
+            model.beacon.position.0 as f64 * self.settings.beacon_size, 
+            model.beacon.position.1 as f64 * self.settings.beacon_size, 
+            self.settings.beacon_size,
+            self.settings.beacon_size,
+            model.beacon.rotation, 
+            c, 
+            g);
     }
 }
