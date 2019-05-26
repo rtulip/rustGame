@@ -1,4 +1,6 @@
 use crate::traits::{shape, entity, state};
+const ENEMY_SPEED: f64 = 0.1;
+
 pub enum EnemyState {
     Beacon,
     Player,
@@ -19,7 +21,8 @@ impl shape::Shape for Enemy {
 
 impl entity::Entity for Enemy {
     fn tick(&mut self) {
-        // Todo
+        self.position[0] += self.direction[0] * ENEMY_SPEED;
+        self.position[1] += self.direction[0] * ENEMY_SPEED;
     }
 }
 
