@@ -62,4 +62,30 @@ impl GameModel {
 
     }
 
+    fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
+        
+        let mut open_idx = (0,0);
+        let mut open_count = 0;
+
+        for h in 2..level.height-2 {
+            for w in 2..level.width-2 {
+                let mut count = 0;
+                for y in h-2..h+2 {
+                    for x in w-2..w+2{
+                        match level.map.get(&(x,y)) {
+                            Some(Tile::Floor) => count += 1,
+                            _ => (),
+                        }
+                    }
+                }
+                if count > open_count{
+                    open_idx = (w,h);
+                    open_count = count;
+                }
+            }
+        }
+
+        open_idx
+    } 
+
 }
