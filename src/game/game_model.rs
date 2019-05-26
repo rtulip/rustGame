@@ -19,10 +19,11 @@ impl GameModel {
     pub fn new(seed: Seed) -> Self {
         let mut level = Level::new(seed);
         let mut rng = from_seed(seed);
-        let player_spawn = GameModel::find_player_spawn(&level, &mut rng);
-        let mut player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let mut beacon = Beacon::new(beacon_spawn);
+        let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
+        let mut player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
+        
         Self {
             level: level,
             rng: rng,
@@ -41,12 +42,12 @@ impl GameModel {
     ///         spawn point
     /// 
     /// Chooses a spawn point randomly from any Tile::Floor spaces in the Level
-    fn find_player_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
+    fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> MapIdx {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
 
-        for h in 0..level.height {
-            for w in 0..level.width {
+        for h in beacon.position.1-10..beacon.position.1+11 {
+            for w in beacon.position.0-10..beacon.position.0+11 {
                 match level.map.get(&(w,h)) {
                     Some(Tile::Floor) => {
                         spawnable_spaces.push((w,h));
@@ -71,8 +72,8 @@ impl GameModel {
         let mut open_idx = (0,0);
         let mut open_count = 0;
 
-        for h in 2..level.height-2 {
-            for w in 2..level.width-2 {
+        for h in level.height/4..level.height*3/4 {
+            for w in level.width/4..level.width*3/4 {
                 let mut count = 0;
                 for y in h-2..h+2 {
                     for x in w-2..w+2{
