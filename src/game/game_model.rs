@@ -37,6 +37,8 @@ impl GameModel {
     /// args:
     ///     level: &Level: A reference to the level to serach for a player 
     ///         spwan point
+    ///     beacon: &Beacon: A reference to the beacon which the player is to
+    ///         spawn near
     ///     rng: &mut RNG: A mutable reference to a random number generator
     ///         which is used to decide which of the open spaces is to be the
     ///         spawn point
@@ -67,6 +69,16 @@ impl GameModel {
 
     }
 
+    /// find_beacon_spawn()
+    /// 
+    /// level: &Level: A reference to the level to serach for a beacon 
+    ///         spwan point
+    ///     rng: &mut RNG: A mutable reference to a random number generator
+    ///         which is used to decide which of the open spaces is to be the
+    ///         spawn point
+    /// 
+    /// Finds an open space to spawn the beacon. To be sufficiently open there 
+    /// must be at least 15 more Floors than Walls in a surrounding area.
     fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
         
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
@@ -75,8 +87,8 @@ impl GameModel {
         for h in level.height/4..level.height*3/4 {
             for w in level.width/4..level.width*3/4 {
                 let mut count = 0;
-                for y in h-2..h+2 {
-                    for x in w-2..w+2{
+                for y in h-3..h+3 {
+                    for x in w-3..w+3{
                         match level.map.get(&(x,y)) {
                             Some(Tile::Floor) => count += 1,
                             Some(Tile::Wall) => count -= 1,
@@ -84,10 +96,20 @@ impl GameModel {
                         }
                     }
                 }
-                println!("w: {}, h: {}, count: {}",w,h,count);
-                if count > threshold{
-                    spawnable_spaces.push((w,h));
+                if count > threshold {
+                    match [
+                        level.map.get(&(w-1,h-1)),
+                        level.map.get(&(w-1,h)),
+                        level.map.get(&(w,h-1)),
+                        level.map.get(&(w,h)),
+                    ] {
+                        [Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor)] => {
+                            spawnable_spaces.push((w,h));
+                        },
+                        _ => (),
+                    }
                 }
+                
             }
         }
 
