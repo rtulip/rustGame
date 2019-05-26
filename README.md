@@ -41,3 +41,7 @@ Move:
 
 - `w` to move forward
 - `cursor` for player direction
+
+Attack: 
+- `space` to attack
+- `cursor` for direction
