@@ -75,6 +75,7 @@ impl GameController {
 
         self.model.player.tick();
         self.check_player_collision();
+        self.model.beacon.tick();
     }
 
     /// check_player_collision()
