@@ -49,7 +49,13 @@ impl RectangleType {
     /// 
     /// Draws an Rectangle in the specified Color at the specified location
     pub fn draw<G: Graphics>(&self, color: Color, x: f64, y: f64, width: f64, height: f64, rotation: f64, c: &Context, g: &mut G) {
-        Rectangle::new(color).draw([0.0, 0.0, width, height], &c.draw_state, c.transform.trans(x,y).rot_rad(rotation), g);
+        let mut transform = c.transform;
+        if rotation == 0.0 {
+            transform = transform.trans(x,y);
+        } else {
+            transform = transform.trans(x,y).rot_rad(rotation).trans(-width/2.0,-height/2.0);
+        }
+        Rectangle::new(color).draw([0.0, 0.0, width, height], &c.draw_state, transform, g);
     }
 
 }

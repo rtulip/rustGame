@@ -140,6 +140,7 @@ impl GameView {
     pub fn draw<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         self.draw_level(model, c, g);
         self.draw_player(model, c, g);
+        self.draw_beacon(model, c, g);
     }
 
     /// draw_level()
@@ -259,8 +260,8 @@ impl GameView {
     fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         model.beacon.get_shape().draw(
             self.settings.beacon_color,
-            model.beacon.position.0 as f64 * self.settings.beacon_size, 
-            model.beacon.position.1 as f64 * self.settings.beacon_size, 
+            model.beacon.position.0 as f64 * self.settings.tile_size, 
+            model.beacon.position.1 as f64 * self.settings.tile_size, 
             self.settings.beacon_size,
             self.settings.beacon_size,
             model.beacon.rotation, 
