@@ -78,11 +78,11 @@ impl GameModel {
     ///         spawn point
     /// 
     /// Finds an open space to spawn the beacon. To be sufficiently open there 
-    /// must be at least 15 more Floors than Walls in a surrounding area.
+    /// must be at least threshold more Floors than Walls in a surrounding area
     fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
         
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
-        let threshold = 14;
+        let threshold = 30;
 
         for h in level.height/4..level.height*3/4 {
             for w in level.width/4..level.width*3/4 {
@@ -105,6 +105,7 @@ impl GameModel {
                     ] {
                         [Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor)] => {
                             spawnable_spaces.push((w,h));
+                            println!("Count: {}", count);
                         },
                         _ => (),
                     }
