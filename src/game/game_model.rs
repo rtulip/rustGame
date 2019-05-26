@@ -69,8 +69,8 @@ impl GameModel {
 
     fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
         
-        let mut open_idx = (0,0);
-        let mut open_count = 0;
+        let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
+        let threshold = 14;
 
         for h in level.height/4..level.height*3/4 {
             for w in level.width/4..level.width*3/4 {
@@ -79,18 +79,26 @@ impl GameModel {
                     for x in w-2..w+2{
                         match level.map.get(&(x,y)) {
                             Some(Tile::Floor) => count += 1,
+                            Some(Tile::Wall) => count -= 1,
                             _ => (),
                         }
                     }
                 }
-                if count > open_count{
-                    open_idx = (w,h);
-                    open_count = count;
+                println!("w: {}, h: {}, count: {}",w,h,count);
+                if count > threshold{
+                    spawnable_spaces.push((w,h));
                 }
             }
         }
 
-        open_idx
+        if spawnable_spaces.len() == 0 {
+            panic!("No spawnable spaces!");
+        }
+
+        let idx = next_u32(rng) as usize % spawnable_spaces.len();
+        let idx = spawnable_spaces.remove(idx);
+        idx
+
     } 
 
 }
