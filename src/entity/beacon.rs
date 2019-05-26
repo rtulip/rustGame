@@ -1,17 +1,18 @@
 use crate::traits::{shape, entity};
+use crate::level::MapIdx;
 use std::f64;
 
 const ROTATION_SPEED: f64 = 0.01;
 const STARTING_HEALTH: i32 = 10;
 
 pub struct Beacon {
-    pub position: [f64;2],
+    pub position: MapIdx,
     pub health: i32,
     pub rotation: f64,
 }
 
 impl Beacon {
-    pub fn new(pos: [f64;2]) -> Self {
+    pub fn new(pos: MapIdx) -> Self {
         Self {
             position: pos,
             health: STARTING_HEALTH,

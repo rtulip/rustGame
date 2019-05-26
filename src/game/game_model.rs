@@ -2,15 +2,16 @@ use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
+use crate::entity::beacon::Beacon;
 
 /// GameModel 
 /// 
 /// A model of the games entities and controls game logic
 pub struct GameModel {
-    // beacon: Beacon,
     // entities: Vec<Entity>,
     pub level: Level,
     pub player: Player,
+    pub beacon: Beacon,
     rng: RNG,
 }
 
@@ -20,10 +21,13 @@ impl GameModel {
         let mut rng = from_seed(seed);
         let player_spawn = GameModel::find_player_spawn(&level, &mut rng);
         let mut player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
+        let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
+        let mut beacon = Beacon::new(beacon_spawn);
         Self {
             level: level,
             rng: rng,
             player: player,
+            beacon: beacon,
         }
     }
 
