@@ -105,7 +105,6 @@ impl GameModel {
                     ] {
                         [Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor)] => {
                             spawnable_spaces.push((w,h));
-                            println!("Count: {}", count);
                         },
                         _ => (),
                     }
