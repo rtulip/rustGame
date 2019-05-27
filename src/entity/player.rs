@@ -60,7 +60,7 @@ impl Player {
     fn convert_to_unit_vector(&self, vector: [f64; 2]) -> [f64;2] {
         let ax = vector[0].abs();
         let ay = vector[1].abs();
-        let mut ratio = 1.0;
+        let mut ratio;
         match ax > ay {
             true => {
                 ratio = 1.0 / ax;

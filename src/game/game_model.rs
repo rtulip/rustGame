@@ -12,21 +12,19 @@ pub struct GameModel {
     pub level: Level,
     pub player: Player,
     pub beacon: Beacon,
-    rng: RNG,
 }
 
 impl GameModel {
     pub fn new(seed: Seed) -> Self {
-        let mut level = Level::new(seed);
+        let level = Level::new(seed);
         let mut rng = from_seed(seed);
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
-        let mut beacon = Beacon::new(beacon_spawn);
+        let beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let mut player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
+        let player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
         
         Self {
             level: level,
-            rng: rng,
             player: player,
             beacon: beacon,
         }
