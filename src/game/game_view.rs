@@ -207,8 +207,8 @@ impl GameView {
         model.player.get_shape().draw(
             self.settings.player_color,
             self.settings.player_radius,
-            model.player.position[0],
-            model.player.position[1],
+            model.player.position.x,
+            model.player.position.y,
             self.settings.player_size,
             self.settings.player_size,
             c,
@@ -232,8 +232,8 @@ impl GameView {
 
                 rad = pi - rad;
 
-                let player_center = [model.player.position[0] + self.settings.player_size / 2.0,
-                                     model.player.position[1] + self.settings.player_size / 2.0];
+                let player_center = [model.player.position.x + self.settings.player_size / 2.0,
+                                     model.player.position.y + self.settings.player_size / 2.0];
                 
                 let tangent_point = [player_center[0] + self.settings.player_radius * rad.cos(),
                                      player_center[1] + self.settings.player_radius * rad.sin()];

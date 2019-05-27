@@ -1,5 +1,6 @@
 pub use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
+use crate::misc::point2d::Point2;
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 use crate::entity::beacon::Beacon;
@@ -23,7 +24,7 @@ impl GameModel {
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let mut beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let mut player = Player::new([player_spawn.x as f64 * 20.0, player_spawn.y as f64 * 20.0]);
+        let mut player = Player::new( Point2{x: player_spawn.x as f64 * 20.0, y: player_spawn.y as f64 * 20.0} );
         let enemies: Vec<Enemy> = Vec::new();
         Self {
             level: level,

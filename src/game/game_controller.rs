@@ -1,5 +1,6 @@
 use crate::game::{GameModel, GameView, AnimationEnum};
 use crate::misc::random::Seed;
+use crate::misc::point2d::Point2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::entity::{player, tile};
@@ -16,7 +17,7 @@ use piston::input::{GenericEvent, Button, Key};
 pub struct GameController {
     pub model: GameModel,
     pub view: GameView,
-    cursor_pos: [f64;2],
+    cursor_pos: Point2,
     keys_pressed: HashSet<Key>,
 }
 
@@ -25,7 +26,7 @@ impl GameController {
         let mut controller = Self {
             model: GameModel::new(seed),
             view: GameView::new(),
-            cursor_pos: [0.0; 2],
+            cursor_pos: Point2 {x: 0.0, y: 0.0},
             keys_pressed: HashSet::new(),
         };
 
@@ -44,8 +45,8 @@ impl GameController {
     /// relseases
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
-            self.cursor_pos = pos;
-            self.model.player.update_direction(self.cursor_pos, self.view.settings.player_size);
+            self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
+            self.model.player.update_direction(&self.cursor_pos, self.view.settings.player_size);
         }
         if let Some(Button::Keyboard(key)) = e.press_args() {
             self.keys_pressed.insert(key);
@@ -97,23 +98,22 @@ impl GameController {
     fn check_player_collision(&mut self) {
         let tile_size = self.view.settings.tile_size;
         let player_size = self.view.settings.player_size;
-        let player_pos = self.model.player.position;
 
-        let min_x = ( player_pos[0] / tile_size).floor() as i32;
-        let max_x = ((player_pos[0] + player_size) / tile_size).floor() as i32 + 1;
+        let min_x = ( self.model.player.position.x / tile_size).floor() as i32;
+        let max_x = ((self.model.player.position.x + player_size) / tile_size).floor() as i32 + 1;
 
-        let min_y = ( player_pos[1] / tile_size).floor() as i32;
-        let max_y = ((player_pos[1] + player_size) / tile_size).floor() as i32 + 1;
+        let min_y = ( self.model.player.position.y / tile_size).floor() as i32;
+        let max_y = ((self.model.player.position.y + player_size) / tile_size).floor() as i32 + 1;
         
         for h in min_y..max_y {
             for w in min_x..max_x {
                 match self.model.level.map.get(&MapIdx::new(w,h)) {
                     Some(tile::Tile::Wall) => {
                         let tile_pos = [w as f64 * tile_size, h as f64 * tile_size];
-                        let shift_left = tile_pos[0] - player_pos[0] - player_size - 0.1;
-                        let shift_right = tile_pos[0] + tile_size - player_pos[0] + 0.1;
-                        let shift_up = tile_pos[1] - player_pos[1] - player_size - 0.1;
-                        let shift_down = tile_pos[1] + tile_size - player_pos[1] + 0.1;
+                        let shift_left = tile_pos[0] - self.model.player.position.x - player_size - 0.1;
+                        let shift_right = tile_pos[0] + tile_size - self.model.player.position.x + 0.1;
+                        let shift_up = tile_pos[1] - self.model.player.position.y - player_size - 0.1;
+                        let shift_down = tile_pos[1] + tile_size - self.model.player.position.y + 0.1;
     
                         let moves = [shift_left, shift_right, shift_up, shift_down];
                         let mut min_move = moves[0];
@@ -125,9 +125,9 @@ impl GameController {
                         }
 
                         if min_move == shift_left || min_move == shift_right {
-                            self.model.player.position[0] += min_move;
+                            self.model.player.position.x += min_move;
                         } else {
-                            self.model.player.position[1] += min_move;
+                            self.model.player.position.y += min_move;
                         }
 
                     },

@@ -1,5 +1,6 @@
 use crate::traits::{shape, entity, state};
 use crate::misc::vector2d::Vec2;
+use crate::misc::point2d::Point2;
 use std::f64;
 const STARTING_HEALTH: i32 = 10;
 const PLAYER_SPEED: f64 = 0.1;
@@ -19,14 +20,14 @@ pub enum PlayerState{
 /// A representation of the Player. The Player struct is responsible for 
 /// the logic surrounding how to update itself.
 pub struct Player{
-    pub position: [f64; 2],
+    pub position: Point2,
     pub health: i32,
     pub state: PlayerState,
     pub direction: Vec2,
 }
 
 impl Player {
-    pub fn new(start_position: [f64; 2]) -> Self {
+    pub fn new(start_position: Point2) -> Self {
         Player {
             position: start_position, 
             health: STARTING_HEALTH,
@@ -43,8 +44,8 @@ impl Player {
     pub fn update_position(&mut self) {
         match self.state {
             PlayerState::Moving => {
-                self.position[0] += self.direction.x * PLAYER_SPEED;
-                self.position[1] += self.direction.y * PLAYER_SPEED;
+                self.position.x += self.direction.x * PLAYER_SPEED;
+                self.position.y += self.direction.y * PLAYER_SPEED;
             },
             _ => {}
         }
@@ -60,10 +61,10 @@ impl Player {
     /// 
     /// Sets the Player direction to point towards the cursor. The direction 
     /// must be a unit vector. 
-    pub fn update_direction(&mut self, cursor_pos: [f64; 2], player_size: f64) {
+    pub fn update_direction(&mut self, cursor_pos: &Point2, player_size: f64) {
 
-        self.direction = Vec2::new_unit(cursor_pos[0] - self.position[0] + player_size/2.0,
-                                        cursor_pos[1] - self.position[1] + player_size/2.0);
+        self.direction = Vec2::new_unit(cursor_pos.x - self.position.y + player_size/2.0,
+                                        cursor_pos.x - self.position.y + player_size/2.0);
     }
 
 }
