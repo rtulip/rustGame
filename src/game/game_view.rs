@@ -45,6 +45,8 @@ const TILE_SIZE: f64 = 20.0;
 const PLAYER_SIZE: f64 = 16.0;
 const PLAYER_RADIUS: f64 = PLAYER_SIZE/2.0;
 const BEACON_SIZE: f64 = 18.0;
+const ENEMY_SIZE: f64 = 16.0;
+const ENEMY_RADIUS: f64 = ENEMY_SIZE/2.0;
 
 const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
 const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
@@ -80,6 +82,9 @@ pub struct GameViewSettings {
     pub player_radius: f64,
     pub player_color: Color,
     pub player_attack_animation: MeleeAnimation,
+    pub enemy_color: Color,
+    pub enemy_size: f64,
+    pub enemy_radius: f64,
     pub error_color: Color,
     
 }
@@ -97,7 +102,11 @@ impl GameViewSettings {
             player_size: PLAYER_SIZE,
             player_radius: PLAYER_RADIUS,
             player_color: PLAYER_COLOR,
-            player_attack_animation: PLAYER_ATTACK_ANIMATION,  
+            player_attack_animation: PLAYER_ATTACK_ANIMATION,
+            enemy_color: ENEMY_COLOR,
+            enemy_size: ENEMY_SIZE,
+            enemy_radius: ENEMY_RADIUS,
+
             error_color: ERROR_COLOR
         }
 
@@ -257,5 +266,20 @@ impl GameView {
             model.beacon.rotation, 
             c, 
             g);
+    }
+
+    fn draw_enemies<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+        for enemy in model.enemies.iter() {
+            enemy.get_shape().draw(
+                self.settings.enemy_color,
+                self.settings.enemy_radius,
+                enemy.position[0],
+                enemy.position[1],
+                self.settings.enemy_size,
+                self.settings.enemy_size,
+                c,
+                g
+            )
+        }
     }
 }
