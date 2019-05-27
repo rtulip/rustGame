@@ -61,8 +61,8 @@ impl Player {
     /// must be a unit vector. 
     pub fn update_direction(&mut self, cursor_pos: &Point2, player_size: f64) {
 
-        self.direction = Vec2::new_unit(cursor_pos.x - self.position.y + player_size/2.0,
-                                        cursor_pos.x - self.position.y + player_size/2.0);
+        self.direction = Vec2::new_unit(cursor_pos.x - self.position.x + player_size/2.0,
+                                        cursor_pos.y - self.position.y + player_size/2.0);
     }
 
 }
