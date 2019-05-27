@@ -40,32 +40,20 @@ impl State for MeleeAnimation {
     }
 }
 
-/// TILE_SIZE Constant
-/// The size of a Tile in pixels
+
 const TILE_SIZE: f64 = 20.0;
-/// PLAYER_SIZE Constant
-/// The size of the Player in pixels
 const PLAYER_SIZE: f64 = 16.0;
-/// PLAYER_RADIUS Constant
-/// The radius of the Player in pixels
 const PLAYER_RADIUS: f64 = PLAYER_SIZE/2.0;
-/// FLOOR_COLOR Constant
-/// The color of a Tile::Floor
+const BEACON_SIZE: f64 = 18.0;
+
 const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
-/// WALL_COLOR Constant
-/// The color of a Tile::Wall
 const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
 const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
-const BEACON_SIZE: f64 = 18.0;
-/// PLAYER_COLOR Constant
-/// The color of a Player
 const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
-/// ERROR_COLOR Constant
-/// The color of an unrecognized Shape
+const ENEMY_COLOR: Color = [0.04, 0.13, 0.27, 1.0];
 const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
 
 const ANIMATION_COLOR: Color = [0.5, 0.5, 0.5 ,1.0];
-
 const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation 
     {
         animation_width: PLAYER_SIZE,
