@@ -315,6 +315,12 @@ impl Level {
 
     }
 
+    fn pathfind(&self, start: &MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
+
+        astar(start, |p| p.successors(&self.map), |p| p.distance(target) / 3,|p| p == target)
+
+    }
+
 }
 
 
