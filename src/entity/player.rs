@@ -1,4 +1,5 @@
 use crate::traits::{shape, entity, state};
+use crate::misc::vector2d::Vec2;
 use std::f64;
 const STARTING_HEALTH: i32 = 10;
 const PLAYER_SPEED: f64 = 0.1;
@@ -21,7 +22,7 @@ pub struct Player{
     pub position: [f64; 2],
     pub health: i32,
     pub state: PlayerState,
-    pub direction: [f64; 2],
+    pub direction: Vec2,
 }
 
 impl Player {
@@ -30,7 +31,7 @@ impl Player {
             position: start_position, 
             health: STARTING_HEALTH,
             state: PlayerState::Stationary,
-            direction: [0.0, 1.0],
+            direction: Vec2::new_unit(0.0, 1.0),
         }
     }
 
@@ -42,38 +43,14 @@ impl Player {
     pub fn update_position(&mut self) {
         match self.state {
             PlayerState::Moving => {
-                self.position[0] += self.direction[0] * PLAYER_SPEED;
-                self.position[1] += self.direction[1] * PLAYER_SPEED;
+                self.position[0] += self.direction.x * PLAYER_SPEED;
+                self.position[1] += self.direction.y * PLAYER_SPEED;
             },
             _ => {}
         }
     }
 
-    /// convert_to_unit_vector()
-    /// 
-    /// args:
-    ///     vector: [f64; 2]: A vector to be converted to a unit vector.
-    /// 
-    /// returns: A unit vector.
-    /// 
-    /// Uses an approximation method is used to calculate the unit vector.
-    fn convert_to_unit_vector(&self, vector: [f64; 2]) -> [f64;2] {
-        let ax = vector[0].abs();
-        let ay = vector[1].abs();
-        let mut ratio = 1.0;
-        match ax > ay {
-            true => {
-                ratio = 1.0 / ax;
-            },
-            false => {
-                ratio = 1.0 / ay;
-            },
-        };
-        ratio = ratio * (1.29289 - (ax + ay) * ratio * 0.29289);
-        [vector[0] * ratio, vector[1] * ratio]
-
-        
-    }
+    
 
     /// update_direction()
     /// 
@@ -85,11 +62,8 @@ impl Player {
     /// must be a unit vector. 
     pub fn update_direction(&mut self, cursor_pos: [f64; 2], player_size: f64) {
 
-        self.direction = self.convert_to_unit_vector(
-                    [
-                        cursor_pos[0] - self.position[0] + player_size/2.0,
-                        cursor_pos[1] - self.position[1] + player_size/2.0
-                    ]);
+        self.direction = Vec2::new_unit(cursor_pos[0] - self.position[0] + player_size/2.0,
+                                        cursor_pos[1] - self.position[1] + player_size/2.0);
     }
 
 }

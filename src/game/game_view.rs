@@ -219,11 +219,11 @@ impl GameView {
                 let shape = attack::Attack {};
                 let shape = shape.get_shape();
                 let pi = f64::consts::PI;
-                let dir = model.player.direction;
-                let mut rad = model.player.direction[1] / model.player.direction[0];
+                let dir = &model.player.direction;
+                let mut rad = model.player.direction.y / model.player.direction.x;
                 rad = rad.atan();
                 
-                match [dir[0] < 0.0, dir[1] < 0.0] {
+                match [dir.x < 0.0, dir.y < 0.0] {
                     [true, true] => rad = pi * 2.0 - rad,
                     [true, false] => rad = rad * -1.0,
                     [false, true] => rad = pi + rad * -1.0,
