@@ -1,6 +1,7 @@
+extern crate pathfinding;
 use crate::entity::tile::Tile;
 use crate::misc::random::{Seed,RNG,from_seed, next_u32};
-
+use pathfinding::prelude::{absdiff, astar};
 use std::collections::HashMap;
 
 const WIDTH: i32 = 50;
@@ -20,6 +21,31 @@ pub struct MapIdx {
 impl MapIdx {
     pub fn new(x: i32, y: i32) -> Self {
         Self {x: x, y: y}
+    }
+
+    fn distance(&self, other: &MapIdx) -> u32 {
+        (absdiff(self.x, other.x) + absdiff(self.y, other.y)) as u32
+    }
+
+    fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)>  {
+        let mut neighbours = Level::neighbours(self);
+        let mut remove: Vec<usize> = Vec::new();
+        for i in (0..neighbours.len()).rev() {
+            match map.get(&neighbours[i]){
+                Some(Tile::Wall) => {
+                    remove.push(i);
+                },
+                Some(Tile::Cust(_val)) => {
+                    remove.push(i);
+                }
+                _ => ()
+            }
+        }
+        for i in remove {
+            neighbours.remove(i);
+        }
+        neighbours.into_iter().map(|p| (p, 1)).collect()
+
     }
 }
 /// Map Type
