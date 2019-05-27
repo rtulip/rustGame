@@ -18,13 +18,13 @@ pub struct GameModel {
 }
 
 impl GameModel {
-    pub fn new(seed: Seed) -> Self {
+    pub fn new(seed: Seed, idx_to_point: fn(MapIdx) -> Point2) -> Self {
         let mut level = Level::new(seed);
         let mut rng = from_seed(seed);
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let mut beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let mut player = Player::new( Point2{x: player_spawn.x as f64 * 20.0, y: player_spawn.y as f64 * 20.0} );
+        let mut player = Player::new( idx_to_point(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
         Self {
             level: level,

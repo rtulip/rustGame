@@ -23,17 +23,18 @@ pub struct GameController {
 
 impl GameController {
     pub fn new(seed: Seed) -> Self {
-        let mut controller = Self {
-            model: GameModel::new(seed),
-            view: GameView::new(),
-            cursor_pos: Point2 {x: 0.0, y: 0.0},
-            keys_pressed: HashSet::new(),
-        };
+        
+        let view = GameView::new();
+        let mut model = GameModel::new(seed, GameView::map_idx_to_point2);
+        let cursor_pos = Point2 {x: 0.0, y: 0.0};
+        let keys_pressed = HashSet::new();
 
-        controller.model.spawn_enemy(GameView::map_idx_to_point2);
-        controller.model.spawn_enemy(GameView::map_idx_to_point2);
-        controller.model.spawn_enemy(GameView::map_idx_to_point2);
-        controller
+        model.spawn_enemy(GameView::map_idx_to_point2);
+        model.spawn_enemy(GameView::map_idx_to_point2);
+        model.spawn_enemy(GameView::map_idx_to_point2);
+        
+        Self {model: model, view: view, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
+
     }
 
     /// handle_event()
