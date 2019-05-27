@@ -162,8 +162,19 @@ impl GameModel {
 
     pub fn spawn_enemy(&mut self, tile_size: f64) {
         let spawn = GameModel::find_enemy_spawn(&self.level, &mut self.rng);
-        let enemy = Enemy::new([spawn.x as f64 * tile_size, spawn.y as f64 * tile_size]);
-        self.enemies.push(enemy);
+        let target = &self.beacon.position;
+        let mut enemy = Enemy::new([spawn.x as f64 * tile_size, spawn.y as f64 * tile_size]);
+        
+        if let Some(path) = self.level.pathfind(&spawn, target) {
+            let mut enemy_path: Vec<[f64;2]> = Vec::new();
+            for idx in path.0 {
+                enemy_path.push([idx.x as f64 * tile_size, idx.y as f64 * tile_size]);
+            }
+            enemy.path = enemy_path;
+            self.enemies.push(enemy);
+        }
+        
+        
     }
 
 }
