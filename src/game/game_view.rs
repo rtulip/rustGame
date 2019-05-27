@@ -139,6 +139,7 @@ impl GameView {
         self.draw_level(model, c, g);
         self.draw_player(model, c, g);
         self.draw_beacon(model, c, g);
+        self.draw_enemies(model, c, g);
     }
 
     /// draw_level()
