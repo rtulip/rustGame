@@ -1,4 +1,5 @@
 use crate::game::GameModel;
+use crate::level::MapIdx;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::entity::{tile, attack};
@@ -157,7 +158,7 @@ impl GameView {
         let settings = &self.settings;
         for h in 0..model.level.height {
             for w in 0..model.level.width {
-                match model.level.map.get(&(w,h)){
+                match model.level.map.get(&MapIdx::new(w,h)){
                     Some(tile::Tile::Floor) => {
                         tile::Tile::Floor.get_shape().draw(settings.floor_color,
                                                      w as f64 * settings.tile_size, 
@@ -260,8 +261,8 @@ impl GameView {
     fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         model.beacon.get_shape().draw(
             self.settings.beacon_color,
-            model.beacon.position.0 as f64 * self.settings.tile_size, 
-            model.beacon.position.1 as f64 * self.settings.tile_size, 
+            model.beacon.position.x as f64 * self.settings.tile_size, 
+            model.beacon.position.y as f64 * self.settings.tile_size, 
             self.settings.beacon_size,
             self.settings.beacon_size,
             model.beacon.rotation, 
