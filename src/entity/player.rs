@@ -51,8 +51,6 @@ impl Player {
         }
     }
 
-    
-
     /// update_direction()
     /// 
     /// args:

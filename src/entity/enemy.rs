@@ -1,4 +1,5 @@
 use crate::traits::{shape, entity, state};
+use crate::misc::{vector2d, point2d};
 const ENEMY_SPEED: f64 = 0.1;
 
 pub enum EnemyState {
@@ -7,16 +8,16 @@ pub enum EnemyState {
 }
 
 pub struct Enemy {
-    pub position: [f64; 2],
-    pub direction: [f64; 2],
+    pub position: point2d::Point2,
+    pub direction: vector2d::Vec2,
     pub path: Vec<[f64;2]>,
     pub state: EnemyState,
 }
 
 impl Enemy {
 
-    pub fn new(start_position: [f64;2]) -> Self {
-        Self {position: start_position, direction: [0.0;2],path: Vec::new(), state: EnemyState::Beacon}
+    pub fn new(start_position: point2d::Point2) -> Self {
+        Self {position: start_position, direction: vector2d::Vec2 {x: 0.0, y: 0.0}, path: Vec::new(), state: EnemyState::Beacon}
     }
 
 }
@@ -30,8 +31,8 @@ impl shape::Shape for Enemy {
 
 impl entity::Entity for Enemy {
     fn tick(&mut self) {
-        self.position[0] += self.direction[0] * ENEMY_SPEED;
-        self.position[1] += self.direction[1] * ENEMY_SPEED;
+        self.position.x += self.direction.x * ENEMY_SPEED;
+        self.position.y += self.direction.y * ENEMY_SPEED;
     }
 }
 

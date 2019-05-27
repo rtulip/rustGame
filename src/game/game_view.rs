@@ -1,5 +1,6 @@
 use crate::game::GameModel;
 use crate::level::{MapIdx, Level};
+use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::entity::{tile, attack};
@@ -127,6 +128,12 @@ impl GameView {
         Self { settings: GameViewSettings::new() }
     }
 
+    pub fn MapIdx_to_Point2(&self, idx: MapIdx) -> Point2 {
+
+        Point2 {x: idx.x as f64 * self.settings.tile_size, y: idx.y as f64 * self.settings.tile_size}
+
+    }
+
     /// draw()
     /// 
     /// args:
@@ -158,9 +165,10 @@ impl GameView {
             for w in 0..model.level.width {
                 match model.level.map.get(&MapIdx::new(w,h)){
                     Some(tile::Tile::Floor) => {
+                        let p = self.MapIdx_to_Point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.floor_color,
-                                                     w as f64 * settings.tile_size, 
-                                                     h as f64 * settings.tile_size, 
+                                                     p.x, 
+                                                     p.y, 
                                                      settings.tile_size,
                                                      settings.tile_size,
                                                      0.0, 
@@ -168,9 +176,10 @@ impl GameView {
                                                      g)
                     },
                     Some(tile::Tile::Wall) => {
+                        let p = self.MapIdx_to_Point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.wall_color,
-                                                     w as f64 * settings.tile_size, 
-                                                     h as f64 * settings.tile_size, 
+                                                     p.x, 
+                                                     p.y, 
                                                      settings.tile_size,
                                                      settings.tile_size,
                                                      0.0, 
@@ -178,9 +187,10 @@ impl GameView {
                                                      g)
                     },
                     _ => {
+                        let p = self.MapIdx_to_Point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.error_color,
-                                                     w as f64 * settings.tile_size, 
-                                                     h as f64 * settings.tile_size, 
+                                                     p.x, 
+                                                     p.y, 
                                                      settings.tile_size,
                                                      settings.tile_size,
                                                      0.0,
@@ -258,10 +268,11 @@ impl GameView {
     }
 
     fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+        let p = self.MapIdx_to_Point2(MapIdx::new(model.beacon.position.x, model.beacon.position.y));
         model.beacon.get_shape().draw(
             self.settings.beacon_color,
-            model.beacon.position.x as f64 * self.settings.tile_size, 
-            model.beacon.position.y as f64 * self.settings.tile_size, 
+            p.x, 
+            p.y, 
             self.settings.beacon_size,
             self.settings.beacon_size,
             model.beacon.rotation, 
@@ -274,8 +285,8 @@ impl GameView {
             enemy.get_shape().draw(
                 self.settings.enemy_color,
                 self.settings.enemy_radius,
-                enemy.position[0],
-                enemy.position[1],
+                enemy.position.x,
+                enemy.position.y,
                 self.settings.enemy_size,
                 self.settings.enemy_size,
                 c,
