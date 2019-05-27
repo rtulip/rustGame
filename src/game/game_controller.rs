@@ -36,6 +36,8 @@ impl GameController {
         let cursor_pos = Point2 {x: 0.0, y: 0.0};
         let keys_pressed = HashSet::new();
 
+        println!("BEACON SPAWN: {:?}", GameView::map_idx_to_point2(model.beacon.position));
+
         model.spawn_enemy(GameView::map_idx_to_point2);
         model.spawn_enemy(GameView::map_idx_to_point2);
         model.spawn_enemy(GameView::map_idx_to_point2);
@@ -153,19 +155,17 @@ impl GameController {
             enemy.tick();
             
             let beacon_point = GameView::map_idx_to_point2(self.model.beacon.position);
-            if (beacon_point.x < enemy.position.x + self.view.settings.enemy_size && 
-                enemy.position.x < beacon_point.x + self.view.settings.beacon_size) || 
-               (beacon_point.y > enemy.position.y + self.view.settings.enemy_size && 
-                enemy.position.y > beacon_point.y + self.view.settings.beacon_size) {
+            let beacon_center = Point2 {x: beacon_point.x + self.view.settings.beacon_size / 2.0,
+                                        y: beacon_point.y + self.view.settings.beacon_size / 2.0};
+            let enemy_center = Point2 { x: enemy.position.x + self.view.settings.enemy_size / 2.0,
+                                        y: enemy.position.y + self.view.settings.enemy_size / 2.0};
+            if (beacon_center.x - enemy_center.x).abs() + (beacon_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
                 to_remove.push(i);
                 self.model.beacon.health -= 1;
-                
             } 
-
-            if (self.model.player.position.x < enemy.position.x + self.view.settings.enemy_size && 
-                enemy.position.x < self.model.player.position.x + self.view.settings.beacon_size) || 
-               (self.model.player.position.y > enemy.position.y + self.view.settings.enemy_size && 
-                enemy.position.y > self.model.player.position.y + self.view.settings.beacon_size) {
+            let player_center = Point2 { x: self.model.player.position.x + self.view.settings.player_size / 2.0,
+                                         y: self.model.player.position.y + self.view.settings.player_size / 2.0};
+            if (player_center.x - enemy_center.x).abs() + (player_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius + self.view.settings.player_radius {
                 to_remove.push(i);
                 self.model.player.health -= 1;
             }
