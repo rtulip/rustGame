@@ -22,12 +22,17 @@ pub struct GameController {
 
 impl GameController {
     pub fn new(seed: Seed) -> Self {
-        Self {
+        let mut controller = Self {
             model: GameModel::new(seed),
             view: GameView::new(),
             cursor_pos: [0.0; 2],
             keys_pressed: HashSet::new(),
-        }
+        };
+
+        controller.model.spawn_enemy(controller.view.settings.tile_size);
+        controller.model.spawn_enemy(controller.view.settings.tile_size);
+        controller.model.spawn_enemy(controller.view.settings.tile_size);
+        controller
     }
 
     /// handle_event()

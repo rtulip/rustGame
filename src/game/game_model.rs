@@ -24,9 +24,7 @@ impl GameModel {
         let mut beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
         let mut player = Player::new([player_spawn.x as f64 * 20.0, player_spawn.y as f64 * 20.0]);
-        let enemy_spawn = GameModel::find_enemy_spawn(&level, &mut rng);
-        let enemy = Enemy::new([enemy_spawn.x as f64 * 20.0, enemy_spawn.y as f64 * 20.0]);
-        let mut enemies = vec![enemy];
+        let enemies: Vec<Enemy> = Vec::new();
         Self {
             level: level,
             rng: rng,
@@ -160,6 +158,12 @@ impl GameModel {
         let idx = spawnable_spaces.remove(idx);
         idx
 
+    }
+
+    pub fn spawn_enemy(&mut self, tile_size: f64) {
+        let spawn = GameModel::find_enemy_spawn(&self.level, &mut self.rng);
+        let enemy = Enemy::new([spawn.x as f64 * tile_size, spawn.y as f64 * tile_size]);
+        self.enemies.push(enemy);
     }
 
 }
