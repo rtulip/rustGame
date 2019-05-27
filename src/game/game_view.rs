@@ -4,7 +4,7 @@ use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::entity::{tile, attack};
-use graphics::{Context, Graphics,Transformed};
+use graphics::{Context, Graphics};
 use graphics::types::Color;
 use std::f64;
 
