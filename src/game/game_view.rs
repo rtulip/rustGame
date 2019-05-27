@@ -1,5 +1,5 @@
 use crate::game::GameModel;
-use crate::level::MapIdx;
+use crate::level::{MapIdx, Level};
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::entity::{tile, attack};
@@ -192,6 +192,22 @@ impl GameView {
                 };
             }
         }
+
+        if let Some(path) = model.level.pathfind(MapIdx::new(3, 4), MapIdx::new(41, 46)){
+            for idx in path.0 {
+                tile::Tile::Floor.get_shape().draw(settings.error_color,
+                                                     idx.x as f64 * settings.tile_size, 
+                                                     idx.y as f64 * settings.tile_size, 
+                                                     settings.tile_size,
+                                                     settings.tile_size,
+                                                     0.0,
+                                                     c, 
+                                                     g)
+            }
+        } else {
+            
+        }
+
     }
 
     /// draw_player()

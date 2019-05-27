@@ -27,8 +27,13 @@ impl MapIdx {
         (absdiff(self.x, other.x) + absdiff(self.y, other.y)) as u32
     }
 
+    fn neighbours(&self) -> Vec<MapIdx> {
+        vec![MapIdx::new(self.x-1, self.y), MapIdx::new(self.x, self.y-1),
+             MapIdx::new(self.x+1, self.y), MapIdx::new(self.x, self.y+1)]
+    }
+
     fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)>  {
-        let mut neighbours = Level::neighbours(self);
+        let mut neighbours = self.neighbours();
         let mut remove: Vec<usize> = Vec::new();
         for i in (0..neighbours.len()).rev() {
             match map.get(&neighbours[i]){
@@ -315,9 +320,9 @@ impl Level {
 
     }
 
-    fn pathfind(&self, start: &MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
+    pub fn pathfind(&self, start: MapIdx, target: MapIdx) -> Option<(Vec<MapIdx>, u32)> {
 
-        astar(start, |p| p.successors(&self.map), |p| p.distance(target) / 3,|p| p == target)
+        astar(&start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == target)
 
     }
 
