@@ -9,13 +9,14 @@ pub enum EnemyState {
 pub struct Enemy {
     pub position: [f64; 2],
     pub direction: [f64; 2],
+    pub path: Vec<[f64;2]>,
     pub state: EnemyState,
 }
 
 impl Enemy {
 
     pub fn new(start_position: [f64;2]) -> Self {
-        Self {position: start_position, direction: [0.0;2], state: EnemyState::Beacon}
+        Self {position: start_position, direction: [0.0;2],path: Vec::new(), state: EnemyState::Beacon}
     }
 
 }
