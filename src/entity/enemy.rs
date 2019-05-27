@@ -12,6 +12,14 @@ pub struct Enemy {
     pub state: EnemyState,
 }
 
+impl Enemy {
+
+    pub fn new(start_position: [f64;2]) -> Self {
+        Self {position: start_position, direction: [0.0;2], state: EnemyState::Beacon}
+    }
+
+}
+
 impl shape::Shape for Enemy {
     type ShapeVairant = shape::EllipseType;
     fn get_shape(&self) -> Self::ShapeVairant {
@@ -22,7 +30,7 @@ impl shape::Shape for Enemy {
 impl entity::Entity for Enemy {
     fn tick(&mut self) {
         self.position[0] += self.direction[0] * ENEMY_SPEED;
-        self.position[1] += self.direction[0] * ENEMY_SPEED;
+        self.position[1] += self.direction[1] * ENEMY_SPEED;
     }
 }
 
