@@ -1,21 +1,63 @@
+extern crate pathfinding;
 use crate::entity::tile::Tile;
 use crate::misc::random::{Seed,RNG,from_seed, next_u32};
-
+use pathfinding::prelude::{absdiff, astar};
 use std::collections::HashMap;
 
 const WIDTH: i32 = 50;
 const HEIGHT: i32 = 50;
 const ITERS: i32 = 5;
 
-/// Map Type
-/// 
-/// A Map is a HashMap which associates positions to Tiles. 
-pub type Map = HashMap<MapIdx, Tile>;
 /// MapIdx Type
 /// 
 /// MapIdx represents a grid position in 2D space. 
 /// MapIdx.0 is x and MapIdx.1 is y
-pub type MapIdx = (i32, i32);
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct MapIdx {
+    pub x: i32,
+    pub y: i32
+}
+
+impl MapIdx {
+    pub fn new(x: i32, y: i32) -> Self {
+        Self {x: x, y: y}
+    }
+
+    fn distance(&self, other: &MapIdx) -> u32 {
+        (absdiff(self.x, other.x) + absdiff(self.y, other.y)) as u32
+    }
+
+    fn neighbours(&self) -> Vec<MapIdx> {
+        vec![MapIdx::new(self.x-1, self.y), MapIdx::new(self.x, self.y-1),
+             MapIdx::new(self.x+1, self.y), MapIdx::new(self.x, self.y+1)]
+    }
+
+    fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)>  {
+        let mut neighbours = self.neighbours();
+        let mut remove: Vec<usize> = Vec::new();
+        for i in (0..neighbours.len()).rev() {
+            match map.get(&neighbours[i]){
+                Some(Tile::Wall) => {
+                    remove.push(i);
+                },
+                Some(Tile::Cust(_val)) => {
+                    remove.push(i);
+                }
+                _ => ()
+            }
+        }
+        for i in remove {
+            neighbours.remove(i);
+        }
+        neighbours.into_iter().map(|p| (p, 1)).collect()
+
+    }
+}
+/// Map Type
+/// 
+/// A Map is a HashMap which associates positions to Tiles. 
+pub type Map = HashMap<MapIdx, Tile>;
+
 /// Level Struct
 /// 
 /// Encapsulates all information for a level.
@@ -50,7 +92,7 @@ impl Level {
             for w in 0..WIDTH {
                 // Any given tile has a 50/50 chance of being a wall initially.
                 if next_u32(&mut rng) % 2 == 1 {
-                    map.insert((w,h), Tile::Wall);
+                    map.insert(MapIdx::new(w,h), Tile::Wall);
                 }
             }
         }
@@ -61,9 +103,9 @@ impl Level {
         // Fill the empty spaces in the Map with Tile::Floor
         for h in 0..HEIGHT {
             for w in 0..WIDTH {
-                match map.contains_key(&(w,h)) {
+                match map.contains_key(&MapIdx::new(w,h)) {
                     false => {
-                        map.insert((w,h), Tile::Floor);
+                        map.insert(MapIdx::new(w,h), Tile::Floor);
                     } ,
                     _ => (),
                 }
@@ -86,12 +128,10 @@ impl Level {
     /// 
     /// Will go beyond width and height boundaries in edge cases. Ensure that edges
     /// are checked to avoid issues. 
-    fn neighbours(&(x,y): &MapIdx) -> Vec<MapIdx> {
-        vec![
-            (x-1,y-1), (x,y-1), (x+1,y-1),
-            (x-1,y),            (x+1,y),
-            (x-1,y+1), (x,y+1), (x+1,y+1),
-        ]
+    fn neighbours(map_idx: &MapIdx) -> Vec<MapIdx> {
+        vec![MapIdx::new(map_idx.x-1, map_idx.y-1),MapIdx::new(map_idx.x-1, map_idx.y),MapIdx::new(map_idx.x-1, map_idx.y+1),
+             MapIdx::new(map_idx.x,   map_idx.y-1)  ,                                  MapIdx::new(map_idx.x,   map_idx.y+1),
+             MapIdx::new(map_idx.x+1, map_idx.y-1),MapIdx::new(map_idx.x+1, map_idx.y),MapIdx::new(map_idx.x+1, map_idx.y+1)]
     }
 
     /// neighbour_counts()
@@ -187,12 +227,12 @@ impl Level {
             match map.get(start) {
                 Some(Tile::Floor) => {
                     map.remove(start);
-                    map.insert(*start, Tile::Cust(*new_val));
+                    map.insert(MapIdx::new(start.x,start.y), Tile::Cust(*new_val));
                     *sets.entry(*new_val).or_insert(1) += 1;
-                    flood_fill(&mut map, &(start.0, start.1-1), new_val, sets);
-                    flood_fill(&mut map, &(start.0, start.1+1), new_val, sets);
-                    flood_fill(&mut map, &(start.0-1, start.1), new_val, sets);
-                    flood_fill(&mut map, &(start.0+1, start.1), new_val, sets);
+                    flood_fill(&mut map, &MapIdx::new(start.x, start.y-1), new_val, sets);
+                    flood_fill(&mut map, &MapIdx::new(start.x, start.y+1), new_val, sets);
+                    flood_fill(&mut map, &MapIdx::new(start.x-1, start.y), new_val, sets);
+                    flood_fill(&mut map, &MapIdx::new(start.x+1, start.y), new_val, sets);
                 },
                 _ => ()
             }
@@ -208,9 +248,9 @@ impl Level {
         for h in 0..height {
             for w in 0..width {
 
-                match map.get(&(w,h)) {
+                match map.get(&MapIdx::new(w,h)) {
                     Some(Tile::Floor) => {
-                        flood_fill(&mut map, &(w,h), &region, &mut sets);
+                        flood_fill(&mut map, &MapIdx::new(w,h), &region, &mut sets);
                         // increment region counter.
                         region += 1;
                     },
@@ -232,16 +272,16 @@ impl Level {
         for h in 0..height {
             for w in 0..width {
                 
-                match map.get(&(w,h)) {
+                match map.get(&MapIdx::new(w,h)) {
                     // If Tile is of the most traversable region, convert to floor
                     Some(Tile::Cust(max_val)) if *max_val == max.0 => {
-                        map.remove(&(w,h));
-                        map.insert((w,h), Tile::Floor);
+                        map.remove(&MapIdx::new(w,h));
+                        map.insert(MapIdx::new(w,h), Tile::Floor);
                     },
                     // If Tile is of another region, convert to Wall.
                     Some(Tile::Cust(_val)) => {
-                        map.remove(&(w,h));
-                        map.insert((w,h), Tile::Wall);
+                        map.remove(&MapIdx::new(w,h));
+                        map.insert(MapIdx::new(w,h), Tile::Wall);
                     },
                     _ => ()
                     
@@ -264,19 +304,25 @@ impl Level {
     fn fill_edge(mut map: Map, width: i32, height:i32) -> Map {
 
         for w in 0..width {
-            map.remove(&(w,0));
-            map.insert((w,0), Tile::Wall);
-            map.remove(&(w,height-1));
-            map.insert((w,height-1), Tile::Wall);
+            map.remove(&MapIdx::new(w,0));
+            map.insert(MapIdx::new(w,0), Tile::Wall);
+            map.remove(&MapIdx::new(w,height-1));
+            map.insert(MapIdx::new(w,height-1), Tile::Wall);
         }
         for h in 0..height {
-            map.remove(&(0,h));
-            map.insert((0,h), Tile::Wall);
-            map.remove(&(width-1,h));
-            map.insert((width-1,h), Tile::Wall);
+            map.remove(&MapIdx::new(0,h));
+            map.insert(MapIdx::new(0,h), Tile::Wall);
+            map.remove(&MapIdx::new(width-1,h));
+            map.insert(MapIdx::new(width-1,h), Tile::Wall);
         }
 
         map
+
+    }
+
+    pub fn pathfind(&self, start: MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
+
+        astar(&start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == *target)
 
     }
 

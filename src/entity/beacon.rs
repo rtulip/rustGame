@@ -3,7 +3,7 @@ use crate::level::MapIdx;
 use std::f64;
 
 const ROTATION_SPEED: f64 = 0.01;
-const STARTING_HEALTH: i32 = 10;
+const STARTING_HEALTH: i32 = 4;
 
 pub struct Beacon {
     pub position: MapIdx,

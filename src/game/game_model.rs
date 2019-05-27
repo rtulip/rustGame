@@ -1,32 +1,37 @@
-use crate::level::{Level, MapIdx};
+pub use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
+use crate::misc::point2d::Point2;
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 use crate::entity::beacon::Beacon;
+use crate::entity::enemy::Enemy;
 
 /// GameModel 
 /// 
 /// A model of the games entities and controls game logic
 pub struct GameModel {
-    // entities: Vec<Entity>,
     pub level: Level,
     pub player: Player,
     pub beacon: Beacon,
+    pub enemies: Vec<Enemy>,
+    rng: RNG,
 }
 
 impl GameModel {
-    pub fn new(seed: Seed) -> Self {
+    pub fn new(seed: Seed, idx_to_point: fn(MapIdx) -> Point2) -> Self {
         let level = Level::new(seed);
         let mut rng = from_seed(seed);
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
-        
+        let player = Player::new( idx_to_point(player_spawn));
+        let enemies: Vec<Enemy> = Vec::new();
         Self {
             level: level,
             player: player,
             beacon: beacon,
+            enemies: enemies,
+            rng: rng
         }
     }
 
@@ -46,11 +51,11 @@ impl GameModel {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
 
-        for h in beacon.position.1-10..beacon.position.1+11 {
-            for w in beacon.position.0-10..beacon.position.0+11 {
-                match level.map.get(&(w,h)) {
+        for h in beacon.position.x-10..beacon.position.y+11 {
+            for w in beacon.position.x-10..beacon.position.y+11 {
+                match level.map.get(&MapIdx::new(w,h)) {
                     Some(Tile::Floor) => {
-                        spawnable_spaces.push((w,h));
+                        spawnable_spaces.push(MapIdx::new(w,h));
                     },
                     _ => (),
                 }
@@ -87,7 +92,7 @@ impl GameModel {
                 let mut count = 0;
                 for y in h-3..h+3 {
                     for x in w-3..w+3{
-                        match level.map.get(&(x,y)) {
+                        match level.map.get(&MapIdx::new(x,y)) {
                             Some(Tile::Floor) => count += 1,
                             Some(Tile::Wall) => count -= 1,
                             _ => (),
@@ -96,13 +101,13 @@ impl GameModel {
                 }
                 if count > threshold {
                     match [
-                        level.map.get(&(w-1,h-1)),
-                        level.map.get(&(w-1,h)),
-                        level.map.get(&(w,h-1)),
-                        level.map.get(&(w,h)),
+                        level.map.get(&MapIdx::new(w-1,h-1)),
+                        level.map.get(&MapIdx::new(w-1,h)),
+                        level.map.get(&MapIdx::new(w,h-1)),
+                        level.map.get(&MapIdx::new(w,h)),
                     ] {
                         [Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor)] => {
-                            spawnable_spaces.push((w,h));
+                            spawnable_spaces.push(MapIdx::new(w,h));
                         },
                         _ => (),
                     }
@@ -120,5 +125,57 @@ impl GameModel {
         idx
 
     } 
+
+    /// find_enemy_spawn()
+    /// 
+    /// args:
+    ///     level: &Level: A reference to the level to serach for a player 
+    ///         spwan point
+    ///     rng: &mut RNG: A mutable reference to a random number generator
+    ///         which is used to decide which of the open spaces is to be the
+    ///         spawn point
+    /// 
+    /// Chooses a spawn point randomly from any Tile::Floor spaces in the Level
+    fn find_enemy_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
+
+        let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
+
+        for h in 0..level.height {
+            for w in 0..level.width {
+                match level.map.get(&MapIdx::new(w,h)) {
+                    Some(Tile::Floor) => {
+                        spawnable_spaces.push(MapIdx::new(w,h));
+                    },
+                    _ => (),
+                }
+            }
+        }
+
+        if spawnable_spaces.len() == 0 {
+            panic!("No spawnable spaces!");
+        }
+
+        let idx = next_u32(rng) as usize % spawnable_spaces.len();
+        let idx = spawnable_spaces.remove(idx);
+        idx
+
+    }
+
+    pub fn spawn_enemy(&mut self, idx_to_point: fn(MapIdx) -> Point2) {
+        let spawn = GameModel::find_enemy_spawn(&self.level, &mut self.rng);
+        let target = &self.beacon.position;
+        let mut enemy = Enemy::new(idx_to_point(spawn));
+        
+        if let Some(path) = self.level.pathfind(spawn, target) {
+            let mut enemy_path: Vec<Point2> = Vec::new();
+            for idx in path.0 {
+                enemy_path.push(idx_to_point(idx));
+            }
+            enemy.path = enemy_path;
+            self.enemies.push(enemy);
+        }
+        
+        
+    }
 
 }
