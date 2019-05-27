@@ -1,9 +1,10 @@
 use crate::game::{GameModel, GameView, AnimationEnum};
 use crate::misc::random::Seed;
 use crate::misc::point2d::Point2;
+use crate::misc::vector2d::Vec2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
-use crate::entity::{player, tile};
+use crate::entity::{player, tile, enemy};
 use crate::level::MapIdx;
 
 use std::collections::HashSet;
@@ -84,9 +85,8 @@ impl GameController {
         self.model.player.tick();
         self.check_player_collision();
         self.model.beacon.tick();
-        for enemy in self.model.enemies.iter_mut() {
-            enemy.tick();
-        }
+        self.tick_enemies();
+        
     }
 
     /// check_player_collision()
@@ -139,6 +139,37 @@ impl GameController {
                 }
             }
         }
+    }
+
+    fn tick_enemies(&mut self) {
+        let mut to_remove: Vec<usize> = Vec::new();
+        for (i, enemy) in self.model.enemies.iter_mut().enumerate().rev() {
+            enemy.tick();
+            
+            let beacon_point = GameView::map_idx_to_point2(self.model.beacon.position);
+            if (beacon_point.x < enemy.position.x + self.view.settings.enemy_size && 
+                enemy.position.x < beacon_point.x + self.view.settings.beacon_size) || 
+               (beacon_point.y > enemy.position.y + self.view.settings.enemy_size && 
+                enemy.position.y > beacon_point.y + self.view.settings.beacon_size) {
+                to_remove.push(i);
+                self.model.beacon.health -= 1;
+            } 
+
+            if (self.model.player.position.x < enemy.position.x + self.view.settings.enemy_size && 
+                enemy.position.x < self.model.player.position.x + self.view.settings.beacon_size) || 
+               (self.model.player.position.y > enemy.position.y + self.view.settings.enemy_size && 
+                enemy.position.y > self.model.player.position.y + self.view.settings.beacon_size) {
+                to_remove.push(i);
+                self.model.player.health -= 1;
+            }
+
+        }
+
+        for i in to_remove {
+            self.model.enemies.remove(i);
+            
+        }
+
     }
 
 }
