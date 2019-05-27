@@ -12,7 +12,7 @@ const ITERS: i32 = 5;
 /// 
 /// MapIdx represents a grid position in 2D space. 
 /// MapIdx.0 is x and MapIdx.1 is y
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct MapIdx {
     pub x: i32,
     pub y: i32
@@ -320,9 +320,9 @@ impl Level {
 
     }
 
-    pub fn pathfind(&self, start: &MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
+    pub fn pathfind(&self, start: MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
 
-        astar(start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == *target)
+        astar(&start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == *target)
 
     }
 

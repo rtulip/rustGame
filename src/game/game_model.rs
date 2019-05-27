@@ -1,5 +1,6 @@
 pub use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
+use crate::misc::point2d::Point2;
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 use crate::entity::beacon::Beacon;
@@ -17,13 +18,13 @@ pub struct GameModel {
 }
 
 impl GameModel {
-    pub fn new(seed: Seed) -> Self {
+    pub fn new(seed: Seed, idx_to_point: fn(MapIdx) -> Point2) -> Self {
         let mut level = Level::new(seed);
         let mut rng = from_seed(seed);
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let mut beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let mut player = Player::new([player_spawn.x as f64 * 20.0, player_spawn.y as f64 * 20.0]);
+        let mut player = Player::new( idx_to_point(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
         Self {
             level: level,
@@ -160,15 +161,15 @@ impl GameModel {
 
     }
 
-    pub fn spawn_enemy(&mut self, tile_size: f64) {
+    pub fn spawn_enemy(&mut self, idx_to_point: fn(MapIdx) -> Point2) {
         let spawn = GameModel::find_enemy_spawn(&self.level, &mut self.rng);
         let target = &self.beacon.position;
-        let mut enemy = Enemy::new([spawn.x as f64 * tile_size, spawn.y as f64 * tile_size]);
+        let mut enemy = Enemy::new(idx_to_point(spawn));
         
-        if let Some(path) = self.level.pathfind(&spawn, target) {
-            let mut enemy_path: Vec<[f64;2]> = Vec::new();
+        if let Some(path) = self.level.pathfind(spawn, target) {
+            let mut enemy_path: Vec<Point2> = Vec::new();
             for idx in path.0 {
-                enemy_path.push([idx.x as f64 * tile_size, idx.y as f64 * tile_size]);
+                enemy_path.push(idx_to_point(idx));
             }
             enemy.path = enemy_path;
             self.enemies.push(enemy);
