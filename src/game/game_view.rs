@@ -18,7 +18,7 @@ pub struct MeleeAnimation {
     pub animation_width: f64,
     pub animation_height: f64,
     pub animation_color: Color,
-    pub animation_position: [f64;2],
+    pub animation_position: Point2,
     pub animation_rotation: f64,
     pub state: AnimationEnum,
 }
@@ -62,7 +62,7 @@ const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation
         animation_width: PLAYER_SIZE,
         animation_height: PLAYER_SIZE / 3.0,
         animation_color: ANIMATION_COLOR,
-        animation_position: [0.0, 0.0],
+        animation_position: Point2 {x: 0.0, y: 0.0},
         animation_rotation: 0.0,
         state: AnimationEnum::Ready,
     };
@@ -242,18 +242,18 @@ impl GameView {
 
                 rad = pi - rad;
 
-                let player_center = [model.player.position.x + self.settings.player_size / 2.0,
-                                     model.player.position.y + self.settings.player_size / 2.0];
+                let player_center = Point2 { x: model.player.position.x + self.settings.player_size / 2.0,
+                                             y: model.player.position.y + self.settings.player_size / 2.0};
                 
-                let tangent_point = [player_center[0] + self.settings.player_radius * rad.cos(),
-                                     player_center[1] + self.settings.player_radius * rad.sin()];
+                let tangent_point = Point2 { x: player_center.x + self.settings.player_radius * rad.cos(),
+                                             y: player_center.y + self.settings.player_radius * rad.sin()};
 
-                let animation_corner = [tangent_point[0] - self.settings.player_attack_animation.animation_height / 2.0,
-                                        tangent_point[1] - self.settings.player_attack_animation.animation_height / 2.0];
+                let animation_corner = Point2{ x: tangent_point.x - self.settings.player_attack_animation.animation_height / 2.0,
+                                               y: tangent_point.y - self.settings.player_attack_animation.animation_height / 2.0};
                 
                 shape.draw( self.settings.player_attack_animation.animation_color,
-                            animation_corner[0],
-                            animation_corner[1],
+                            animation_corner.x,
+                            animation_corner.y,
                             self.settings.player_attack_animation.animation_width,
                             self.settings.player_attack_animation.animation_height,
                             rad, 
