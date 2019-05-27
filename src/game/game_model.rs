@@ -1,4 +1,4 @@
-use crate::level::{Level, MapIdx};
+pub use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::entity::player::Player;
 use crate::entity::tile::Tile;
@@ -22,7 +22,7 @@ impl GameModel {
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let mut beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let mut player = Player::new([player_spawn.0 as f64 * 20.0, player_spawn.1 as f64 * 20.0]);
+        let mut player = Player::new([player_spawn.x as f64 * 20.0, player_spawn.y as f64 * 20.0]);
         
         Self {
             level: level,
@@ -48,11 +48,11 @@ impl GameModel {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
 
-        for h in beacon.position.1-10..beacon.position.1+11 {
-            for w in beacon.position.0-10..beacon.position.0+11 {
-                match level.map.get(&(w,h)) {
+        for h in beacon.position.x-10..beacon.position.y+11 {
+            for w in beacon.position.x-10..beacon.position.y+11 {
+                match level.map.get(&MapIdx::new(w,h)) {
                     Some(Tile::Floor) => {
-                        spawnable_spaces.push((w,h));
+                        spawnable_spaces.push(MapIdx::new(w,h));
                     },
                     _ => (),
                 }
@@ -89,7 +89,7 @@ impl GameModel {
                 let mut count = 0;
                 for y in h-3..h+3 {
                     for x in w-3..w+3{
-                        match level.map.get(&(x,y)) {
+                        match level.map.get(&MapIdx::new(x,y)) {
                             Some(Tile::Floor) => count += 1,
                             Some(Tile::Wall) => count -= 1,
                             _ => (),
@@ -98,13 +98,13 @@ impl GameModel {
                 }
                 if count > threshold {
                     match [
-                        level.map.get(&(w-1,h-1)),
-                        level.map.get(&(w-1,h)),
-                        level.map.get(&(w,h-1)),
-                        level.map.get(&(w,h)),
+                        level.map.get(&MapIdx::new(w-1,h-1)),
+                        level.map.get(&MapIdx::new(w-1,h)),
+                        level.map.get(&MapIdx::new(w,h-1)),
+                        level.map.get(&MapIdx::new(w,h)),
                     ] {
                         [Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor),Some(Tile::Floor)] => {
-                            spawnable_spaces.push((w,h));
+                            spawnable_spaces.push(MapIdx::new(w,h));
                         },
                         _ => (),
                     }

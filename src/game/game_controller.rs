@@ -3,6 +3,7 @@ use crate::misc::random::Seed;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::entity::{player, tile};
+use crate::level::MapIdx;
 
 use std::collections::HashSet;
 
@@ -101,7 +102,7 @@ impl GameController {
         
         for h in min_y..max_y {
             for w in min_x..max_x {
-                match self.model.level.map.get(&(w,h)) {
+                match self.model.level.map.get(&MapIdx::new(w,h)) {
                     Some(tile::Tile::Wall) => {
                         let tile_pos = [w as f64 * tile_size, h as f64 * tile_size];
                         let shift_left = tile_pos[0] - player_pos[0] - player_size - 0.1;
