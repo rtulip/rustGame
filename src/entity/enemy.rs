@@ -10,7 +10,7 @@ pub enum EnemyState {
 pub struct Enemy {
     pub position: point2d::Point2,
     pub direction: vector2d::Vec2,
-    pub path: Vec<[f64;2]>,
+    pub path: Vec<point2d::Point2>,
     pub state: EnemyState,
 }
 

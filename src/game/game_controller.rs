@@ -30,9 +30,9 @@ impl GameController {
             keys_pressed: HashSet::new(),
         };
 
-        controller.model.spawn_enemy(controller.view.settings.tile_size);
-        controller.model.spawn_enemy(controller.view.settings.tile_size);
-        controller.model.spawn_enemy(controller.view.settings.tile_size);
+        controller.model.spawn_enemy(GameView::map_idx_to_point2);
+        controller.model.spawn_enemy(GameView::map_idx_to_point2);
+        controller.model.spawn_enemy(GameView::map_idx_to_point2);
         controller
     }
 
@@ -109,11 +109,11 @@ impl GameController {
             for w in min_x..max_x {
                 match self.model.level.map.get(&MapIdx::new(w,h)) {
                     Some(tile::Tile::Wall) => {
-                        let tile_pos = [w as f64 * tile_size, h as f64 * tile_size];
-                        let shift_left = tile_pos[0] - self.model.player.position.x - player_size - 0.1;
-                        let shift_right = tile_pos[0] + tile_size - self.model.player.position.x + 0.1;
-                        let shift_up = tile_pos[1] - self.model.player.position.y - player_size - 0.1;
-                        let shift_down = tile_pos[1] + tile_size - self.model.player.position.y + 0.1;
+                        let tile_pos = GameView::map_idx_to_point2(MapIdx::new(w, h));
+                        let shift_left = tile_pos.x - self.model.player.position.x - player_size - 0.1;
+                        let shift_right = tile_pos.y + tile_size - self.model.player.position.x + 0.1;
+                        let shift_up = tile_pos.x - self.model.player.position.y - player_size - 0.1;
+                        let shift_down = tile_pos.y + tile_size - self.model.player.position.y + 0.1;
     
                         let moves = [shift_left, shift_right, shift_up, shift_down];
                         let mut min_move = moves[0];

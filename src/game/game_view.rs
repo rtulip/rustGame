@@ -128,9 +128,9 @@ impl GameView {
         Self { settings: GameViewSettings::new() }
     }
 
-    pub fn MapIdx_to_Point2(&self, idx: MapIdx) -> Point2 {
+    pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
-        Point2 {x: idx.x as f64 * self.settings.tile_size, y: idx.y as f64 * self.settings.tile_size}
+        Point2 {x: idx.x as f64 * TILE_SIZE, y: idx.y as f64 * TILE_SIZE}
 
     }
 
@@ -165,7 +165,7 @@ impl GameView {
             for w in 0..model.level.width {
                 match model.level.map.get(&MapIdx::new(w,h)){
                     Some(tile::Tile::Floor) => {
-                        let p = self.MapIdx_to_Point2(MapIdx::new(w, h));
+                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.floor_color,
                                                      p.x, 
                                                      p.y, 
@@ -176,7 +176,7 @@ impl GameView {
                                                      g)
                     },
                     Some(tile::Tile::Wall) => {
-                        let p = self.MapIdx_to_Point2(MapIdx::new(w, h));
+                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.wall_color,
                                                      p.x, 
                                                      p.y, 
@@ -187,7 +187,7 @@ impl GameView {
                                                      g)
                     },
                     _ => {
-                        let p = self.MapIdx_to_Point2(MapIdx::new(w, h));
+                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.error_color,
                                                      p.x, 
                                                      p.y, 
@@ -268,7 +268,7 @@ impl GameView {
     }
 
     fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
-        let p = self.MapIdx_to_Point2(MapIdx::new(model.beacon.position.x, model.beacon.position.y));
+        let p = GameView::map_idx_to_point2(MapIdx::new(model.beacon.position.x, model.beacon.position.y));
         model.beacon.get_shape().draw(
             self.settings.beacon_color,
             p.x, 
