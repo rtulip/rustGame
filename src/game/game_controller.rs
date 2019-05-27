@@ -11,6 +11,11 @@ use std::collections::HashSet;
 
 use piston::input::{GenericEvent, Button, Key};
 
+pub enum GameState {
+    Running,
+    Finished,
+}
+
 /// GameController
 /// 
 /// A struct to control the game processes including user input, graphics and
@@ -18,6 +23,7 @@ use piston::input::{GenericEvent, Button, Key};
 pub struct GameController {
     pub model: GameModel,
     pub view: GameView,
+    pub state: GameState,
     cursor_pos: Point2,
     keys_pressed: HashSet<Key>,
 }
@@ -34,7 +40,7 @@ impl GameController {
         model.spawn_enemy(GameView::map_idx_to_point2);
         model.spawn_enemy(GameView::map_idx_to_point2);
         
-        Self {model: model, view: view, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
+        Self {model: model, view: view, state: GameState::Running, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
 
     }
 
@@ -115,8 +121,8 @@ impl GameController {
                     Some(tile::Tile::Wall) => {
                         let tile_pos = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         let shift_left = tile_pos.x - self.model.player.position.x - player_size - 0.1;
-                        let shift_right = tile_pos.y + tile_size - self.model.player.position.x + 0.1;
-                        let shift_up = tile_pos.x - self.model.player.position.y - player_size - 0.1;
+                        let shift_right = tile_pos.x + tile_size - self.model.player.position.x + 0.1;
+                        let shift_up = tile_pos.y - self.model.player.position.y - player_size - 0.1;
                         let shift_down = tile_pos.y + tile_size - self.model.player.position.y + 0.1;
     
                         let moves = [shift_left, shift_right, shift_up, shift_down];
@@ -153,6 +159,7 @@ impl GameController {
                 enemy.position.y > beacon_point.y + self.view.settings.beacon_size) {
                 to_remove.push(i);
                 self.model.beacon.health -= 1;
+                
             } 
 
             if (self.model.player.position.x < enemy.position.x + self.view.settings.enemy_size && 
@@ -170,6 +177,17 @@ impl GameController {
             
         }
 
+        if self.model.beacon.health == 0 || self.model.player.health == 0{
+            self.change_state(GameState::Finished);
+        }
+
     }
 
+}
+
+impl State for GameController {
+    type StateEnum = GameState;
+    fn change_state(&mut self, new_state: Self::StateEnum) {
+        self.state = new_state;
+    }
 }
