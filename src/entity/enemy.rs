@@ -31,8 +31,21 @@ impl shape::Shape for Enemy {
 
 impl entity::Entity for Enemy {
     fn tick(&mut self) {
-        self.position.x += self.direction.x * ENEMY_SPEED;
-        self.position.y += self.direction.y * ENEMY_SPEED;
+        if self.path.len() > 0 {
+            let mut dist = self.path[0] - self.position;
+            if (dist.x).abs() < 1.0 && (dist.y).abs() < 1.0 {
+                self.path.remove(0);
+                if self.path.len() > 0 {
+                    dist = self.path[0] - self.position;
+                } else {
+                    return;
+                }
+            }
+            self.direction = vector2d::Vec2::new_unit_from_point(dist);
+            self.position.x += self.direction.x * ENEMY_SPEED;
+            self.position.y += self.direction.y * ENEMY_SPEED;
+        }
+        
     }
 }
 

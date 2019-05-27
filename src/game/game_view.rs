@@ -282,6 +282,21 @@ impl GameView {
 
     fn draw_enemies<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         for enemy in model.enemies.iter() {
+            let mut cust_color = ERROR_COLOR;
+            for idx in enemy.path.iter() {
+                tile::Tile::Floor.get_shape().draw(
+                    cust_color,
+                    idx.x,
+                    idx.y,
+                    self.settings.tile_size,
+                    self.settings.tile_size,
+                    0.0,
+                    c,
+                    g,
+                );
+                cust_color[0] -= 0.01;
+            }
+
             enemy.get_shape().draw(
                 self.settings.enemy_color,
                 self.settings.enemy_radius,
@@ -291,7 +306,7 @@ impl GameView {
                 self.settings.enemy_size,
                 c,
                 g
-            )
+            );
         }
     }
 }

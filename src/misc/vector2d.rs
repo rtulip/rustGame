@@ -1,3 +1,5 @@
+use crate::misc::point2d::Point2;
+#[derive(Clone,Copy,Debug)]
 pub struct Vec2 {
     pub x: f64,
     pub y: f64,
@@ -10,6 +12,14 @@ impl Vec2 {
 
     pub fn new_unit(x: f64, y: f64) -> Self {
         Vec2::convert_to_unit_vector(Self {x: x, y: y})
+    }
+
+    pub fn new_from_point(p: Point2) -> Self {
+        Self {x: p.x, y: p.y}
+    }
+
+    pub fn new_unit_from_point(p: Point2) -> Self {
+        Vec2::convert_to_unit_vector(Self {x: p.x, y: p.y})
     }
 
     /// convert_to_unit_vector()
