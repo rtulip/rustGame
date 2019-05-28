@@ -52,6 +52,7 @@ pub struct GameModel {
     pub player: Player,
     pub beacon: Beacon,
     pub enemies: Vec<Enemy>,
+    pub spawners: Vec<MapIdx>,
     rng: RNG,
 }
 
@@ -69,11 +70,13 @@ impl GameModel {
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
         let player = Player::new( idx_to_point(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
+        let spawners: Vec<MapIdx> = Vec::new();
         Self {
             level: level,
             player: player,
             beacon: beacon,
             enemies: enemies,
+            spawners: spawners,
             rng: rng
         }
     }
@@ -219,7 +222,7 @@ impl GameModel {
             let pos = canditate_spaces[idx];
             self.level.map.remove(&pos);
             self.level.map.insert(pos, Tile::Spawner);
-
+            self.spawners.push(pos);
         }
 
     }
