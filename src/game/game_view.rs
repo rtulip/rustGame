@@ -51,11 +51,13 @@ const PLAYER_RADIUS: f64 = PLAYER_SIZE/2.0;
 const BEACON_SIZE: f64 = 18.0;
 const ENEMY_SIZE: f64 = 16.0;
 const ENEMY_RADIUS: f64 = ENEMY_SIZE/2.0;
+const DROP_SIZE: f64 = TILE_SIZE / 2.0;
 
 const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
 const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
 const SPAWNER_COLOR: Color = [0.4, 0.06, 0.0, 1.0];
 const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
+const RESOURCE_COLOR: Color = BEACON_COLOR;
 const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
 const ENEMY_COLOR: Color = [0.04, 0.13, 0.27, 1.0];
 const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
@@ -89,6 +91,8 @@ pub struct GameViewSettings {
     pub enemy_color: Color,
     pub enemy_size: f64,
     pub enemy_radius: f64,
+    pub drop_size: f64,
+    pub resource_color: Color,
     pub error_color: Color,
     
 }
@@ -111,7 +115,8 @@ impl GameViewSettings {
             enemy_color: ENEMY_COLOR,
             enemy_size: ENEMY_SIZE,
             enemy_radius: ENEMY_RADIUS,
-
+            drop_size: DROP_SIZE,
+            resource_color: RESOURCE_COLOR,
             error_color: ERROR_COLOR
         }
 
@@ -144,9 +149,11 @@ impl GameView {
     /// the beacon, and finally all the enemies.
     pub fn draw<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         self.draw_level(model, c, g);
-        self.draw_player(model, c, g);
         self.draw_beacon(model, c, g);
+        self.draw_resources(model, c, g);
         self.draw_enemies(model, c, g);
+        self.draw_player(model, c, g);
+        
     }
 
     /// Draws the Level of the GameModel by looping through each tile in the 
@@ -272,5 +279,24 @@ impl GameView {
                 g
             );
         }
+    }
+
+    fn draw_resources<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+
+        for resource in model.resources.iter() {
+
+            let transform = c.transform.trans(resource.position.x + self.settings.drop_size / 2.0,
+                resource.position.y + self.settings.drop_size / 2.0)
+                .rot_rad(resource.rotation)
+                .trans( -self.settings.drop_size / 2.0, -self.settings.drop_size / 2.0);
+            resource.get_shape().draw(
+                self.settings.resource_color,
+                [0.0, 0.0, self.settings.drop_size,self.settings.drop_size],
+                transform, 
+                c, 
+                g);
+
+        }
+
     }
 }
