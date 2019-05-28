@@ -54,6 +54,7 @@ const ENEMY_RADIUS: f64 = ENEMY_SIZE/2.0;
 
 const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
 const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
+const SPAWNER_COLOR: Color = [0.4, 0.06, 0.0, 1.0];
 const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
 const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
 const ENEMY_COLOR: Color = [0.04, 0.13, 0.27, 1.0];
@@ -78,6 +79,7 @@ pub struct GameViewSettings {
     pub tile_size: f64,
     pub floor_color: Color,
     pub wall_color: Color,
+    pub spawner_color: Color,
     pub beacon_color: Color,
     pub beacon_size: f64,
     pub player_size: f64,
@@ -99,6 +101,7 @@ impl GameViewSettings {
             tile_size: TILE_SIZE,
             floor_color: FLOOR_COLOR,
             wall_color: WALL_COLOR,
+            spawner_color: SPAWNER_COLOR,
             beacon_color: BEACON_COLOR,
             beacon_size: BEACON_SIZE,
             player_size: PLAYER_SIZE,
@@ -167,6 +170,17 @@ impl GameView {
                     Some(tile::Tile::Wall) => {
                         let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.wall_color,
+                                                     p.x, 
+                                                     p.y, 
+                                                     settings.tile_size,
+                                                     settings.tile_size,
+                                                     0.0, 
+                                                     c, 
+                                                     g)
+                    },
+                    Some(tile::Tile::Spawner) => {
+                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
+                        tile::Tile::Floor.get_shape().draw(settings.spawner_color,
                                                      p.x, 
                                                      p.y, 
                                                      settings.tile_size,

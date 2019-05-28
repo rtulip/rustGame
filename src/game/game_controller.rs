@@ -113,6 +113,8 @@ impl GameController {
         self.model.beacon.tick();
         // Tick enemies and check for collision.
         self.tick_enemies();
+
+        self.model.create_spawner();
         
     }
 
