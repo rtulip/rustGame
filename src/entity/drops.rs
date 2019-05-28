@@ -9,6 +9,15 @@ pub struct Resource {
     pub rotation: f64,
 }
 
+impl Resource {
+    pub fn new(position: Point2) -> Self {
+        Self {
+            position: position,
+            rotation: 0.0,
+        }
+    }
+}
+
 impl shape::Shape for Resource{
     type ShapeVairant = shape::RectangleType;
     fn get_shape(&self) -> Self::ShapeVairant {

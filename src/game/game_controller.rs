@@ -184,7 +184,7 @@ impl GameController {
     /// For checking collisions with the Player, the Player and the Enemy must
     /// overlap. 
     fn tick_enemies(&mut self) {
-        let mut to_remove: Vec<usize> = Vec::new();
+        let mut to_remove: Vec<(usize, bool)> = Vec::new();
         // Loop through enemies
         for (i, enemy) in self.model.enemies.iter_mut().enumerate().rev() {
             // move enemy
@@ -197,14 +197,14 @@ impl GameController {
             let enemy_center = Point2 { x: enemy.position.x + self.view.settings.enemy_size / 2.0,
                                         y: enemy.position.y + self.view.settings.enemy_size / 2.0};
             if (beacon_center.x - enemy_center.x).abs() + (beacon_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
-                to_remove.push(i);
+                to_remove.push((i,false));
                 self.model.beacon.health -= 1;
             } 
             // check for collision with the player.
             let player_center = Point2 { x: self.model.player.position.x + self.view.settings.player_size / 2.0,
                                          y: self.model.player.position.y + self.view.settings.player_size / 2.0};
             if (player_center.x - enemy_center.x).abs() + (player_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius + self.view.settings.player_radius {
-                to_remove.push(i);
+                to_remove.push((i,false));
                 self.model.player.health -= 1;
             }
 
@@ -228,12 +228,9 @@ impl GameController {
                             
                     };
 
-                    if (p1.x - enemy_center.x).abs() + (p1.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
-                        to_remove.push(i);
-                    }
-
-                    if (p2.x - enemy_center.x).abs() + (p2.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
-                        to_remove.push(i);
+                    if  (p1.x - enemy_center.x).abs() + (p1.y - enemy_center.y).abs() <= self.view.settings.enemy_radius || 
+                        (p2.x - enemy_center.x).abs() + (p2.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
+                        to_remove.push((i,true));
                     }
                     
                 },
@@ -243,9 +240,12 @@ impl GameController {
         }
 
         // remove all enemies which had collisions
-        for i in to_remove {
-            self.model.enemies.remove(i);
+        for (i, resource) in to_remove {
             
+            let enemy = self.model.enemies.remove(i);
+            if resource {
+                self.model.spawn_resource(&enemy);
+            }
         }
 
         //Check Gamestate to see if GameOver.

@@ -225,7 +225,7 @@ impl GameModel {
         
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
-            if r % 1000 == 1 {
+            if r % 1000 == 0 {
                 let target = &self.beacon.position;
                 let mut enemy = Enemy::new(idx_to_point(*spawner));
                 
@@ -239,6 +239,15 @@ impl GameModel {
                 }
             }
         }
+    }
+
+    pub fn spawn_resource(&mut self, enemy: &Enemy) {
+
+        let r = next_u32(&mut self.rng);
+        if r % 10 == 0 {
+            self.resources.push(Resource::new(enemy.position));
+        }
+
     }
 
 }
