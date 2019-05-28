@@ -1,4 +1,6 @@
 #[derive(Clone, Copy, Debug)]
+/// A structure to represent a point in 2d space in a usable manner by the 
+/// GameView. 
 pub struct Point2 {
     pub x: f64,
     pub y: f64,
