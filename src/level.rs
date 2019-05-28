@@ -55,8 +55,8 @@ impl MapIdx {
 
     /// Returns a the positions surronding a MapIdx which are traversable in the 
     /// input Map and a cost. If the space is traversable, the cost is 1. Only
-    /// Tile::Floor is traversable. Any other Tile variant surrounding the 
-    /// MapIdx will be counted as impassable.
+    /// Tile::Floor and Tile::Spawner variants are traversable. Any other Tile
+    /// variant surrounding the MapIdx will be counted as impassable.
     fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)> {
         // Find surrounding spaces
         let mut neighbours = self.neighbours();

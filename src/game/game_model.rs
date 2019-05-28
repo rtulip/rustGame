@@ -34,19 +34,18 @@ use crate::entity::enemy::Enemy;
 /// 
 /// If no spawnable space is found for the Player, the program panics.  
 /// 
-/// ## Enemies
+/// ## Spawners
 /// 
-/// A random Tile::Floor is chosen for enemy spawn. 
+/// Any Tile::Wall with at least one Tile::Floor or Tile::Spawner to the north,
+/// east, south or west will be considered a candidate space. 
 /// 
-/// If no spawnable space is found for the Enemy, the program panics.
+/// If there are no candidate spaces found for the Enemy nothing happens.
 /// 
 /// # Spawning Enemies
 /// 
-/// The GameModel is also responsible for spawning enmies. First the location
-/// is found for where the enemy should be placed. Then, if a path can be 
-/// created from the Tile to the Beacon, the new enemy is added to the enemy 
-/// list. Otherwise, no enemy is added. See GameView's map_idx_to_point2 
-/// function.
+/// The GameModel is also responsible for spawning enmies. For each spawning
+/// Tile in the Map, there is a constant chance of having an enemy spawn at 
+/// that location.
 pub struct GameModel {
     pub level: Level,
     pub player: Player,
@@ -158,6 +157,7 @@ impl GameModel {
 
     } 
 
+    /// Has a chance of creating a new spawner
     pub fn chanced_create_spawner(&mut self, chance: u32) {
 
         let rand = next_u32(&mut self.rng);
@@ -167,6 +167,8 @@ impl GameModel {
 
     } 
 
+    /// Creates a new spawner in a random location with a Floor or Spawner to  
+    /// the north, east, south or west. 
     pub fn create_spawner(&mut self) {
            
         let mut canditate_spaces: Vec<MapIdx> = Vec::new();

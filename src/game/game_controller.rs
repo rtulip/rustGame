@@ -50,7 +50,8 @@ pub struct GameController {
 
 impl GameController {
     
-    /// Creates a new GameController.
+    /// Creates a new GameController. The GameModel will start with 2 spawning
+    /// spaces created. 
     pub fn new(seed: Seed) -> Self {
         
         let view = GameView::new();
@@ -61,7 +62,6 @@ impl GameController {
         model.create_spawner();
         model.create_spawner();
 
-        // Temporary. Will be removed once random enemy spawning in added.
         Self {model: model, view: view, state: GameState::Running, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
 
     }
@@ -90,7 +90,7 @@ impl GameController {
         }
     }
 
-    /// Executes a single game tick
+    /// Executes a single game tick 
     pub fn tick(&mut self) {
         // Update Movement state if W is pressed
         if self.keys_pressed.contains(&Key::W) {
@@ -113,7 +113,9 @@ impl GameController {
         // Tick enemies and check for collision.
         self.tick_enemies();
 
+        // Chreate spawner with constant chance
         self.model.chanced_create_spawner(5000);
+        // Spawn enmies from spawners
         self.model.spawn_enemies(GameView::map_idx_to_point2);
         
     }
