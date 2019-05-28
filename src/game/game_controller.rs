@@ -111,6 +111,7 @@ impl GameController {
         self.check_player_collision();
         // Tick Beacon
         self.model.beacon.tick();
+        self.tick_resources();
         // Tick enemies and check for collision.
         self.tick_enemies();
 
@@ -251,6 +252,14 @@ impl GameController {
         //Check Gamestate to see if GameOver.
         if self.model.beacon.health == 0 || self.model.player.health == 0{
             self.change_state(GameState::Finished);
+        }
+
+    }
+
+    fn tick_resources(&mut self) {
+
+        for resource in self.model.resources.iter_mut() {
+            resource.tick();
         }
 
     }

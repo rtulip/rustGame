@@ -244,7 +244,7 @@ impl GameModel {
     pub fn spawn_resource(&mut self, enemy: &Enemy) {
 
         let r = next_u32(&mut self.rng);
-        if r % 10 == 0 {
+        if r % 3 == 0 {
             self.resources.push(Resource::new(enemy.position));
         }
 
