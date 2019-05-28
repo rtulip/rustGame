@@ -161,7 +161,7 @@ impl GameModel {
     pub fn chanced_create_spawner(&mut self, chance: u32) {
 
         let rand = next_u32(&mut self.rng);
-        if rand % chance == 1 {
+        if rand % chance == 0 {
             self.create_spawner();
         }
 

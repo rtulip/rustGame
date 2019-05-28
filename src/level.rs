@@ -69,6 +69,7 @@ impl MapIdx {
             // the tile for removal
             match map.get(idx) {
                 Some(Tile::Floor) => (),
+                Some(Tile::Spawner) => (),
                 _ => {
                     remove.push(i);
                 }

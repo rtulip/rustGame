@@ -1,5 +1,5 @@
 use crate::game::GameModel;
-use crate::level::{MapIdx, Level};
+use crate::level::MapIdx;
 use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
