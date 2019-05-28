@@ -21,6 +21,25 @@ pub enum GameState {
 
 /// A struct to control the game processes including user input, graphics and
 /// game ticks.
+/// 
+/// # Input Handling
+/// The position of the cursor is updated every time it is updated. 
+/// Every key pressed is tracked in the keys_pressed list, and whenever a 
+/// key is released, the key is removed from the key pressed list. 
+/// 
+/// ## Cursor Position
+/// This input is used to control which direction the Player is facing.
+/// 
+/// ## W Key
+/// This input is used to start and stop player movement. So long as this 
+/// key is pressed, and the Space Bar isn't pressed, the player will move
+/// towards the direction it's facing (towards the mouse). 
+/// 
+/// ## Space Bar
+/// This input is used to control the player attack animation. Pressing 
+/// space will start the animation. This will prevent all player movement 
+/// until the space bar is released. The animation will draw a box in the
+/// center of the Player towards the mouse. 
 pub struct GameController {
     pub model: GameModel,
     pub view: GameView,
@@ -50,25 +69,6 @@ impl GameController {
 
     /// Parses the event for cursor position, Keyboard presses and keyboard
     /// relseases. 
-    /// 
-    /// # Input Handling
-    /// The position of the cursor is updated every time it is updated. 
-    /// Every key pressed is tracked in the keys_pressed list, and whenever a 
-    /// key is released, the key is removed from the key pressed list. 
-    /// 
-    /// ## Cursor Position
-    /// This input is used to control which direction the Player is facing.
-    /// 
-    /// ## W Key
-    /// This input is used to start and stop player movement. So long as this 
-    /// key is pressed, and the Space Bar isn't pressed, the player will move
-    /// towards the direction it's facing (towards the mouse). 
-    /// 
-    /// ## Space Bar
-    /// This input is used to control the player attack animation. Pressing 
-    /// space will start the animation. This will prevent all player movement 
-    /// until the space bar is released. The animation will draw a box in the
-    /// center of the Player towards the mouse. 
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
             self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
