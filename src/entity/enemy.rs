@@ -2,11 +2,16 @@ use crate::traits::{shape, entity, state};
 use crate::misc::{vector2d, point2d};
 const ENEMY_SPEED: f64 = 0.1;
 
+/// A structure describing the states of the Enemy game components. While in
+/// the Beacon state, the Enemy will pathfind towards the Beacon. While in the
+/// Player state, the Enemy will pathfind towards the Player
 pub enum EnemyState {
     Beacon,
     Player,
 }
 
+/// A structure to describe the Enemy game component. They'll try to hunt down
+/// the Beacon and the Player. 
 pub struct Enemy {
     pub position: point2d::Point2,
     pub direction: vector2d::Vec2,
@@ -16,6 +21,7 @@ pub struct Enemy {
 
 impl Enemy {
 
+    /// Creates a new enemy in the start position.
     pub fn new(start_position: point2d::Point2) -> Self {
         Self {position: start_position, direction: vector2d::Vec2 {x: 0.0, y: 0.0}, path: Vec::new(), state: EnemyState::Beacon}
     }

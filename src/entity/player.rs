@@ -5,9 +5,12 @@ use std::f64;
 const STARTING_HEALTH: i32 = 10;
 const PLAYER_SPEED: f64 = 0.1;
 
-/// PlayerState
-/// 
-/// A struct defining the different states a Player can have
+/// A struct defining the different states a Player can have. While Stationary,
+/// the Player isn't moving. While Moving, the player will move in the 
+/// direction of the Mouse Cursor. While attacking, the player will remain
+/// stationary. The Player can only move out of the Attacking state to the 
+/// FinishedAttacking state, which acts as a signal saying the attacking 
+/// animation has finished. 
 pub enum PlayerState{
     Stationary,
     Moving,
@@ -15,11 +18,9 @@ pub enum PlayerState{
     FinishedAttacking,
 }
 
-/// Player
-/// 
 /// A representation of the Player. The Player struct is responsible for 
 /// the logic surrounding how to update itself.
-pub struct Player{
+pub struct Player {
     pub position: Point2,
     pub health: i32,
     pub state: PlayerState,
@@ -27,6 +28,8 @@ pub struct Player{
 }
 
 impl Player {
+    
+    /// Creates a new Player
     pub fn new(start_position: Point2) -> Self {
         Player {
             position: start_position, 
@@ -36,11 +39,11 @@ impl Player {
         }
     }
 
-    /// update_position()
-    /// 
     /// A function to move the player. The Player moves at PLAYER_SPEED in the 
     /// direction defined by the unit vector self.direction. The Player only 
     /// moves while in the Moving state.
+    /// 
+    /// Assumes that direction is a unit vector.
     pub fn update_position(&mut self) {
         match self.state {
             PlayerState::Moving => {
@@ -51,23 +54,17 @@ impl Player {
         }
     }
 
-    /// update_direction()
-    /// 
-    /// args:
-    ///     cursor_pos: [f64; 2]: The coordinates of the cursor on the screen.
-    ///     player_size: f64: The size of the Player.
-    /// 
     /// Sets the Player direction to point towards the cursor. The direction 
     /// must be a unit vector. 
     pub fn update_direction(&mut self, cursor_pos: &Point2, player_size: f64) {
 
         self.direction = Vec2::new_unit(cursor_pos.x - self.position.x + player_size/2.0,
                                         cursor_pos.y - self.position.y + player_size/2.0);
+    
     }
 
 }
 
-/// Player implements Shape with ShapeVariant EllipseType
 impl shape::Shape for Player {
     type ShapeVairant = shape::EllipseType;
     fn get_shape(&self) -> Self::ShapeVairant {
@@ -75,16 +72,19 @@ impl shape::Shape for Player {
     }
 }
 
-/// Player implements Entity 
 impl entity::Entity for Player {
     fn tick(&mut self) {
         self.update_position();
     }
 }
 
-/// Player implements State with StateEnum PlayerState
 impl state::State for Player {
     type StateEnum = PlayerState;
+    /// Can transition from any state to any state with the exception of the 
+    /// Attacking state. 
+    /// 
+    /// The Player can transition to the attacking state from any state, but
+    /// must transition to the FinishedAttacking state from the Attacking state
     fn change_state(&mut self, new_state: Self::StateEnum) {
         match [&self.state, &new_state] {
             [PlayerState::Attacking, PlayerState::FinishedAttacking] => {
