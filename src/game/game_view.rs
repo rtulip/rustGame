@@ -6,6 +6,7 @@ use crate::traits::state::State;
 use crate::entity::{tile, attack};
 use graphics::{Context, Graphics, Transformed};
 use graphics::types::Color;
+use graphics::character::CharacterCache;
 use std::f64;
 
 /// An enum to describe all the different states of animation. Ready means that
@@ -147,7 +148,15 @@ impl GameView {
 
     /// Draws the GameModel by first drawing the level, then the player, then
     /// the beacon, and finally all the enemies.
-    pub fn draw<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+    pub fn draw<G: Graphics, C>(
+        &mut self, 
+        model: &GameModel,
+        glyphs: &mut C, 
+        c: &Context, 
+        g: &mut G
+    ) 
+        where C: CharacterCache<Texture = G::Texture> {
+        
         self.draw_level(model, c, g);
         self.draw_beacon(model, c, g);
         self.draw_resources(model, c, g);
