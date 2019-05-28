@@ -170,6 +170,23 @@ impl GameController {
                 }
             }
         }
+
+        let player_center = Point2 { x: self.model.player.position.x + self.view.settings.player_size / 2.0,
+                                     y: self.model.player.position.y + self.view.settings.player_size / 2.0};
+        let mut to_remove: Vec<usize> = Vec::new();
+        for (i,resource) in self.model.resources.iter_mut().enumerate().rev() {
+            let resource_center = Point2 {  x: resource.position.x + self.view.settings.drop_size / 2.0,
+                                            y: resource.position.y + self.view.settings.drop_size / 2.0};
+            if (resource_center.x - player_center.x).abs() + (resource_center.y - player_center.y).abs() <= self.view.settings.player_radius {
+                to_remove.push(i);
+                self.model.player.resources += 1;
+            }
+        }
+
+        for i in to_remove {
+            self.model.resources.remove(i);
+        }
+
     }
 
     /// Moves each enemy in the direction of its path. Then the position of 

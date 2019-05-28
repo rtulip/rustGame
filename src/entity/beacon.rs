@@ -3,7 +3,7 @@ use crate::level::MapIdx;
 use std::f64;
 
 const ROTATION_SPEED: f64 = 0.01;
-const STARTING_HEALTH: i32 = 4;
+const STARTING_HEALTH: i32 = 10000;
 
 /// A struct representing the Beacon game component. The beacon is the game 
 /// piece the player is trying to defend. If enemies collide with the Beacon,

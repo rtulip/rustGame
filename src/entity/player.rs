@@ -2,7 +2,7 @@ use crate::traits::{shape, entity, state};
 use crate::misc::vector2d::Vec2;
 use crate::misc::point2d::Point2;
 use std::f64;
-const STARTING_HEALTH: i32 = 10;
+const STARTING_HEALTH: i32 = 10000;
 const PLAYER_SPEED: f64 = 0.1;
 
 /// A struct defining the different states a Player can have. While Stationary,
@@ -25,6 +25,7 @@ pub struct Player {
     pub health: i32,
     pub state: PlayerState,
     pub direction: Vec2,
+    pub resources: i32,
 }
 
 impl Player {
@@ -36,6 +37,7 @@ impl Player {
             health: STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: Vec2::new_unit(0.0, 1.0),
+            resources: 0,
         }
     }
 
