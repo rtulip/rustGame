@@ -5,6 +5,7 @@ use crate::traits::shape;
 pub enum Tile {
     Floor,
     Wall,
+    Spawner,
     Cust(i32),
 }
 
