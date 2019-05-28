@@ -182,6 +182,48 @@ impl GameModel {
 
     }
 
+    pub fn create_spawner(&mut self) {
+        let mut canditate_spaces: Vec<MapIdx> = Vec::new();
+        for h in 0..self.level.height {
+            for w in 0..self.level.width {
+                
+                // Check surrounding neighbours
+                let pos = MapIdx::new(w,h);
+                match self.level.map.get(&pos){
+                    // If Tile at Pos is a wall, see if there is a floor surrounding it
+                    Some(Tile::Wall) => {
+                        
+                        for idx in pos.neighbours() {
+                            match self.level.map.get(&idx) {
+                                Some(Tile::Floor) => {
+                                    canditate_spaces.push(pos);
+                                    break;
+                                },
+                                Some(Tile::Spawner) => {
+                                    canditate_spaces.push(pos);
+                                    break;
+                                },
+                                _ => (),
+                            }
+                        }
+
+                    },
+                    _ => (),
+                }
+            }
+        }
+
+        // randomly choose a candidate space
+        if canditate_spaces.len() > 0 {
+            let idx = next_u32(&mut self.rng) as usize % canditate_spaces.len();
+            let pos = canditate_spaces[idx];
+            self.level.map.remove(&pos);
+            self.level.map.insert(pos, Tile::Spawner);
+
+        }
+
+    }
+
     /// Creates a new enemy if a path can be found from the randomly generated
     /// spawn point to the Beacon. 
     /// 

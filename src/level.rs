@@ -48,7 +48,7 @@ impl MapIdx {
 
     /// Returns the positions surrounding a MapIdx to the north, south, east, 
     /// and west. Used to navigate a Map using A*. 
-    fn neighbours(&self) -> Vec<MapIdx> {
+    pub fn neighbours(&self) -> Vec<MapIdx> {
         vec![MapIdx::new(self.x-1, self.y), MapIdx::new(self.x, self.y-1),
              MapIdx::new(self.x+1, self.y), MapIdx::new(self.x, self.y+1)]
     }
