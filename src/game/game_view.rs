@@ -130,6 +130,7 @@ impl GameView {
 
     /// Public function to translate a MapIdx to a Point2. This allows for the
     /// size of the tiles to change while leaving all the game logic the same.
+    /// Some functions in the GameModel use this function.
     pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
         Point2 {x: idx.x as f64 * TILE_SIZE, y: idx.y as f64 * TILE_SIZE}
@@ -145,14 +146,6 @@ impl GameView {
         self.draw_enemies(model, c, g);
     }
 
-    /// draw_level()
-    /// 
-    /// args:
-    ///     model: &GameModel: A reference to the GameModel for which the level
-    ///         is to be drawn
-    ///     c: &Context: The graphics Context
-    ///     g: &mut Graphics: A mutable reference to the Graphics
-    /// 
     /// Draws the Level of the GameModel by looping through each tile in the 
     /// Map.
     fn draw_level<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
