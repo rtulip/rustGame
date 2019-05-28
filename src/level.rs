@@ -48,15 +48,15 @@ impl MapIdx {
 
     /// Returns the positions surrounding a MapIdx to the north, south, east, 
     /// and west. Used to navigate a Map using A*. 
-    fn neighbours(&self) -> Vec<MapIdx> {
+    pub fn neighbours(&self) -> Vec<MapIdx> {
         vec![MapIdx::new(self.x-1, self.y), MapIdx::new(self.x, self.y-1),
              MapIdx::new(self.x+1, self.y), MapIdx::new(self.x, self.y+1)]
     }
 
     /// Returns a the positions surronding a MapIdx which are traversable in the 
     /// input Map and a cost. If the space is traversable, the cost is 1. Only
-    /// Tile::Floor is traversable. Any other Tile variant surrounding the 
-    /// MapIdx will be counted as impassable.
+    /// Tile::Floor and Tile::Spawner variants are traversable. Any other Tile
+    /// variant surrounding the MapIdx will be counted as impassable.
     fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)> {
         // Find surrounding spaces
         let mut neighbours = self.neighbours();
@@ -69,6 +69,7 @@ impl MapIdx {
             // the tile for removal
             match map.get(idx) {
                 Some(Tile::Floor) => (),
+                Some(Tile::Spawner) => (),
                 _ => {
                     remove.push(i);
                 }

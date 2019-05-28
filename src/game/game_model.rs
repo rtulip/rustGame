@@ -34,24 +34,24 @@ use crate::entity::enemy::Enemy;
 /// 
 /// If no spawnable space is found for the Player, the program panics.  
 /// 
-/// ## Enemies
+/// ## Spawners
 /// 
-/// A random Tile::Floor is chosen for enemy spawn. 
+/// Any Tile::Wall with at least one Tile::Floor or Tile::Spawner to the north,
+/// east, south or west will be considered a candidate space. 
 /// 
-/// If no spawnable space is found for the Enemy, the program panics.
+/// If there are no candidate spaces found for the Enemy nothing happens.
 /// 
 /// # Spawning Enemies
 /// 
-/// The GameModel is also responsible for spawning enmies. First the location
-/// is found for where the enemy should be placed. Then, if a path can be 
-/// created from the Tile to the Beacon, the new enemy is added to the enemy 
-/// list. Otherwise, no enemy is added. See GameView's map_idx_to_point2 
-/// function.
+/// The GameModel is also responsible for spawning enmies. For each spawning
+/// Tile in the Map, there is a constant chance of having an enemy spawn at 
+/// that location.
 pub struct GameModel {
     pub level: Level,
     pub player: Player,
     pub beacon: Beacon,
     pub enemies: Vec<Enemy>,
+    pub spawners: Vec<MapIdx>,
     rng: RNG,
 }
 
@@ -69,11 +69,13 @@ impl GameModel {
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
         let player = Player::new( idx_to_point(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
+        let spawners: Vec<MapIdx> = Vec::new();
         Self {
             level: level,
             player: player,
             beacon: beacon,
             enemies: enemies,
+            spawners: spawners,
             rng: rng
         }
     }
@@ -155,30 +157,58 @@ impl GameModel {
 
     } 
 
-    /// Chooses a spawn point randomly from any Tile::Floor spaces in the Level
-    /// and if no spawnable space exists, the program panics.
-    fn find_enemy_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
+    /// Has a chance of creating a new spawner
+    pub fn chanced_create_spawner(&mut self, chance: u32) {
 
-        let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
+        let rand = next_u32(&mut self.rng);
+        if rand % chance == 0 {
+            self.create_spawner();
+        }
 
-        for h in 0..level.height {
-            for w in 0..level.width {
-                match level.map.get(&MapIdx::new(w,h)) {
-                    Some(Tile::Floor) => {
-                        spawnable_spaces.push(MapIdx::new(w,h));
+    } 
+
+    /// Creates a new spawner in a random location with a Floor or Spawner to  
+    /// the north, east, south or west. 
+    pub fn create_spawner(&mut self) {
+           
+        let mut canditate_spaces: Vec<MapIdx> = Vec::new();
+        for h in 0..self.level.height {
+            for w in 0..self.level.width {
+                
+                // Check surrounding neighbours
+                let pos = MapIdx::new(w,h);
+                match self.level.map.get(&pos){
+                    // If Tile at Pos is a wall, see if there is a floor surrounding it
+                    Some(Tile::Wall) => {
+                        
+                        for idx in pos.neighbours() {
+                            match self.level.map.get(&idx) {
+                                Some(Tile::Floor) => {
+                                    canditate_spaces.push(pos);
+                                    break;
+                                },
+                                Some(Tile::Spawner) => {
+                                    canditate_spaces.push(pos);
+                                    break;
+                                },
+                                _ => (),
+                            }
+                        }
+
                     },
                     _ => (),
                 }
             }
         }
 
-        if spawnable_spaces.len() == 0 {
-            panic!("No spawnable spaces!");
+        // randomly choose a candidate space
+        if canditate_spaces.len() > 0 {
+            let idx = next_u32(&mut self.rng) as usize % canditate_spaces.len();
+            let pos = canditate_spaces[idx];
+            self.level.map.remove(&pos);
+            self.level.map.insert(pos, Tile::Spawner);
+            self.spawners.push(pos);
         }
-
-        let idx = next_u32(rng) as usize % spawnable_spaces.len();
-        let idx = spawnable_spaces.remove(idx);
-        idx
 
     }
 
@@ -187,21 +217,24 @@ impl GameModel {
     /// 
     /// Requires a function to convert a MapIdx to a Point2. See GameView's 
     /// map_idx_to_point2 function.
-    pub fn spawn_enemy(&mut self, idx_to_point: fn(MapIdx) -> Point2) {
+    pub fn spawn_enemies(&mut self, idx_to_point: fn(MapIdx) -> Point2) {
         
-        let spawn = GameModel::find_enemy_spawn(&self.level, &mut self.rng);
-        let target = &self.beacon.position;
-        let mut enemy = Enemy::new(idx_to_point(spawn));
-        
-        if let Some(path) = self.level.pathfind(&spawn, target) {
-            let mut enemy_path: Vec<Point2> = Vec::new();
-            for idx in path.0 {
-                enemy_path.push(idx_to_point(idx));
+        for spawner in self.spawners.iter() {
+            let r = next_u32(&mut self.rng);
+            if r % 1000 == 1 {
+                let target = &self.beacon.position;
+                let mut enemy = Enemy::new(idx_to_point(*spawner));
+                
+                if let Some(path) = self.level.pathfind(&spawner, target) {
+                    let mut enemy_path: Vec<Point2> = Vec::new();
+                    for idx in path.0 {
+                        enemy_path.push(idx_to_point(idx));
+                    }
+                    enemy.path = enemy_path;
+                    self.enemies.push(enemy);
+                }
             }
-            enemy.path = enemy_path;
-            self.enemies.push(enemy);
         }
-
     }
 
 }
