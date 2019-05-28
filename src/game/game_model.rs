@@ -45,7 +45,7 @@ use crate::entity::enemy::Enemy;
 /// The GameModel is also responsible for spawning enmies. First the location
 /// is found for where the enemy should be placed. Then, if a path can be 
 /// created from the Tile to the Beacon, the new enemy is added to the enemy 
-/// list. Otherwise, no enemy is added.See GameView's map_idx_to_point2 
+/// list. Otherwise, no enemy is added. See GameView's map_idx_to_point2 
 /// function.
 pub struct GameModel {
     pub level: Level,
