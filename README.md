@@ -3,7 +3,7 @@
 
 A survival tower defense game made in rust.
 
-![Game demo](images/game-demo.PNG)
+![Game demo](images/game-demo.png)
 
 ## Install
 
@@ -33,6 +33,19 @@ Open a terminal and do the following
 
     ```bash
     cargo run
+    ```
+
+## Documentation
+1. Navigate to the rustGame directory
+
+    ```bash
+    cd rustGame
+    ```
+
+2. Generate the documentation
+
+    ```bash
+    cargo doc --open
     ```
 
 ## How to Play
