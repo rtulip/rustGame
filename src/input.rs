@@ -1,32 +1,22 @@
 use std::env;
 
-/// init_config
-/// 
 /// Structure to contain all the initial configurations
 pub struct InitConfig {
     pub debug: bool,
 }
 
 impl InitConfig {
-    /// new() 
-    /// 
-    /// args:
-    ///     None
-    /// returns: A new InitConfig struct.
-    /// default debug value is false.
+    /// Returns a new InitConfig. The debug value defaults to false.
     fn new() -> Self {
         Self {debug: false}
     }
 
 }
 
-/// handle_init_input()
+/// Returns a newly created init_config after parsing command line inputs
 /// 
-/// args:
-///     None
-/// 
-/// returns: A newly created init_config after parsing command line inputs
-/// 
+/// The following arguments are valid arguments:
+/// 1. -d or --debug: Use a constant known seed 
 pub fn handle_init_input() -> InitConfig {
         let mut config = InitConfig::new();
         let args: Vec<String> = env::args().collect();
