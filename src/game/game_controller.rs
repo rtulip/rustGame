@@ -58,11 +58,10 @@ impl GameController {
         let cursor_pos = Point2 {x: 0.0, y: 0.0};
         let keys_pressed = HashSet::new();
 
+        model.create_spawner();
+        model.create_spawner();
+
         // Temporary. Will be removed once random enemy spawning in added.
-        model.spawn_enemy(GameView::map_idx_to_point2);
-        model.spawn_enemy(GameView::map_idx_to_point2);
-        model.spawn_enemy(GameView::map_idx_to_point2);
-        
         Self {model: model, view: view, state: GameState::Running, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
 
     }
@@ -114,7 +113,8 @@ impl GameController {
         // Tick enemies and check for collision.
         self.tick_enemies();
 
-        self.model.create_spawner();
+        self.model.chanced_create_spawner(5000);
+        self.model.spawn_enemies(GameView::map_idx_to_point2);
         
     }
 
