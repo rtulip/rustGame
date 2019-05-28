@@ -8,10 +8,25 @@ const WIDTH: i32 = 50;
 const HEIGHT: i32 = 50;
 const ITERS: i32 = 5;
 
-/// MapIdx Type
+/// A struct for indexing into a Map.
 /// 
-/// MapIdx represents a grid position in 2D space. 
-/// MapIdx.0 is x and MapIdx.1 is y
+/// # Example 
+/// ```
+/// extern crate rust_game;
+/// use rust_game::Level::MapIdx;
+/// 
+/// // create an index for the point (5,3)
+/// fn main() {
+///     let idx = MapIdx::new(5, 3);
+///     assert_eq(idx.x, 5);
+///     assert_eq(idx.y, 3);
+/// 
+///     // The new function doesn't need to be used
+///     let idx = MapIdx {x: 5, y: 3};
+///     assert_eq(idx.x, 5);
+///     assert_eq(idx.y, 3);
+/// }
+/// ```
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct MapIdx {
     pub x: i32,
@@ -19,49 +34,117 @@ pub struct MapIdx {
 }
 
 impl MapIdx {
+    
+    /// Create new MapIdx
     pub fn new(x: i32, y: i32) -> Self {
         Self {x: x, y: y}
     }
 
+    /// Calculates the straight line distance between two MapIdx points.
+    /// Used as a heuristic for A* pathfinding in a Map.
     fn distance(&self, other: &MapIdx) -> u32 {
         (absdiff(self.x, other.x) + absdiff(self.y, other.y)) as u32
     }
 
+    /// Returns the positions surrounding a MapIdx to the north, south, east, 
+    /// and west. Used to navigate a Map using A*. 
     fn neighbours(&self) -> Vec<MapIdx> {
         vec![MapIdx::new(self.x-1, self.y), MapIdx::new(self.x, self.y-1),
              MapIdx::new(self.x+1, self.y), MapIdx::new(self.x, self.y+1)]
     }
 
-    fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)>  {
+    /// Returns a the positions surronding a MapIdx which are traversable in the 
+    /// input Map and a cost. If the space is traversable, the cost is 1. Only
+    /// Tile::Floor is traversable. Any other Tile variant surrounding the 
+    /// MapIdx will be counted as impassable.
+    fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)> {
+        // Find surrounding spaces
         let mut neighbours = self.neighbours();
+        // A list of indicies to remove 
         let mut remove: Vec<usize> = Vec::new();
-        for i in (0..neighbours.len()).rev() {
-            match map.get(&neighbours[i]){
-                Some(Tile::Wall) => {
-                    remove.push(i);
-                },
-                Some(Tile::Cust(_val)) => {
+        // Traverse the neibhbours backwards, so that removing by index doesn't
+        // cause any issues
+        for (i, idx) in neighbours.iter().enumerate().rev() {
+            // If map.get(idx) contains a Tile::Floor do nothing, otherwise mark
+            // the tile for removal
+            match map.get(idx) {
+                Some(Tile::Floor) => (),
+                _ => {
                     remove.push(i);
                 }
-                _ => ()
             }
         }
+        // Remove all marked tiles from neighbour list
         for i in remove {
             neighbours.remove(i);
         }
+        // return the traversable tiles mapped with a traversal cost of 1
         neighbours.into_iter().map(|p| (p, 1)).collect()
 
     }
 }
-/// Map Type
-/// 
-/// A Map is a HashMap which associates positions to Tiles. 
+
+/// A HashMap mapping MapIdxs to Tiles. Used to represent the game board.
 pub type Map = HashMap<MapIdx, Tile>;
 
-/// Level Struct
+/// A structure to fully describe the game board. A Map is used to store the 
+/// Tiles representing the game board. Width and height are provided for easy
+/// traversal. A random number generator is included to make random selections
+/// for spawning entities. 
 /// 
-/// Encapsulates all information for a level.
-/// Includes a Map, the width and height of the level, and the ChaChaRng. 
+/// Random generation is done using a seeded random number generator. To allow
+/// for fixed seeds (for testing), a Seed must be provided.
+/// 
+/// # Level Generation
+/// Level generation is done using Conway's Game of Life. Initially roughly 50%
+/// of all spaces are created as a Tile::Wall (chosen randomly). Then a number
+/// of iterations of Conway's Game of Life are run to create natural looking 
+/// level for the player to navigate in. 
+/// 
+/// Rosetta code was referenced for the [Game of Life implementation](http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust).
+/// 
+/// After the Game of Life iterations are complete, the remaining spaces are
+/// filled with Tile::Floor filling out the board. 
+/// 
+/// The next step in level generation is to ensure there is only one area which
+/// can be navigated. This step might not be strictly necessary, but it ensures
+/// that the beacon, the player, and all enemies are reachable from each other.
+/// 
+/// To acomplish this a flood fill algorithm is used to find all connected 
+/// components of the Map. Then all but the largest connected component is 
+/// filled with Tile::Wall. As such this ensures that any Tile::Floor is 
+/// reachable from all other Tile::Floor in the Map.
+/// 
+/// Finally, to ensure all entities remain within the map, the outer rim of the
+/// Map is turned into Tile::Wall. 
+/// 
+/// # Path Finding
+/// To navigate the Map, an A* algorithm is used. 
+/// 
+/// # Example
+/// 
+/// ```
+/// extern crate rust_game;
+/// use rust_game::misc::random::Seed
+/// use rust_game::level::{Level, MapIdx};
+/// 
+/// fn main() {
+///     
+///     // Create a Seed
+///     let seed: Seed = [1,2,3,4,5,6,7,8,
+///                       1,2,3,4,5,6,7,8,
+///                       1,2,3,4,5,6,7,8,
+///                       1,2,3,4,5,6,7,8];
+///     // Create a level 
+///     let level = Level::new(seed);
+/// 
+///     let start = MapIdx::new(5,5);
+///     let target = MapIdx::new(10,3);
+/// 
+///     let (path, cost) = level.pathfind(&start, &target);
+/// 
+/// }
+/// ```
 pub struct Level {
     pub map: Map,
     pub width: i32,
@@ -73,16 +156,8 @@ impl Level {
     // Referenced http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust for Game of Life
     // implementation.
 
-    /// new()
-    /// 
-    /// args: 
-    ///     width: i32: The width of the Map to be created.
-    ///     height: i32: The height of the Map to be created.
-    ///     iters: i32: The number of iterations of Conway's Game of Life to run.
-    ///     seed: <ChaChaCore as SeedableRng::Seed>: The seed used to create a new random number
-    ///         generator. 
-    /// 
-    /// returns: The newly created Level.
+    /// Returns a new level using a random number generator created from the 
+    /// input seed.
     pub fn new(init: Seed) -> Self {
         let mut map: Map = Map::new();
         let mut rng = from_seed(init);
@@ -119,32 +194,20 @@ impl Level {
 
     }
 
-    /// neighbours()
-    /// 
-    /// args:
-    ///     &(x,y): &MapIdx: A reference to a position.
-    /// 
-    /// return: A vector of all 8 positions which surround the input position.
-    /// 
-    /// Will go beyond width and height boundaries in edge cases. Ensure that edges
-    /// are checked to avoid issues. 
+    /// Returns a list of indicies surrounding the input index. Differs from
+    /// MapIdx.neighbours because it looks in all 8 surrounding locations. 
     fn neighbours(map_idx: &MapIdx) -> Vec<MapIdx> {
         vec![MapIdx::new(map_idx.x-1, map_idx.y-1),MapIdx::new(map_idx.x-1, map_idx.y),MapIdx::new(map_idx.x-1, map_idx.y+1),
              MapIdx::new(map_idx.x,   map_idx.y-1)  ,                                  MapIdx::new(map_idx.x,   map_idx.y+1),
              MapIdx::new(map_idx.x+1, map_idx.y-1),MapIdx::new(map_idx.x+1, map_idx.y),MapIdx::new(map_idx.x+1, map_idx.y+1)]
     }
 
-    /// neighbour_counts()
+    /// Returns a HashMap relating each position in the input Map to the number
+    /// of neighbours surrounding the point. A neighbour is considered to be
+    /// any Tile variant within the Map. 
     /// 
-    /// args:
-    ///     map: &Map: A reference to a Map.
-    /// 
-    /// returns: A HashMap relating each position in the input Map to the number of
-    /// neighbours surrounding the point. 
-    /// 
-    /// Assumes that the input Map only contains Tile::Walls at this time. Should  
-    /// be updated to count the surrounding number of Tile::Wall instead of number  
-    /// of elements surrounding each point.
+    /// For use in level generation, only Tile::Walls should be present in the
+    /// input Map. 
     fn neighbour_counts(map: &Map) -> HashMap<MapIdx, i32> {
         let mut ncnts = HashMap::new();
         for (idx, _tile) in map.iter() {
@@ -154,17 +217,9 @@ impl Level {
         }
         ncnts
     }
-
-    /// generation()
-    /// 
-    /// args:
-    ///     map: Map: The Map to be progressed by a generation.
-    /// 
-    /// returns: A new Map as created by simulating a generation of Conway's Game
-    /// of Life.
-    /// 
-    /// Assumes that the input Map only contains Tile::Walls at this time. Should  
-    /// be updated to handle other Tile types within the Map.
+ 
+    /// Returns a new Map as created by simulating a generation of Conway's 
+    /// Game of Life. Assumes that the input Map only contains Tile::Walls.
     fn generation(map: Map) -> Map {
         Level::neighbour_counts(&map)
             .into_iter()
@@ -177,13 +232,8 @@ impl Level {
             .collect()
     }
 
-    /// iterate_map()
-    /// 
-    /// args:
-    ///     init: Map: The initial arangement of the Map to be generated.
-    ///     iters: i32: The number of iterations of Conway's Game of Life to run.
-    ///
-    /// returns: The iterated Map 
+    /// Returns the Map created after processing the input Map for iters 
+    /// generations of Conway's Game of Life. 
     fn iterate_map(init: Map, iters: i32) -> Map {
         let mut map: Map = init; 
         for i in 0..iters+1 {
@@ -194,13 +244,6 @@ impl Level {
         map
     }
 
-    /// fill_walls()
-    /// 
-    /// args:
-    ///     mut map: Map: A mutable version of the Map to be filled.
-    ///     width: i32: The width of the map.
-    ///     height: i32: The height of the map.
-    /// 
     /// returns: An augmented version of the map which has only one traversable
     /// area. The connected area of the map is chosen, every other space is 
     /// converted into a Tile::Wall. 
@@ -213,15 +256,6 @@ impl Level {
     ///        Tile::Wall.
     fn fill_walls(mut map: Map, width: i32, height:i32) -> Map {
 
-        /// flood_fill()
-        /// 
-        /// args:
-        ///     mut map: &mut Map: The Map which is being traversed.
-        ///     start: &MapIdx: The starting position of the flood fill.
-        ///     new_val: &i32: The replacement value of the flood fill.
-        ///     sets: &mut HashMap<i32, i32>: A hashmap to track the sets of 
-        ///         traversable area and their sizes.
-        /// 
         /// Convertes all reachable Tile::Floor from start to Tile::Cust(new_val)
         fn flood_fill(mut map: &mut Map, start: &MapIdx, new_val: &i32, sets: &mut HashMap<i32, i32>) {
             match map.get(start) {
@@ -292,13 +326,6 @@ impl Level {
         map
     }
 
-    /// fill_edge()
-    /// 
-    /// args:
-    ///     map: Map: A mutable map of which the edges will be filled
-    ///     width: i32: The width of the Map
-    ///     height: i32 The height of the Map
-    /// 
     /// Fills in the edges of the Map with Walls, to prevent anyone from exiting
     /// the Level.
     fn fill_edge(mut map: Map, width: i32, height:i32) -> Map {
@@ -320,9 +347,11 @@ impl Level {
 
     }
 
-    pub fn pathfind(&self, start: MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
+    /// Returns a list of MapIdx and a total cost if there exists a path from
+    /// start to target, otherwise returns None.
+    pub fn pathfind(&self, start: &MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
 
-        astar(&start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == *target)
+        astar(start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == *target)
 
     }
 

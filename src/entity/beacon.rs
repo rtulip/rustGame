@@ -5,6 +5,10 @@ use std::f64;
 const ROTATION_SPEED: f64 = 0.01;
 const STARTING_HEALTH: i32 = 4;
 
+/// A struct representing the Beacon game component. The beacon is the game 
+/// piece the player is trying to defend. If enemies collide with the Beacon,
+/// the Beacon will lose health. If the Beacon runs out of health, the game 
+/// will be over.
 pub struct Beacon {
     pub position: MapIdx,
     pub health: i32,
@@ -12,6 +16,7 @@ pub struct Beacon {
 }
 
 impl Beacon {
+    /// Creates a new beacon.
     pub fn new(pos: MapIdx) -> Self {
         Self {
             position: pos,

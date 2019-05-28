@@ -8,12 +8,16 @@ use graphics::{Context, Graphics};
 use graphics::types::Color;
 use std::f64;
 
+/// An enum to describe all the different states of animation. Ready means that
+/// the animation is ready to start. Active means the animation is currently in
+/// progress, and Finished means that the animation has completed.
 pub enum AnimationEnum {
     Active,
     Finished,
     Ready,
 }
 
+/// A structure to fully describe an animation.
 pub struct MeleeAnimation {
     pub animation_width: f64,
     pub animation_height: f64,
@@ -41,7 +45,6 @@ impl State for MeleeAnimation {
     }
 }
 
-
 const TILE_SIZE: f64 = 20.0;
 const PLAYER_SIZE: f64 = 16.0;
 const PLAYER_RADIUS: f64 = PLAYER_SIZE/2.0;
@@ -68,10 +71,8 @@ const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation
     };
 
 
-/// GameViewSettings 
-/// 
-/// A structure containing the needed information to draw each Entity and Shape
-/// in the game.
+/// A structure to encapsulate all the settings used by the GameView to display
+/// the GameModel
 pub struct GameViewSettings {
 
     pub tile_size: f64,
@@ -115,33 +116,29 @@ impl GameViewSettings {
 
 }
 
-/// GameView
-/// 
-/// A structure to handle all the graphics in the game
+/// A structure responsible for drawing the GameModel.
 pub struct GameView {
     pub settings: GameViewSettings,
 }
 
 impl GameView {
     
+    /// Creates a new GameView
     pub fn new() -> Self {
         Self { settings: GameViewSettings::new() }
     }
 
+    /// Public function to translate a MapIdx to a Point2. This allows for the
+    /// size of the tiles to change while leaving all the game logic the same.
+    /// Some functions in the GameModel use this function.
     pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
         Point2 {x: idx.x as f64 * TILE_SIZE, y: idx.y as f64 * TILE_SIZE}
 
     }
 
-    /// draw()
-    /// 
-    /// args:
-    ///     model: &GameModel: A reference to the GameModel to draw
-    ///     c: &Context: The graphics Context
-    ///     g: &mut Graphics: A mutable reference to the Graphics
-    /// 
-    /// Draws the GameModel
+    /// Draws the GameModel by first drawing the level, then the player, then
+    /// the beacon, and finally all the enemies.
     pub fn draw<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         self.draw_level(model, c, g);
         self.draw_player(model, c, g);
@@ -149,14 +146,6 @@ impl GameView {
         self.draw_enemies(model, c, g);
     }
 
-    /// draw_level()
-    /// 
-    /// args:
-    ///     model: &GameModel: A reference to the GameModel for which the level
-    ///         is to be drawn
-    ///     c: &Context: The graphics Context
-    ///     g: &mut Graphics: A mutable reference to the Graphics
-    /// 
     /// Draws the Level of the GameModel by looping through each tile in the 
     /// Map.
     fn draw_level<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
@@ -203,17 +192,10 @@ impl GameView {
 
     }
 
-    /// draw_player()
-    /// 
-    /// args:
-    ///     model: &GameModel: A reference to the GameModel for which the 
-    ///         player is to be drawn
-    ///     c: &Context: The graphics Context
-    ///     g: &mut Graphics: A mutable reference to the Graphics
-    /// 
     /// Draws the Player of the GameModel. If the player is attacking, the 
     /// Player's sword is drawn as well.
     fn draw_player<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+        // Draw the player
         model.player.get_shape().draw(
             self.settings.player_color,
             self.settings.player_radius,
@@ -224,8 +206,10 @@ impl GameView {
             c,
             g
         );
+        // Draw the player's attack anmiation if in Active state. 
         match self.settings.player_attack_animation.state {
             AnimationEnum::Active => {
+                // Everything in this match statement should be moved to a separate function.
                 let shape = attack::Attack {};
                 let shape = shape.get_shape();
                 let pi = f64::consts::PI;

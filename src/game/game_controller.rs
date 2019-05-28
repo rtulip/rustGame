@@ -1,25 +1,45 @@
 use crate::game::{GameModel, GameView, AnimationEnum};
 use crate::misc::random::Seed;
 use crate::misc::point2d::Point2;
-use crate::misc::vector2d::Vec2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
-use crate::entity::{player, tile, enemy};
+use crate::entity::{player, tile};
 use crate::level::MapIdx;
 
 use std::collections::HashSet;
 
 use piston::input::{GenericEvent, Button, Key};
 
+/// An enumeration describeing the different states for the Game. Running 
+/// implies that both the GameModel Player and the GameModel Beacon have
+/// health remaining. Finished implies that either the Beacon or the Player
+/// have run out of health, and so the game is over.
 pub enum GameState {
     Running,
     Finished,
 }
 
-/// GameController
-/// 
 /// A struct to control the game processes including user input, graphics and
-/// game ticks
+/// game ticks.
+/// 
+/// # Input Handling
+/// The position of the cursor is updated every time it is updated. 
+/// Every key pressed is tracked in the keys_pressed list, and whenever a 
+/// key is released, the key is removed from the key pressed list. 
+/// 
+/// ## Cursor Position
+/// This input is used to control which direction the Player is facing.
+/// 
+/// ## W Key
+/// This input is used to start and stop player movement. So long as this 
+/// key is pressed, and the Space Bar isn't pressed, the player will move
+/// towards the direction it's facing (towards the mouse). 
+/// 
+/// ## Space Bar
+/// This input is used to control the player attack animation. Pressing 
+/// space will start the animation. This will prevent all player movement 
+/// until the space bar is released. The animation will draw a box in the
+/// center of the Player towards the mouse. 
 pub struct GameController {
     pub model: GameModel,
     pub view: GameView,
@@ -29,6 +49,8 @@ pub struct GameController {
 }
 
 impl GameController {
+    
+    /// Creates a new GameController.
     pub fn new(seed: Seed) -> Self {
         
         let view = GameView::new();
@@ -36,8 +58,7 @@ impl GameController {
         let cursor_pos = Point2 {x: 0.0, y: 0.0};
         let keys_pressed = HashSet::new();
 
-        println!("BEACON SPAWN: {:?}", GameView::map_idx_to_point2(model.beacon.position));
-
+        // Temporary. Will be removed once random enemy spawning in added.
         model.spawn_enemy(GameView::map_idx_to_point2);
         model.spawn_enemy(GameView::map_idx_to_point2);
         model.spawn_enemy(GameView::map_idx_to_point2);
@@ -46,18 +67,13 @@ impl GameController {
 
     }
 
-    /// handle_event()
-    /// 
-    /// args:
-    ///     e: &GenericEvent: The generic event to be handled
-    /// 
     /// Parses the event for cursor position, Keyboard presses and keyboard
-    /// relseases
+    /// relseases. 
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
             self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
-            self.model.player.update_direction(&self.cursor_pos, self.view.settings.player_size);
         }
+        self.model.player.update_direction(&self.cursor_pos, self.view.settings.player_size);
         if let Some(Button::Keyboard(key)) = e.press_args() {
             self.keys_pressed.insert(key);
         }
@@ -75,30 +91,31 @@ impl GameController {
         }
     }
 
-    /// tick()
-    /// 
     /// Executes a single game tick
     pub fn tick(&mut self) {
+        // Update Movement state if W is pressed
         if self.keys_pressed.contains(&Key::W) {
             self.model.player.change_state(player::PlayerState::Moving);
         } else {
             self.model.player.change_state(player::PlayerState::Stationary);
         }
-
+        // Start animation if Space is pressed
         if self.keys_pressed.contains(&Key::Space) {
             self.view.settings.player_attack_animation.change_state(AnimationEnum::Active);
             self.model.player.change_state(player::PlayerState::Attacking);
         }
 
+        // Tick player
         self.model.player.tick();
+        // Check for collision
         self.check_player_collision();
+        // Tick Beacon
         self.model.beacon.tick();
+        // Tick enemies and check for collision.
         self.tick_enemies();
         
     }
 
-    /// check_player_collision()
-    /// 
     /// Checks the position of the player against the level walls. If the bounding
     /// box of the player overlaps with a wall, the position of the player is 
     /// corrected by the smallest move. Will take two game ticks to resolve corner
@@ -149,11 +166,26 @@ impl GameController {
         }
     }
 
+    /// Moves each enemy in the direction of its path. Then the position of 
+    /// each enemy is compared against the position of the Beacon and the 
+    /// Player. If there is a collision with either, the appropriate entity
+    /// takes damage, and the enemy is destroyed. If the Player and the Beacon
+    /// are both colliding with the enemy within the same game tick, they both
+    /// take damage.
+    /// 
+    /// For checking collisions with the beacon, the center point of the Beacon
+    /// must within the Enemy's radius.
+    /// 
+    /// For checking collisions with the Player, the Player and the Enemy must
+    /// overlap. 
     fn tick_enemies(&mut self) {
         let mut to_remove: Vec<usize> = Vec::new();
+        // Loop through enemies
         for (i, enemy) in self.model.enemies.iter_mut().enumerate().rev() {
+            // move enemy
             enemy.tick();
             
+            // check for collision with beacon. 
             let beacon_point = GameView::map_idx_to_point2(self.model.beacon.position);
             let beacon_center = Point2 {x: beacon_point.x + self.view.settings.beacon_size / 2.0,
                                         y: beacon_point.y + self.view.settings.beacon_size / 2.0};
@@ -163,6 +195,7 @@ impl GameController {
                 to_remove.push(i);
                 self.model.beacon.health -= 1;
             } 
+            // check for collision with the player.
             let player_center = Point2 { x: self.model.player.position.x + self.view.settings.player_size / 2.0,
                                          y: self.model.player.position.y + self.view.settings.player_size / 2.0};
             if (player_center.x - enemy_center.x).abs() + (player_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius + self.view.settings.player_radius {
@@ -172,11 +205,13 @@ impl GameController {
 
         }
 
+        // remove all enemies which had collisions
         for i in to_remove {
             self.model.enemies.remove(i);
             
         }
 
+        //Check Gamestate to see if GameOver.
         if self.model.beacon.health == 0 || self.model.player.health == 0{
             self.change_state(GameState::Finished);
         }
@@ -185,6 +220,7 @@ impl GameController {
 
 }
 
+// Basic state implementation for GameController.
 impl State for GameController {
     type StateEnum = GameState;
     fn change_state(&mut self, new_state: Self::StateEnum) {
