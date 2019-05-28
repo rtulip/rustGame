@@ -6,9 +6,47 @@ use crate::entity::tile::Tile;
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
 
-/// GameModel 
+/// A structure to fully encapsulate all components of the game. The different
+/// components include a Level, a Player, a Beacon and a collection of enemies.
+/// A random number generator is part of the structure to allow for randomly 
+/// choosing spawn points
 /// 
-/// A model of the games entities and controls game logic
+/// # Entity Spawn Points 
+/// 
+/// The GameModel is also responsible for finding the spawnpoints for each 
+/// entity indlucing the Beacon, the Player, and Enemies. 
+/// 
+/// ## Beacon
+/// 
+/// To find the spawn point of the Beacon, for each Tile::Floor in the Level,
+/// the ratio of Floors to Walls surrounding the point is calculated. This 
+/// ratio is used as a way to measure how open the surrounding area is. Only 
+/// Tiles which are above a threshold are considered for spawning. Once all the
+/// candidate spaces are found, one is chosen at random. 
+/// 
+/// If no spawnable space is found for the Beacon, the program panics.
+/// 
+/// ## Player
+/// 
+/// The spawn point of the player depends on the location of the Beacon. Each
+/// Tile::Floor in an area surrounding the Beacon is a candidate spawning 
+/// space. Once all candidate spaces have been found, one is chosen at random.
+/// 
+/// If no spawnable space is found for the Player, the program panics.  
+/// 
+/// ## Enemies
+/// 
+/// A random Tile::Floor is chosen for enemy spawn. 
+/// 
+/// If no spawnable space is found for the Enemy, the program panics.
+/// 
+/// # Spawning Enemies
+/// 
+/// The GameModel is also responsible for spawning enmies. First the location
+/// is found for where the enemy should be placed. Then, if a path can be 
+/// created from the Tile to the Beacon, the new enemy is added to the enemy 
+/// list. Otherwise, no enemy is added.See GameView's map_idx_to_point2 
+/// function.
 pub struct GameModel {
     pub level: Level,
     pub player: Player,
@@ -18,6 +56,11 @@ pub struct GameModel {
 }
 
 impl GameModel {
+    
+    /// Creates a new GameModel. idx_to_point is a function pointer which
+    /// will convert a MapIdx into a Point2. This is required for creating the
+    /// Player position since find_player_spawn() returns a MapIdx instead of a
+    /// Point2. 
     pub fn new(seed: Seed, idx_to_point: fn(MapIdx) -> Point2) -> Self {
         let level = Level::new(seed);
         let mut rng = from_seed(seed);
@@ -35,18 +78,10 @@ impl GameModel {
         }
     }
 
-    /// find_player_spawn()
+    /// Chooses a spawn point randomly from any Tile::Floor spaces surrounding
+    /// the input Beacon.
     /// 
-    /// args:
-    ///     level: &Level: A reference to the level to serach for a player 
-    ///         spwan point
-    ///     beacon: &Beacon: A reference to the beacon which the player is to
-    ///         spawn near
-    ///     rng: &mut RNG: A mutable reference to a random number generator
-    ///         which is used to decide which of the open spaces is to be the
-    ///         spawn point
-    /// 
-    /// Chooses a spawn point randomly from any Tile::Floor spaces in the Level
+    /// If no spawnable space is found the program will panic.
     fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> MapIdx {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
@@ -72,16 +107,10 @@ impl GameModel {
 
     }
 
-    /// find_beacon_spawn()
-    /// 
-    /// level: &Level: A reference to the level to serach for a beacon 
-    ///         spwan point
-    ///     rng: &mut RNG: A mutable reference to a random number generator
-    ///         which is used to decide which of the open spaces is to be the
-    ///         spawn point
-    /// 
     /// Finds an open space to spawn the beacon. To be sufficiently open there 
     /// must be at least threshold more Floors than Walls in a surrounding area
+    /// 
+    /// If no spawnable spaces are found, the program panics.
     fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
         
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
@@ -126,16 +155,8 @@ impl GameModel {
 
     } 
 
-    /// find_enemy_spawn()
-    /// 
-    /// args:
-    ///     level: &Level: A reference to the level to serach for a player 
-    ///         spwan point
-    ///     rng: &mut RNG: A mutable reference to a random number generator
-    ///         which is used to decide which of the open spaces is to be the
-    ///         spawn point
-    /// 
     /// Chooses a spawn point randomly from any Tile::Floor spaces in the Level
+    /// and if no spawnable space exists, the program panics.
     fn find_enemy_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
@@ -161,12 +182,18 @@ impl GameModel {
 
     }
 
+    /// Creates a new enemy if a path can be found from the randomly generated
+    /// spawn point to the Beacon. 
+    /// 
+    /// Requires a function to convert a MapIdx to a Point2. See GameView's 
+    /// map_idx_to_point2 function.
     pub fn spawn_enemy(&mut self, idx_to_point: fn(MapIdx) -> Point2) {
+        
         let spawn = GameModel::find_enemy_spawn(&self.level, &mut self.rng);
         let target = &self.beacon.position;
         let mut enemy = Enemy::new(idx_to_point(spawn));
         
-        if let Some(path) = self.level.pathfind(spawn, target) {
+        if let Some(path) = self.level.pathfind(&spawn, target) {
             let mut enemy_path: Vec<Point2> = Vec::new();
             for idx in path.0 {
                 enemy_path.push(idx_to_point(idx));
@@ -174,8 +201,7 @@ impl GameModel {
             enemy.path = enemy_path;
             self.enemies.push(enemy);
         }
-        
-        
+
     }
 
 }

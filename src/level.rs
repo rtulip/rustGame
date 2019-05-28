@@ -101,8 +101,7 @@ pub type Map = HashMap<MapIdx, Tile>;
 /// of iterations of Conway's Game of Life are run to create natural looking 
 /// level for the player to navigate in. 
 /// 
-/// Rosetta code was referenced for the [Game of Life implementation]
-/// (http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust).
+/// Rosetta code was referenced for the [Game of Life implementation](http://rosettacode.org/wiki/Conway%27s_Game_of_Life#Rust).
 /// 
 /// After the Game of Life iterations are complete, the remaining spaces are
 /// filled with Tile::Floor filling out the board. 
