@@ -4,7 +4,7 @@ use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::entity::{tile, attack};
-use graphics::{Context, Graphics};
+use graphics::{Context, Graphics, Transformed};
 use graphics::types::Color;
 use std::f64;
 
@@ -63,7 +63,7 @@ const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
 const ANIMATION_COLOR: Color = [0.5, 0.5, 0.5 ,1.0];
 const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation 
     {
-        animation_width: PLAYER_SIZE,
+        animation_width: PLAYER_SIZE *1.5,
         animation_height: PLAYER_SIZE / 3.0,
         animation_color: ANIMATION_COLOR,
         animation_position: Point2 {x: 0.0, y: 0.0},
@@ -159,44 +159,32 @@ impl GameView {
                     Some(tile::Tile::Floor) => {
                         let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.floor_color,
-                                                     p.x, 
-                                                     p.y, 
-                                                     settings.tile_size,
-                                                     settings.tile_size,
-                                                     0.0, 
+                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
+                                                     c.transform, 
                                                      c, 
-                                                     g)
+                                                     g);
                     },
                     Some(tile::Tile::Wall) => {
                         let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.wall_color,
-                                                     p.x, 
-                                                     p.y, 
-                                                     settings.tile_size,
-                                                     settings.tile_size,
-                                                     0.0, 
+                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
+                                                     c.transform, 
                                                      c, 
-                                                     g)
+                                                     g);
                     },
                     Some(tile::Tile::Spawner) => {
                         let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.spawner_color,
-                                                     p.x, 
-                                                     p.y, 
-                                                     settings.tile_size,
-                                                     settings.tile_size,
-                                                     0.0, 
+                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
+                                                     c.transform, 
                                                      c, 
                                                      g)
                     },
                     _ => {
                         let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
                         tile::Tile::Floor.get_shape().draw(settings.error_color,
-                                                     p.x, 
-                                                     p.y, 
-                                                     settings.tile_size,
-                                                     settings.tile_size,
-                                                     0.0,
+                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
+                                                     c.transform, 
                                                      c, 
                                                      g)
                     },
@@ -243,21 +231,14 @@ impl GameView {
                 let player_center = Point2 { x: model.player.position.x + self.settings.player_size / 2.0,
                                              y: model.player.position.y + self.settings.player_size / 2.0};
                 
-                let tangent_point = Point2 { x: player_center.x + self.settings.player_radius * rad.cos(),
-                                             y: player_center.y + self.settings.player_radius * rad.sin()};
-
-                let animation_corner = Point2{ x: tangent_point.x - self.settings.player_attack_animation.animation_height / 2.0,
-                                               y: tangent_point.y - self.settings.player_attack_animation.animation_height / 2.0};
-                
+                let transform = c.transform.trans(player_center.x, player_center.y).rot_rad(rad);
                 shape.draw( self.settings.player_attack_animation.animation_color,
-                            animation_corner.x,
-                            animation_corner.y,
-                            self.settings.player_attack_animation.animation_width,
-                            self.settings.player_attack_animation.animation_height,
-                            rad, 
+                            [0.0, 0.0, self.settings.player_attack_animation.animation_width,
+                             self.settings.player_attack_animation.animation_height],
+                            transform, 
                             c, 
                             g);                
-                self.settings.player_attack_animation.animation_position = animation_corner;
+                self.settings.player_attack_animation.animation_position = player_center;
                 self.settings.player_attack_animation.animation_rotation = rad;
             },
             _ => ()
@@ -269,11 +250,8 @@ impl GameView {
         let p = GameView::map_idx_to_point2(MapIdx::new(model.beacon.position.x, model.beacon.position.y));
         model.beacon.get_shape().draw(
             self.settings.beacon_color,
-            p.x, 
-            p.y, 
-            self.settings.beacon_size,
-            self.settings.beacon_size,
-            model.beacon.rotation, 
+            [p.x, p.y, self.settings.beacon_size,self.settings.beacon_size],
+            c.transform, 
             c, 
             g);
     }

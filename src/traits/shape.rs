@@ -1,5 +1,8 @@
 use graphics::{Rectangle, Context, Graphics, Transformed};
+use graphics::math::Matrix2d;
 use graphics::types::Color;
+
+type rect = [f64;4];
 
 /// A struct representing a Circle Shape
 pub struct EllipseType {}
@@ -20,14 +23,9 @@ impl EllipseType {
 impl RectangleType {
     
     /// Draws an Rectangle in the specified Color at the specified location
-    pub fn draw<G: Graphics>(&self, color: Color, x: f64, y: f64, width: f64, height: f64, rotation: f64, c: &Context, g: &mut G) {
-        let mut transform = c.transform;
-        if rotation == 0.0 {
-            transform = transform.trans(x,y);
-        } else {
-            transform = transform.trans(x,y).rot_rad(rotation).trans(-width/2.0,-height/2.0);
-        }
-        Rectangle::new(color).draw([0.0, 0.0, width, height], &c.draw_state, transform, g);
+    pub fn draw<G: Graphics>(&self, color: Color, shape: rect, transform: Matrix2d, c: &Context, g: &mut G) {
+        
+        Rectangle::new(color).draw(shape, &c.draw_state, transform, g);
     }
 
 }

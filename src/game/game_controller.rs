@@ -207,6 +207,13 @@ impl GameController {
                 self.model.player.health -= 1;
             }
 
+            match self.model.player.state {
+                player::PlayerState::Attacking => {
+
+                },
+                _ => (),
+            }
+
         }
 
         // remove all enemies which had collisions
