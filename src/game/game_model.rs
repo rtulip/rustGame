@@ -5,6 +5,7 @@ use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
+use crate::entity::drops::Resource;
 
 /// A structure to fully encapsulate all components of the game. The different
 /// components include a Level, a Player, a Beacon and a collection of enemies.
@@ -52,6 +53,7 @@ pub struct GameModel {
     pub beacon: Beacon,
     pub enemies: Vec<Enemy>,
     pub spawners: Vec<MapIdx>,
+    pub resources: Vec<Resource>,
     rng: RNG,
 }
 
@@ -70,12 +72,14 @@ impl GameModel {
         let player = Player::new( idx_to_point(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
         let spawners: Vec<MapIdx> = Vec::new();
+        let resources: Vec<Resource> = Vec::new();
         Self {
             level: level,
             player: player,
             beacon: beacon,
             enemies: enemies,
             spawners: spawners,
+            resources: resources,
             rng: rng
         }
     }
