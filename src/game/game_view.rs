@@ -258,16 +258,7 @@ impl GameView {
 
     /// Draws the GameModel's Beacon
     fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
-        let p = GameView::map_idx_to_point2(MapIdx::new(model.beacon.position.x, model.beacon.position.y));
-        let transform = c.transform.trans(p.x + self.settings.beacon_size / 2.0, p.y + self.settings.beacon_size / 2.0)
-            .rot_rad(model.beacon.rotation)
-            .trans( -self.settings.beacon_size / 2.0, -self.settings.beacon_size / 2.0);
-        model.beacon.get_shape().draw(
-            self.settings.beacon_color,
-            [0.0, 0.0, self.settings.beacon_size,self.settings.beacon_size],
-            transform, 
-            c, 
-            g);
+        model.beacon.shape.draw(c, g);
     }
 
     /// Draws each enemy in the GameModel enemy list
