@@ -6,3 +6,4 @@ mod game_struct;
 mod game_model;
 mod game_controller;
 mod game_view;
+pub mod consts;
