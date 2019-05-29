@@ -40,9 +40,7 @@ impl Game {
         let mut events = Events::new(EventSettings::new());
         let mut gl = GlGraphics::new(self.opengl);
         let texture_settings = TextureSettings::new().filter(Filter::Nearest);
-        let ref mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), texture_settings)
-            .expect("Could not load font");
-
+        
         while let Some(e) = events.next(&mut window) {
             match self.controller.state {
                 GameState::Finished => break,
@@ -51,9 +49,11 @@ impl Game {
             self.controller.handle_event(&e);
             self.controller.tick();
             if let Some(args) = e.render_args() {
+                let ref mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), texture_settings)
+                        .expect("Could not load font");
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
-
+                    
                     clear([1.0; 4], g);
                     self.controller.view.draw(&self.controller.model, glyphs, &c, g)
                 });

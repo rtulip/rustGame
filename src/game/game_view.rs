@@ -4,7 +4,7 @@ use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::entity::{tile, attack};
-use graphics::{Context, Graphics, Transformed};
+use graphics::{Context, Graphics, Transformed, Image};
 use graphics::types::Color;
 use graphics::character::CharacterCache;
 use std::f64;
@@ -62,6 +62,7 @@ const RESOURCE_COLOR: Color = BEACON_COLOR;
 const PLAYER_COLOR: Color = [0.75, 0.12, 0.08,1.0];
 const ENEMY_COLOR: Color = [0.04, 0.13, 0.27, 1.0];
 const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
+const TEXT_COLOR: Color = [1.0, 1.0, 1.0, 1.0,];
 
 const ANIMATION_COLOR: Color = [0.5, 0.5, 0.5 ,1.0];
 const PLAYER_ATTACK_ANIMATION: MeleeAnimation = MeleeAnimation 
@@ -158,6 +159,7 @@ impl GameView {
         where C: CharacterCache<Texture = G::Texture> {
         
         self.draw_level(model, c, g);
+        self.draw_text(model, glyphs, c, g);
         self.draw_beacon(model, c, g);
         self.draw_resources(model, c, g);
         self.draw_enemies(model, c, g);
@@ -307,5 +309,32 @@ impl GameView {
 
         }
 
+    }
+
+    fn draw_text<G: Graphics, C>(
+        &mut self, 
+        model: &GameModel,
+        glyphs: &mut C, 
+        c: &Context, 
+        g: &mut G
+    ) 
+        where C: CharacterCache<Texture = G::Texture> {
+
+        let text_img = Image::new_color(ERROR_COLOR);
+        let score_string = model.player.resources.to_string();
+        let char_point = Point2 {
+            x: (model.level.width - 1) as f64 * self.settings.tile_size,
+            y: 0.0
+        };
+        
+        for ch in score_string.chars() {
+            if let Ok(character) = glyphs.character(34, ch) {
+                text_img.draw(
+                    character.texture, 
+                    &c.draw_state,
+                    c.transform.trans(char_point.x, char_point.y),
+                    g);
+            };
+        }
     }
 }

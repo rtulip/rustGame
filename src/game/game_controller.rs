@@ -179,7 +179,9 @@ impl GameController {
                                             y: resource.position.y + self.view.settings.drop_size / 2.0};
             if (resource_center.x - player_center.x).abs() + (resource_center.y - player_center.y).abs() <= self.view.settings.player_radius {
                 to_remove.push(i);
-                self.model.player.resources += 1;
+                if self.model.player.resources < 9 {
+                    self.model.player.resources += 1;
+                }
             }
         }
 
