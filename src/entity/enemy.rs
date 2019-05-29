@@ -1,4 +1,4 @@
-use crate::traits::{shape, entity, state};
+use crate::traits::{entity, state};
 use crate::traits::draw::{GenericShape,ShapeVariant};
 use crate::misc::{vector2d, point2d};
 use crate::game::consts::{
@@ -44,13 +44,6 @@ impl Enemy {
         }
     }
 
-}
-
-impl shape::Shape for Enemy {
-    type ShapeVairant = shape::EllipseType;
-    fn get_shape(&self) -> Self::ShapeVairant {
-        shape::EllipseType {}
-    }
 }
 
 impl entity::Entity for Enemy {
