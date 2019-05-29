@@ -10,9 +10,6 @@ use crate::game::consts::{
     PLAYER_STARTING_HEALTH
 };
 
-use std::f64;
-
-
 /// A struct defining the different states a Player can have. While Stationary,
 /// the Player isn't moving. While Moving, the player will move in the 
 /// direction of the Mouse Cursor. While attacking, the player will remain
