@@ -216,8 +216,7 @@ impl GameController {
             let beacon_point = GameView::map_idx_to_point2(self.model.beacon.position);
             let beacon_center = Point2 {x: beacon_point.x + self.view.settings.beacon_size / 2.0,
                                         y: beacon_point.y + self.view.settings.beacon_size / 2.0};
-            let enemy_center = Point2 { x: enemy.position.x + self.view.settings.enemy_size / 2.0,
-                                        y: enemy.position.y + self.view.settings.enemy_size / 2.0};
+            let enemy_center = enemy.shape.center_point();
             if (beacon_center.x - enemy_center.x).abs() + (beacon_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
                 to_remove.push((i,false));
                 self.model.beacon.health -= 1;

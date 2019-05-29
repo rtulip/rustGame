@@ -273,16 +273,7 @@ impl GameView {
     /// Draws each enemy in the GameModel enemy list
     fn draw_enemies<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         for enemy in model.enemies.iter() {
-            enemy.get_shape().draw(
-                self.settings.enemy_color,
-                self.settings.enemy_radius,
-                enemy.position.x,
-                enemy.position.y,
-                self.settings.enemy_size,
-                self.settings.enemy_size,
-                c,
-                g
-            );
+            enemy.shape.draw(c,g);
         }
     }
 
