@@ -52,6 +52,7 @@ pub struct GameModel {
     pub player: Player,
     pub beacon: Beacon,
     pub enemies: Vec<Enemy>,
+    pub max_enemies: usize,
     pub spawners: Vec<MapIdx>,
     pub resources: Vec<Resource>,
     rng: RNG,
@@ -78,6 +79,7 @@ impl GameModel {
             player: player,
             beacon: beacon,
             enemies: enemies,
+            max_enemies: 15,
             spawners: spawners,
             resources: resources,
             rng: rng
@@ -225,7 +227,7 @@ impl GameModel {
         
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
-            if r % 1000 == 0 {
+            if r % 1000 == 0 && self.enemies.len() < self.max_enemies {
                 let target = &self.beacon.position;
                 let mut enemy = Enemy::new(idx_to_point(*spawner));
                 
