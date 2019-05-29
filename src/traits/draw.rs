@@ -69,18 +69,27 @@ impl GenericShape {
     pub fn center_point(&self) -> Point2 {
         match self.shape {
             ShapeVariant::Square{size: val} => {
-                let offset = Point2 {
+                let center_offset = Point2 {
                     x: val / 2.0,
                     y: val / 2.0,
                 };
-                self.position + offset
+                if let Some(offset) = self.offset {
+                    self.position + center_offset + offset
+                } else {
+                    self.position + center_offset
+                }
+                
             }
             ShapeVariant::Circle{size: val, radius: _rad} => {
-                let offset = Point2 {
+                let center_offset = Point2 {
                     x: val / 2.0,
                     y: val / 2.0,
                 };
-                self.position + offset
+                if let Some(offset) = self.offset {
+                    self.position + center_offset + offset
+                } else {
+                    self.position + center_offset
+                } 
             }
         }
     }
