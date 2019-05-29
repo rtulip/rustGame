@@ -1,6 +1,7 @@
 use crate::traits::{shape, entity, state};
 use crate::misc::vector2d::Vec2;
 use crate::misc::point2d::Point2;
+use crate::traits::draw::{GenericShape, ShapeVariant};
 use std::f64;
 const STARTING_HEALTH: i32 = 10000;
 const PLAYER_SPEED: f64 = 0.1;
