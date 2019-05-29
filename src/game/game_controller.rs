@@ -134,6 +134,7 @@ impl GameController {
         let tile_size = self.view.settings.tile_size;
         let player_size = self.view.settings.player_size;
 
+        
         let min_x = ( self.model.player.shape.get_position().x / tile_size).floor() as i32;
         let max_x = ((self.model.player.shape.get_position().x + player_size) / tile_size).floor() as i32 + 1;
 
@@ -160,9 +161,11 @@ impl GameController {
                         }
 
                         if min_move == shift_left || min_move == shift_right {
-                            self.model.player.shape.get_position().x += min_move;
+                            let delta = Point2{x: min_move, y: 0.0};
+                            self.model.player.shape.update(delta, None);
                         } else {
-                            self.model.player.shape.get_position().y += min_move;
+                            let delta = Point2{x: 0.0, y: min_move};
+                            self.model.player.shape.update(delta, None);
                         }
 
                     },
