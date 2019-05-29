@@ -114,16 +114,16 @@ impl GenericShape {
 impl Draw for GenericShape {
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G){
         let mut transform = c.transform;
-        transform.trans(self.position.x, self.position.y);
+        transform = transform.trans(self.position.x, self.position.y);
         match self.rotation {
             Some(rad) => {
-                transform.rot_rad(rad);
+                transform = transform.rot_rad(rad);
             },
             None => (),
         }
         match self.offset {
             Some(offset) => {
-                transform.trans(offset.x, offset.y);
+                transform = transform.trans(offset.x, offset.y);
             },
             None => (),
         }
@@ -138,7 +138,7 @@ impl Draw for GenericShape {
                 );
             },
             ShapeVariant::Circle{size, radius} => {
-                Rectangle::new_border(self.color, radius).draw(
+                Rectangle::new_round(self.color, radius).draw(
                     [0.0,0.0,size,size],
                     &c.draw_state, 
                     transform, 
