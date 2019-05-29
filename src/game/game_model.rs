@@ -5,6 +5,7 @@ use crate::entity::player::Player;
 use crate::entity::tile::Tile;
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
+use crate::entity::drops::Resource;
 
 /// A structure to fully encapsulate all components of the game. The different
 /// components include a Level, a Player, a Beacon and a collection of enemies.
@@ -52,6 +53,7 @@ pub struct GameModel {
     pub beacon: Beacon,
     pub enemies: Vec<Enemy>,
     pub spawners: Vec<MapIdx>,
+    pub resources: Vec<Resource>,
     rng: RNG,
 }
 
@@ -70,12 +72,14 @@ impl GameModel {
         let player = Player::new( idx_to_point(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
         let spawners: Vec<MapIdx> = Vec::new();
+        let resources: Vec<Resource> = Vec::new();
         Self {
             level: level,
             player: player,
             beacon: beacon,
             enemies: enemies,
             spawners: spawners,
+            resources: resources,
             rng: rng
         }
     }
@@ -221,7 +225,7 @@ impl GameModel {
         
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
-            if r % 1000 == 1 {
+            if r % 1000 == 0 {
                 let target = &self.beacon.position;
                 let mut enemy = Enemy::new(idx_to_point(*spawner));
                 
@@ -235,6 +239,17 @@ impl GameModel {
                 }
             }
         }
+    }
+
+    /// Function to spawn a new resource at the location of the Enemy which was
+    /// killed. There is a roughly 33% chance of spawning a resource. 
+    pub fn spawn_resource(&mut self, enemy: &Enemy) {
+
+        let r = next_u32(&mut self.rng);
+        if r % 3 == 0 {
+            self.resources.push(Resource::new(enemy.position));
+        }
+
     }
 
 }

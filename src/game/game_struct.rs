@@ -5,7 +5,7 @@ use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings};
 use piston::input::RenderEvent;
 use glutin_window::GlutinWindow;
-use opengl_graphics::{OpenGL, GlGraphics};
+use opengl_graphics::{OpenGL, GlGraphics, Filter, GlyphCache, TextureSettings};
 
 const WINDOW_WIDTH: f64 = 1000.0;
 const WINDOW_HEIGHT: f64 = 1000.0;
@@ -39,6 +39,7 @@ impl Game {
         let mut window: GlutinWindow = self.window_settings.build().expect("Couldn't create window!");
         let mut events = Events::new(EventSettings::new());
         let mut gl = GlGraphics::new(self.opengl);
+        let texture_settings = TextureSettings::new().filter(Filter::Nearest);
         
         while let Some(e) = events.next(&mut window) {
             match self.controller.state {
@@ -48,11 +49,13 @@ impl Game {
             self.controller.handle_event(&e);
             self.controller.tick();
             if let Some(args) = e.render_args() {
+                let ref mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), texture_settings)
+                        .expect("Could not load font");
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
-
+                    
                     clear([1.0; 4], g);
-                    self.controller.view.draw(&self.controller.model, &c, g)
+                    self.controller.view.draw(&self.controller.model, glyphs, &c, g)
                 });
             }
         }
