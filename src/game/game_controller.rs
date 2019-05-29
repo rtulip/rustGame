@@ -134,21 +134,22 @@ impl GameController {
         let tile_size = self.view.settings.tile_size;
         let player_size = self.view.settings.player_size;
 
-        let min_x = ( self.model.player.position.x / tile_size).floor() as i32;
-        let max_x = ((self.model.player.position.x + player_size) / tile_size).floor() as i32 + 1;
+        
+        let min_x = ( self.model.player.shape.get_position().x / tile_size).floor() as i32;
+        let max_x = ((self.model.player.shape.get_position().x + player_size) / tile_size).floor() as i32 + 1;
 
-        let min_y = ( self.model.player.position.y / tile_size).floor() as i32;
-        let max_y = ((self.model.player.position.y + player_size) / tile_size).floor() as i32 + 1;
+        let min_y = ( self.model.player.shape.get_position().y / tile_size).floor() as i32;
+        let max_y = ((self.model.player.shape.get_position().y + player_size) / tile_size).floor() as i32 + 1;
         
         for h in min_y..max_y {
             for w in min_x..max_x {
                 match self.model.level.map.get(&MapIdx::new(w,h)) {
                     Some(tile::Tile::Wall) => {
                         let tile_pos = GameView::map_idx_to_point2(MapIdx::new(w, h));
-                        let shift_left = tile_pos.x - self.model.player.position.x - player_size - 0.1;
-                        let shift_right = tile_pos.x + tile_size - self.model.player.position.x + 0.1;
-                        let shift_up = tile_pos.y - self.model.player.position.y - player_size - 0.1;
-                        let shift_down = tile_pos.y + tile_size - self.model.player.position.y + 0.1;
+                        let shift_left = tile_pos.x - self.model.player.shape.get_position().x - player_size - 0.1;
+                        let shift_right = tile_pos.x + tile_size - self.model.player.shape.get_position().x + 0.1;
+                        let shift_up = tile_pos.y - self.model.player.shape.get_position().y - player_size - 0.1;
+                        let shift_down = tile_pos.y + tile_size - self.model.player.shape.get_position().y + 0.1;
     
                         let moves = [shift_left, shift_right, shift_up, shift_down];
                         let mut min_move = moves[0];
@@ -160,9 +161,11 @@ impl GameController {
                         }
 
                         if min_move == shift_left || min_move == shift_right {
-                            self.model.player.position.x += min_move;
+                            let delta = Point2{x: min_move, y: 0.0};
+                            self.model.player.shape.update(delta, None);
                         } else {
-                            self.model.player.position.y += min_move;
+                            let delta = Point2{x: 0.0, y: min_move};
+                            self.model.player.shape.update(delta, None);
                         }
 
                     },
@@ -171,8 +174,7 @@ impl GameController {
             }
         }
 
-        let player_center = Point2 { x: self.model.player.position.x + self.view.settings.player_size / 2.0,
-                                     y: self.model.player.position.y + self.view.settings.player_size / 2.0};
+        let player_center = self.model.player.shape.center_point();
         let mut to_remove: Vec<usize> = Vec::new();
         for (i,resource) in self.model.resources.iter_mut().enumerate().rev() {
             let resource_center = Point2 {  x: resource.position.x + self.view.settings.drop_size / 2.0,
@@ -221,8 +223,7 @@ impl GameController {
                 self.model.beacon.health -= 1;
             } 
             // check for collision with the player.
-            let player_center = Point2 { x: self.model.player.position.x + self.view.settings.player_size / 2.0,
-                                         y: self.model.player.position.y + self.view.settings.player_size / 2.0};
+            let player_center = self.model.player.shape.center_point();
             if (player_center.x - enemy_center.x).abs() + (player_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius + self.view.settings.player_radius {
                 to_remove.push((i,false));
                 self.model.player.health -= 1;

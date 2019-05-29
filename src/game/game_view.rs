@@ -3,6 +3,7 @@ use crate::level::MapIdx;
 use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
+use crate::traits::draw::Draw;
 use crate::entity::{tile, attack};
 use graphics::{Context, Graphics, Transformed, Image};
 use graphics::types::Color;
@@ -216,16 +217,7 @@ impl GameView {
     /// Player's sword is drawn as well.
     fn draw_player<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         // Draw the player
-        model.player.get_shape().draw(
-            self.settings.player_color,
-            self.settings.player_radius,
-            model.player.position.x,
-            model.player.position.y,
-            self.settings.player_size,
-            self.settings.player_size,
-            c,
-            g
-        );
+        model.player.shape.draw(c, g);
         // Draw the player's attack anmiation if in Active state. 
         match self.settings.player_attack_animation.state {
             AnimationEnum::Active => {
@@ -246,8 +238,7 @@ impl GameView {
 
                 rad = pi - rad;
 
-                let player_center = Point2 { x: model.player.position.x + self.settings.player_size / 2.0,
-                                             y: model.player.position.y + self.settings.player_size / 2.0};
+                let player_center = model.player.shape.center_point();
                 
                 let transform = c.transform.trans(player_center.x, player_center.y).rot_rad(rad);
                 shape.draw( self.settings.player_attack_animation.animation_color,
