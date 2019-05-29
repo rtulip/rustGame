@@ -1,4 +1,4 @@
-use crate::traits::{shape, entity};
+use crate::traits::{entity};
 use crate::traits::draw::{GenericShape, ShapeVariant};
 use crate::misc::point2d::Point2;
 use crate::game::consts::{
@@ -6,10 +6,6 @@ use crate::game::consts::{
     DROP_ROTATION_SPEED,
     RESOURCE_COLOR,
 };
-use std::f64::consts::PI;
-
-const ROTATION_SPEED: f64 = -0.01;
-
 /// A structure to represent a tower resource which can be used by the Player
 pub struct Resource {
     pub shape: GenericShape,
@@ -36,7 +32,6 @@ impl Resource {
 }
 
 impl entity::Entity for Resource {
-
     /// Rotates the Resource
     fn tick(&mut self){
         self.shape.update(Point2{x: 0.0, y: 0.0}, Some(DROP_ROTATION_SPEED));

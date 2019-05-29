@@ -249,7 +249,7 @@ impl GameModel {
 
         let r = next_u32(&mut self.rng);
         if r % 3 == 0 {
-            self.resources.push(Resource::new(enemy.shape.get_position()));
+            self.resources.push(Resource::new(enemy.shape.center_point()));
         }
 
     }
