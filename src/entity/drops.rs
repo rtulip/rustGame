@@ -19,12 +19,17 @@ pub struct Resource {
 impl Resource {
     /// Creates a new Resource
     pub fn new(position: Point2) -> Self {
+        let mut shape = GenericShape::new(
+            ShapeVariant::Square{size: DROP_SIZE},
+            RESOURCE_COLOR, 
+            position
+        );
+        shape.set_offset(Point2{
+            x: DROP_SIZE / -2.0, 
+            y: DROP_SIZE / -2.0
+        });
         Self {
-            shape: GenericShape::new(
-                ShapeVariant::Square{size: DROP_SIZE},
-                RESOURCE_COLOR, 
-                position
-            ),
+            shape: shape,
             rotation: 0.0,
         }
     }
