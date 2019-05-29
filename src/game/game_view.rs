@@ -282,16 +282,7 @@ impl GameView {
 
         for resource in model.resources.iter() {
 
-            let transform = c.transform.trans(resource.position.x + self.settings.drop_size / 2.0,
-                resource.position.y + self.settings.drop_size / 2.0)
-                .rot_rad(resource.rotation)
-                .trans( -self.settings.drop_size / 2.0, -self.settings.drop_size / 2.0);
-            resource.get_shape().draw(
-                self.settings.resource_color,
-                [0.0, 0.0, self.settings.drop_size,self.settings.drop_size],
-                transform, 
-                c, 
-                g);
+            resource.shape.draw(c,g);
 
         }
 
