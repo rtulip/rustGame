@@ -257,7 +257,8 @@ impl GameView {
                             c, 
                             g);                
                 self.settings.player_attack_animation.animation_position = player_center;
-                self.settings.player_attack_animation.animation_rotation = rad;
+                self.settings.player_attack_animation.animation_rotation = rad * -1.0;
+
             },
             _ => ()
         }
