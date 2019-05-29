@@ -174,40 +174,9 @@ impl GameView {
         let settings = &self.settings;
         for h in 0..model.level.height {
             for w in 0..model.level.width {
-                match model.level.map.get(&MapIdx::new(w,h)){
-                    Some(tile::Tile::Floor) => {
-                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
-                        tile::Tile::Floor.get_shape().draw(settings.floor_color,
-                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
-                                                     c.transform, 
-                                                     c, 
-                                                     g);
-                    },
-                    Some(tile::Tile::Wall) => {
-                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
-                        tile::Tile::Floor.get_shape().draw(settings.wall_color,
-                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
-                                                     c.transform, 
-                                                     c, 
-                                                     g);
-                    },
-                    Some(tile::Tile::Spawner) => {
-                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
-                        tile::Tile::Floor.get_shape().draw(settings.spawner_color,
-                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
-                                                     c.transform, 
-                                                     c, 
-                                                     g)
-                    },
-                    _ => {
-                        let p = GameView::map_idx_to_point2(MapIdx::new(w, h));
-                        tile::Tile::Floor.get_shape().draw(settings.error_color,
-                                                     [p.x, p.y, settings.tile_size,settings.tile_size],
-                                                     c.transform, 
-                                                     c, 
-                                                     g)
-                    },
-                };
+                if let Some(tile) = model.level.map.get(&MapIdx::new(w, h)) {
+                    tile.shape.draw(c,g);
+                }
             }
         }
 

@@ -3,7 +3,8 @@ use crate::misc::random::Seed;
 use crate::misc::point2d::Point2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
-use crate::entity::{player, tile};
+use crate::entity::player;
+use crate::entity::tile::{Tile, TileVariant};
 use crate::level::MapIdx;
 
 use std::collections::HashSet;
@@ -143,33 +144,34 @@ impl GameController {
         
         for h in min_y..max_y {
             for w in min_x..max_x {
-                match self.model.level.map.get(&MapIdx::new(w,h)) {
-                    Some(tile::Tile::Wall) => {
-                        let tile_pos = GameView::map_idx_to_point2(MapIdx::new(w, h));
-                        let shift_left = tile_pos.x - self.model.player.shape.get_position().x - player_size - 0.1;
-                        let shift_right = tile_pos.x + tile_size - self.model.player.shape.get_position().x + 0.1;
-                        let shift_up = tile_pos.y - self.model.player.shape.get_position().y - player_size - 0.1;
-                        let shift_down = tile_pos.y + tile_size - self.model.player.shape.get_position().y + 0.1;
-    
-                        let moves = [shift_left, shift_right, shift_up, shift_down];
-                        let mut min_move = moves[0];
+                if let Some(tile) = self.model.level.map.get(&MapIdx::new(w,h)) {
+                    match tile.variant {
+                        TileVariant::Wall => {
+                            let tile_pos = GameView::map_idx_to_point2(MapIdx::new(w, h));
+                            let shift_left = tile_pos.x - self.model.player.shape.get_position().x - player_size - 0.1;
+                            let shift_right = tile_pos.x + tile_size - self.model.player.shape.get_position().x + 0.1;
+                            let shift_up = tile_pos.y - self.model.player.shape.get_position().y - player_size - 0.1;
+                            let shift_down = tile_pos.y + tile_size - self.model.player.shape.get_position().y + 0.1;
+        
+                            let moves = [shift_left, shift_right, shift_up, shift_down];
+                            let mut min_move = moves[0];
 
-                        for i in 0..4 {
-                            if moves[i].abs() < min_move.abs() {
-                                min_move = moves[i];
+                            for i in 0..4 {
+                                if moves[i].abs() < min_move.abs() {
+                                    min_move = moves[i];
+                                }
+                            }
+
+                            if min_move == shift_left || min_move == shift_right {
+                                let delta = Point2{x: min_move, y: 0.0};
+                                self.model.player.shape.update(delta, None);
+                            } else {
+                                let delta = Point2{x: 0.0, y: min_move};
+                                self.model.player.shape.update(delta, None);
                             }
                         }
-
-                        if min_move == shift_left || min_move == shift_right {
-                            let delta = Point2{x: min_move, y: 0.0};
-                            self.model.player.shape.update(delta, None);
-                        } else {
-                            let delta = Point2{x: 0.0, y: min_move};
-                            self.model.player.shape.update(delta, None);
-                        }
-
-                    },
-                    _ => {}
+                        _ => (),
+                    }
                 }
             }
         }

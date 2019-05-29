@@ -9,6 +9,7 @@ use crate::game::consts::{
     ERROR_COLOR,
     map_idx_to_point2,
 };
+
 pub enum TileVariant {
     Floor,
     Wall,
@@ -17,8 +18,8 @@ pub enum TileVariant {
 }
 
 pub struct Tile {
-    variant: TileVariant,
-    shape: GenericShape,
+    pub variant: TileVariant,
+    pub shape: GenericShape,
 }
 
 impl Tile {
