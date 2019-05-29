@@ -275,6 +275,7 @@ impl GameController {
 
     }
 
+    /// Ticks each resource in the GameModels resource list
     fn tick_resources(&mut self) {
 
         for resource in self.model.resources.iter_mut() {

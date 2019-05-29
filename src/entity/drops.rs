@@ -4,12 +4,14 @@ use std::f64::consts::PI;
 
 const ROTATION_SPEED: f64 = -0.01;
 
+/// A structure to represent a tower resource which can be used by the Player
 pub struct Resource {
     pub position: Point2,
     pub rotation: f64,
 }
 
 impl Resource {
+    /// Creates a new Resource
     pub fn new(position: Point2) -> Self {
         Self {
             position: position,
@@ -27,6 +29,7 @@ impl shape::Shape for Resource{
 
 impl entity::Entity for Resource {
 
+    /// Rotates the Resource
     fn tick(&mut self){
         self.rotation += ROTATION_SPEED;
         if self.rotation < -2.0 * PI {

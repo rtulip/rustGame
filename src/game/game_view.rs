@@ -264,6 +264,7 @@ impl GameView {
         
     }
 
+    /// Draws the GameModel's Beacon
     fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         let p = GameView::map_idx_to_point2(MapIdx::new(model.beacon.position.x, model.beacon.position.y));
         let transform = c.transform.trans(p.x + self.settings.beacon_size / 2.0, p.y + self.settings.beacon_size / 2.0)
@@ -277,6 +278,7 @@ impl GameView {
             g);
     }
 
+    /// Draws each enemy in the GameModel enemy list
     fn draw_enemies<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
         for enemy in model.enemies.iter() {
             enemy.get_shape().draw(
@@ -292,6 +294,7 @@ impl GameView {
         }
     }
 
+    /// Draws each resource in the GameModels resource list
     fn draw_resources<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
 
         for resource in model.resources.iter() {
@@ -311,6 +314,7 @@ impl GameView {
 
     }
 
+    /// Draws all text. 
     fn draw_text<G: Graphics, C>(
         &mut self, 
         model: &GameModel,

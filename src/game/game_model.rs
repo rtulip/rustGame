@@ -241,6 +241,8 @@ impl GameModel {
         }
     }
 
+    /// Function to spawn a new resource at the location of the Enemy which was
+    /// killed. There is a roughly 33% chance of spawning a resource. 
     pub fn spawn_resource(&mut self, enemy: &Enemy) {
 
         let r = next_u32(&mut self.rng);
