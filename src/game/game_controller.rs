@@ -73,7 +73,7 @@ impl GameController {
         if let Some(pos) = e.mouse_cursor_args() {
             self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
         }
-        self.model.player.update_direction(&self.cursor_pos, self.view.settings.player_size);
+        self.model.player.update_direction(&self.cursor_pos);
         if let Some(Button::Keyboard(key)) = e.press_args() {
             self.keys_pressed.insert(key);
         }

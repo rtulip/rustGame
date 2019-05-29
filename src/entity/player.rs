@@ -76,20 +76,13 @@ impl Player {
 
     /// Sets the Player direction to point towards the cursor. The direction 
     /// must be a unit vector. 
-    pub fn update_direction(&mut self, cursor_pos: &Point2, player_size: f64) {
+    pub fn update_direction(&mut self, cursor_pos: &Point2) {
 
         let delta = *cursor_pos - self.shape.center_point();
         self.direction = Vec2::new_unit_from_point(delta);
     
     }
 
-}
-
-impl shape::Shape for Player {
-    type ShapeVairant = shape::EllipseType;
-    fn get_shape(&self) -> Self::ShapeVairant {
-        shape::EllipseType {}
-    }
 }
 
 impl entity::Entity for Player {
