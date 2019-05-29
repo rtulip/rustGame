@@ -1,16 +1,22 @@
-use crate::traits::{shape, entity};
+use crate::traits::entity;
+use crate::traits::draw::{GenericShape, ShapeVariant};
 use crate::level::MapIdx;
-use std::f64;
-
-const ROTATION_SPEED: f64 = 0.01;
-const STARTING_HEALTH: i32 = 10000;
+use crate::misc::point2d::Point2;
+use crate::game::consts::{
+    BEACON_SIZE,
+    BEACON_COLOR,
+    BEACON_STARTING_HEALTH,
+    BEACON_ROTATION_SPEED,
+    map_idx_to_point2
+};
 
 /// A struct representing the Beacon game component. The beacon is the game 
 /// piece the player is trying to defend. If enemies collide with the Beacon,
 /// the Beacon will lose health. If the Beacon runs out of health, the game 
 /// will be over.
 pub struct Beacon {
-    pub position: MapIdx,
+    pub idx: MapIdx,
+    pub shape: GenericShape,
     pub health: i32,
     pub rotation: f64,
 }
@@ -18,26 +24,37 @@ pub struct Beacon {
 impl Beacon {
     /// Creates a new beacon.
     pub fn new(pos: MapIdx) -> Self {
+        let mut shape = GenericShape::new(
+            ShapeVariant::Square{size: BEACON_SIZE},
+            BEACON_COLOR,
+            map_idx_to_point2(pos)
+        );
+        shape.update(
+            Point2{
+                x: BEACON_SIZE / 2.0,
+                y: BEACON_SIZE / 2.0,
+            },
+            None
+        );
+        shape.set_offset(Point2{
+             x: -BEACON_SIZE / 2.0,
+             y: -BEACON_SIZE / 2.0,
+        });
         Self {
-            position: pos,
-            health: STARTING_HEALTH,
+            idx: pos,
+            shape: shape,
+            health: BEACON_STARTING_HEALTH,
             rotation: 0.0
         }
     }
 }
 
-impl shape::Shape for Beacon {
-    type ShapeVairant = shape::RectangleType;
-    fn get_shape(&self) -> Self::ShapeVairant {
-        shape::RectangleType {}
-    }
-}
-
 impl entity::Entity for Beacon {
     fn tick(&mut self) {
-        self.rotation += ROTATION_SPEED;
-        if self.rotation > 2.0 * f64::consts::PI {
-            self.rotation = 0.0;
-        }
+        let delta = Point2{
+            x: 0.0,
+            y: 0.0,
+        };
+        self.shape.update(delta, Some(BEACON_ROTATION_SPEED));
     }
 }

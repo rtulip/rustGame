@@ -212,9 +212,7 @@ impl GameController {
             enemy.tick();
             
             // check for collision with beacon. 
-            let beacon_point = GameView::map_idx_to_point2(self.model.beacon.position);
-            let beacon_center = Point2 {x: beacon_point.x + self.view.settings.beacon_size / 2.0,
-                                        y: beacon_point.y + self.view.settings.beacon_size / 2.0};
+            let beacon_center = self.model.beacon.shape.center_point();
             let enemy_center = enemy.shape.center_point();
             if (beacon_center.x - enemy_center.x).abs() + (beacon_center.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
                 to_remove.push((i,false));

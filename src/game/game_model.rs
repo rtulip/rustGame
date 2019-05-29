@@ -93,9 +93,8 @@ impl GameModel {
     fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> MapIdx {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
-
-        for h in beacon.position.x-10..beacon.position.y+11 {
-            for w in beacon.position.x-10..beacon.position.y+11 {
+        for h in beacon.idx.x-10..beacon.idx.y+11 {
+            for w in beacon.idx.x-10..beacon.idx.y+11 {
                 match level.map.get(&MapIdx::new(w,h)) {
                     Some(Tile::Floor) => {
                         spawnable_spaces.push(MapIdx::new(w,h));
@@ -228,7 +227,7 @@ impl GameModel {
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
             if r % 1000 == 0 && self.enemies.len() < self.max_enemies {
-                let target = &self.beacon.position;
+                let target = &self.beacon.idx;
                 let mut enemy = Enemy::new(idx_to_point(*spawner));
                 
                 if let Some(path) = self.level.pathfind(&spawner, target) {
