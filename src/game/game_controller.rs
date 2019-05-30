@@ -293,7 +293,7 @@ impl GameController {
                 TowerState::Attacking => {
                     
                     let x = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
-                    let y = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
+                    let y = (tower.bullet.shape.center_point().y / TILE_SIZE).floor() as i32;
                     if let Some(tile) = self.model.level.map.get(&MapIdx::new(x, y)) {
                         match tile.variant {
                             TileVariant::Wall => {

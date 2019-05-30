@@ -99,6 +99,7 @@ impl State for Tower {
                         x: 0.0,
                         y: -BULLET_HEIGHT / 2.0
                     });
+                    self.bullet.shape.set_rotation(rot);
                 }
                 
             },
