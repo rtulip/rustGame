@@ -256,4 +256,13 @@ impl GameModel {
 
     }
 
+    pub fn create_tower(&mut self) {
+
+        if self.player.resources != 0 {
+            self.player.resources -= 1;
+            self.towers.push(Tower::new(self.player.shape.get_position()));
+        }
+
+    }
+
 }

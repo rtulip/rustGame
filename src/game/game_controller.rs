@@ -54,6 +54,7 @@ pub struct GameController {
     pub state: GameState,
     cursor_pos: Point2,
     keys_pressed: HashSet<Key>,
+    keys_locked: HashSet<Key>,
 }
 
 impl GameController {
@@ -66,11 +67,19 @@ impl GameController {
         let mut model = GameModel::new(seed);
         let cursor_pos = Point2 {x: 0.0, y: 0.0};
         let keys_pressed = HashSet::new();
+        let keys_locked = HashSet::new();
 
         model.create_spawner();
         model.create_spawner();
 
-        Self {model: model, view: view, state: GameState::Running, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
+        Self {
+            model: model, 
+            view: view, 
+            state: GameState::Running, 
+            cursor_pos: cursor_pos, 
+            keys_pressed: keys_pressed,
+            keys_locked: keys_locked,
+        }
 
     }
 
@@ -87,6 +96,7 @@ impl GameController {
         if let Some(Button::Keyboard(key)) = e.release_args() {
             if self.keys_pressed.contains(&key) {
                 self.keys_pressed.remove(&key);
+                self.keys_locked.remove(&key);
                 match key {
                     Key::Space => {
                         self.model.player.change_state(player::PlayerState::FinishedAttacking);
@@ -108,6 +118,11 @@ impl GameController {
         // Start animation if Space is pressed
         if self.keys_pressed.contains(&Key::Space) {
             self.model.player.change_state(player::PlayerState::Attacking);
+        }
+
+        if self.keys_pressed.contains(&Key::E) && !self.keys_locked.contains(&Key::E){
+            self.model.create_tower();
+            self.keys_locked.insert(Key::E);
         }
 
         // Tick player
