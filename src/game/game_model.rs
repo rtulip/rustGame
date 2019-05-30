@@ -190,11 +190,13 @@ impl GameModel {
                                         TileVariant::Spawner => {
                                             canditate_spaces.push(pos);
                                             break;          
-                                        }
+                                        },
+                                        _ => (),
                                     }
                                 }
                             }
                         }
+                        _ => (),
                     }
                 }
             }
