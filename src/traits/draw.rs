@@ -188,7 +188,7 @@ impl GenericShape {
                         self.position + offset
                     }
                 }
-            }
+            },
             ShapeVariant::Circle{size: val, radius: _rad} => {
                 match self.rotation {
                     Some(rot) => {
@@ -225,28 +225,6 @@ impl GenericShape {
                     }
                 }
             }
-        }
-    }
-
-    pub fn resize(&mut self, new_size: f64) {
-        match self.shape {
-            ShapeVariant::Square{size: _size} => {
-                self.shape = ShapeVariant::Square{size: new_size};
-            },
-            ShapeVariant::Circle{size: _size, radius: rad} => {
-                self.shape = ShapeVariant::Circle{size: new_size, radius: rad};
-            },
-            ShapeVariant::Rect{width: _w, height: _h} => (),
-            
-        }
-    }
-
-    pub fn set_radius(&mut self, new_radius: f64){
-        match self.shape {
-            ShapeVariant::Circle{size: val, radius: _} => {
-                self.shape = ShapeVariant::Circle{size: val, radius: new_radius};
-            },
-            _ => (),
         }
     }
 
