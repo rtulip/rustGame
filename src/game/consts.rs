@@ -3,6 +3,10 @@ use crate::level::MapIdx;
 use crate::misc::point2d::Point2;
 
 pub const TILE_SIZE: f64 = 20.0;
+pub const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
+pub const WALL_COLOR: Color = [0.3, 0.3, 0.2, 1.0];
+pub const SPAWNER_COLOR: Color = [0.4, 0.06, 0.0, 1.0];
+pub const ERROR_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
 
 pub const PLAYER_SIZE: f64 = 16.0;
 pub const PLAYER_RADIUS: f64 = PLAYER_SIZE/2.0;
