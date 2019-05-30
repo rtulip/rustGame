@@ -63,7 +63,7 @@ impl GameController {
     pub fn new(seed: Seed) -> Self {
         
         let view = GameView::new();
-        let mut model = GameModel::new(seed, map_idx_to_point2);
+        let mut model = GameModel::new(seed);
         let cursor_pos = Point2 {x: 0.0, y: 0.0};
         let keys_pressed = HashSet::new();
 
@@ -123,7 +123,7 @@ impl GameController {
         // Chreate spawner with constant chance
         self.model.chanced_create_spawner(5000);
         // Spawn enmies from spawners
-        self.model.spawn_enemies(map_idx_to_point2);
+        self.model.spawn_enemies();
         
     }
 

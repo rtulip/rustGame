@@ -6,6 +6,9 @@ use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
 use crate::entity::drops::Resource;
+use crate::game::consts::{
+    map_idx_to_point2
+};
 
 /// A structure to fully encapsulate all components of the game. The different
 /// components include a Level, a Player, a Beacon and a collection of enemies.
@@ -64,13 +67,13 @@ impl GameModel {
     /// will convert a MapIdx into a Point2. This is required for creating the
     /// Player position since find_player_spawn() returns a MapIdx instead of a
     /// Point2. 
-    pub fn new(seed: Seed, idx_to_point: fn(MapIdx) -> Point2) -> Self {
+    pub fn new(seed: Seed) -> Self {
         let level = Level::new(seed);
         let mut rng = from_seed(seed);
         let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
         let beacon = Beacon::new(beacon_spawn);
         let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let player = Player::new( idx_to_point(player_spawn));
+        let player = Player::new( map_idx_to_point2(player_spawn));
         let enemies: Vec<Enemy> = Vec::new();
         let spawners: Vec<MapIdx> = Vec::new();
         let resources: Vec<Resource> = Vec::new();
@@ -218,18 +221,18 @@ impl GameModel {
     /// 
     /// Requires a function to convert a MapIdx to a Point2. See GameView's 
     /// map_idx_to_point2 function.
-    pub fn spawn_enemies(&mut self, idx_to_point: fn(MapIdx) -> Point2) {
+    pub fn spawn_enemies(&mut self) {
         
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
             if r % 1000 == 0 && self.enemies.len() < self.max_enemies {
                 let target = &self.beacon.idx;
-                let mut enemy = Enemy::new(idx_to_point(*spawner));
+                let mut enemy = Enemy::new(map_idx_to_point2(*spawner));
                 
                 if let Some(path) = self.level.pathfind(&spawner, target) {
                     let mut enemy_path: Vec<Point2> = Vec::new();
                     for idx in path.0 {
-                        enemy_path.push(idx_to_point(idx));
+                        enemy_path.push(map_idx_to_point2(idx));
                     }
                     enemy.path = enemy_path;
                     self.enemies.push(enemy);
