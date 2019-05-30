@@ -67,6 +67,10 @@ impl GenericShape {
         self.position = new_pos;
     }
 
+    pub fn get_rotation(&self) -> Option<f64> {
+        self.rotation
+    }
+
     pub fn set_rotation(&mut self, new_rot: f64) {
         self.rotation = Some(new_rot);
     }
