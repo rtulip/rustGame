@@ -40,8 +40,8 @@ pub const TOWER_COLOR: Color = [0.33, 0.33, 0.33, 1.0];
 pub const TOWER_SIZE: f64 = PLAYER_SIZE;
 pub const TOWER_RADIUS: f64 = TOWER_SIZE / 2.0;
 pub const TOWER_CANNON_COLOR: Color = PLAYER_ATTACK_COLOR;
-pub const TOWER_CANNON_WIDTH: f64 = PLAYER_ATTACK_WIDTH;
-pub const TOWER_CANNON_HEIGHT: f64 = PLAYER_ATTACK_HEIGHT;
+pub const TOWER_CANNON_WIDTH: f64 = TOWER_SIZE;
+pub const TOWER_CANNON_HEIGHT: f64 = TOWER_SIZE / 3.0;
 
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 

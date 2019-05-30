@@ -1,7 +1,6 @@
 pub use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::misc::point2d::Point2;
-use crate::misc::vector2d::Vec2;
 use crate::entity::player::Player;
 use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
