@@ -121,7 +121,7 @@ impl Entity for Tower {
 }
 
 pub struct Bullet {
-    shape: GenericShape,
+    pub shape: GenericShape,
     direction: Vec2,
 }
 

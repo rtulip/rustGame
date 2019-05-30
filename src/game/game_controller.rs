@@ -5,6 +5,7 @@ use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::entity::player;
 use crate::entity::tile::TileVariant;
+use crate::entity::tower::TowerState;
 use crate::level::MapIdx;
 use crate::game::consts::{
     map_idx_to_point2,
@@ -125,8 +126,7 @@ impl GameController {
             self.keys_locked.insert(Key::E);
         }
         self.model.tick_towers();
-
-
+        self.check_bullet_collision();
         // Tick player
         self.model.player.tick();
         // Check for collision
@@ -284,6 +284,46 @@ impl GameController {
             resource.tick();
         }
 
+    }
+
+    fn check_bullet_collision(&mut self) {
+        for tower in self.model.towers.iter_mut() {
+            let mut to_remove: Vec<usize> = Vec::new();
+            match tower.state {
+                TowerState::Attacking => {
+                    
+                    let x = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
+                    let y = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
+                    if let Some(tile) = self.model.level.map.get(&MapIdx::new(x, y)) {
+                        match tile.variant {
+                            TileVariant::Wall => {
+                                tower.change_state(TowerState::Ready);
+                                continue;
+                            },
+                            _ => (),
+                        }
+                    } else {
+                        tower.change_state(TowerState::Ready);
+                        continue;
+                    }
+                    
+                    for (i,enemy) in self.model.enemies.iter().enumerate().rev() {
+                        if (tower.bullet.shape.center_point().x - enemy.shape.center_point().x).abs() + 
+                           (tower.bullet.shape.center_point().y - enemy.shape.center_point().y).abs() <= ENEMY_RADIUS {
+                               to_remove.push(i);
+                               tower.change_state(TowerState::Ready);
+                           }
+                    }
+
+                    for i in to_remove {
+                        self.model.enemies.remove(i);
+                    }
+
+                },
+                _ => (),
+            }
+
+        }
     }
 
 }
