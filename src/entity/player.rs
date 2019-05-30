@@ -1,9 +1,16 @@
-use crate::traits::{shape, entity, state};
+use crate::entity::attack::Attack;
 use crate::misc::vector2d::Vec2;
 use crate::misc::point2d::Point2;
-use std::f64;
-const STARTING_HEALTH: i32 = 10000;
-const PLAYER_SPEED: f64 = 0.1;
+use crate::traits::draw::{GenericShape, ShapeVariant};
+use crate::traits::{entity, state};
+use crate::game::consts::{
+    PLAYER_SIZE, 
+    PLAYER_RADIUS, 
+    PLAYER_COLOR, 
+    PLAYER_SPEED, 
+    PLAYER_STARTING_HEALTH,
+    PI,
+};
 
 /// A struct defining the different states a Player can have. While Stationary,
 /// the Player isn't moving. While Moving, the player will move in the 
@@ -21,7 +28,8 @@ pub enum PlayerState{
 /// A representation of the Player. The Player struct is responsible for 
 /// the logic surrounding how to update itself.
 pub struct Player {
-    pub position: Point2,
+    pub shape: GenericShape,
+    pub attack: Attack,
     pub health: i32,
     pub state: PlayerState,
     pub direction: Vec2,
@@ -33,8 +41,16 @@ impl Player {
     /// Creates a new Player
     pub fn new(start_position: Point2) -> Self {
         Player {
-            position: start_position, 
-            health: STARTING_HEALTH,
+            shape: GenericShape::new(
+                ShapeVariant::Circle {
+                    size: PLAYER_SIZE,
+                    radius: PLAYER_RADIUS
+                },
+                PLAYER_COLOR,
+                start_position
+            ),
+            attack: Attack::new(), 
+            health: PLAYER_STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: Vec2::new_unit(0.0, 1.0),
             resources: 0,
@@ -49,8 +65,11 @@ impl Player {
     pub fn update_position(&mut self) {
         match self.state {
             PlayerState::Moving => {
-                self.position.x += self.direction.x * PLAYER_SPEED;
-                self.position.y += self.direction.y * PLAYER_SPEED;
+                let delta = Point2{
+                    x: self.direction.x * PLAYER_SPEED,
+                    y: self.direction.y * PLAYER_SPEED
+                };
+                self.shape.update(delta, None);
             },
             _ => {}
         }
@@ -58,20 +77,32 @@ impl Player {
 
     /// Sets the Player direction to point towards the cursor. The direction 
     /// must be a unit vector. 
-    pub fn update_direction(&mut self, cursor_pos: &Point2, player_size: f64) {
+    pub fn update_direction(&mut self, cursor_pos: &Point2) {
 
-        self.direction = Vec2::new_unit(cursor_pos.x - self.position.x + player_size/2.0,
-                                        cursor_pos.y - self.position.y + player_size/2.0);
+        let delta = *cursor_pos - self.shape.center_point();
+        self.direction = Vec2::new_unit_from_point(delta);
     
+        match self.state {
+            PlayerState::Attacking => {
+                let mut rad = self.direction.y / self.direction.x;
+                rad = rad.atan();
+                
+                match [self.direction.x < 0.0, self.direction.y < 0.0] {
+                    [true, true] => rad = PI * 2.0 - rad,
+                    [true, false] => rad = rad * -1.0,
+                    [false, true] => rad = PI + rad * -1.0,
+                    [false, false] => rad = PI - rad
+                }
+
+                rad = PI - rad;
+
+                self.attack.shape.set_rotation(rad);
+            }
+            _ => {}
+        }
+
     }
 
-}
-
-impl shape::Shape for Player {
-    type ShapeVairant = shape::EllipseType;
-    fn get_shape(&self) -> Self::ShapeVairant {
-        shape::EllipseType {}
-    }
 }
 
 impl entity::Entity for Player {
@@ -92,6 +123,10 @@ impl state::State for Player {
             [PlayerState::Attacking, PlayerState::FinishedAttacking] => {
                 self.state = new_state;
             },
+            [_, PlayerState::Attacking] => {
+                self.state = new_state;
+                self.attack.shape.set_position(self.shape.center_point());
+            }
             [PlayerState::FinishedAttacking, _] => {
                 self.state = new_state;
             },
