@@ -8,7 +8,6 @@ use crate::entity::tile::TileVariant;
 use crate::level::MapIdx;
 
 use std::collections::HashSet;
-use std::f64::consts::PI;
 
 use piston::input::{GenericEvent, Button, Key};
 
