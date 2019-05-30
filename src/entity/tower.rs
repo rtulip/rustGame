@@ -1,5 +1,6 @@
 use crate::misc::point2d::Point2;
 use crate::traits::draw::{Draw, Context, Graphics, GenericShape, ShapeVariant};
+use crate::traits::state::State;
 use crate::game::consts::{
     TOWER_COLOR,
     TOWER_SIZE,
@@ -10,10 +11,16 @@ use crate::game::consts::{
     TOWER_RANGE,
 };
 
+pub enum TowerState{
+    Ready,
+    Attacking,
+}
+
 pub struct Tower {
     pub base_shape: GenericShape,
     pub cannon_shape: GenericShape,
-    pub range: f64
+    pub range: f64,
+    pub state: TowerState,
 }
 
 impl Tower {
@@ -44,6 +51,7 @@ impl Tower {
             cannon_shape:cannon_shape,
             base_shape: base_shape,
             range: TOWER_RANGE,
+            state: TowerState::Ready,
         }
     }
 
@@ -56,5 +64,15 @@ impl Draw for Tower {
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G){
         self.base_shape.draw(c, g);
         self.cannon_shape.draw(c, g);
+    }
+}
+
+impl State for Tower {
+
+    type StateEnum = TowerState;
+    fn change_state(&mut self, new_state: Self::StateEnum) {
+
+        self.state = new_state;
+
     }
 }
