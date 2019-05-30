@@ -1,10 +1,8 @@
 use crate::game::GameModel;
 use crate::level::MapIdx;
 use crate::misc::point2d::Point2;
-use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::traits::draw::Draw;
-use crate::entity::attack;
 use graphics::{Context, Graphics, Transformed, Image};
 use graphics::types::Color;
 use graphics::character::CharacterCache;
