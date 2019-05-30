@@ -9,14 +9,14 @@ use crate::game::consts::{
     BULLET_SPEED
 };
 
-
+/// A structure to represent a bullet fired from a tower.
 pub struct Bullet {
     pub shape: GenericShape,
     direction: Vec2,
 }
 
 impl Bullet {
-
+    /// Returns a new Bullet at the input position facing the input direction.
     pub fn new(position: Point2, direction: Vec2) -> Self {
         Self {
             shape: GenericShape::new(
@@ -34,13 +34,12 @@ impl Bullet {
 }
 
 impl Entity for Bullet {
+    /// Moves the bullet forward every tick.
     fn tick(&mut self) {
         let delta = Point2{
             x: self.direction.x * BULLET_SPEED,
             y: self.direction.y * BULLET_SPEED,
         };
         self.shape.update(delta,None);
-        // println!("BULLET POSITION: {:?}", self.shape.get_position());
-
     }
 }
