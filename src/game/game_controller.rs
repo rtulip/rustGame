@@ -88,6 +88,7 @@ impl GameController {
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
             self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
+            self.model.update_tower_rotation(self.cursor_pos); 
         }
         self.model.player.update_direction(&self.cursor_pos);
         if let Some(Button::Keyboard(key)) = e.press_args() {

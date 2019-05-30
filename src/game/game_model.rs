@@ -8,7 +8,8 @@ use crate::entity::enemy::Enemy;
 use crate::entity::drops::Resource;
 use crate::entity::tower::Tower;
 use crate::game::consts::{
-    map_idx_to_point2
+    map_idx_to_point2,
+    PI
 };
 
 /// A structure to fully encapsulate all components of the game. The different
@@ -261,6 +262,28 @@ impl GameModel {
         if self.player.resources != 0 {
             self.player.resources -= 1;
             self.towers.push(Tower::new(self.player.shape.get_position()));
+        }
+
+    }
+
+    pub fn update_tower_rotation(&mut self, cursor: Point2){
+
+        for tower in self.towers.iter_mut() {
+            
+            let vec = cursor - tower.base_shape.get_position();
+            let mut rad = vec.y / vec.x;
+            rad = rad.atan();
+            
+            match [vec.x < 0.0, vec.y < 0.0] {
+                [true, true] => rad = PI * 2.0 - rad,
+                [true, false] => rad = rad * -1.0,
+                [false, true] => rad = PI + rad * -1.0,
+                [false, false] => rad = PI - rad
+            }
+
+            rad = PI - rad;
+            tower.set_rotation(rad);
+
         }
 
     }

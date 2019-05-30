@@ -33,6 +33,10 @@ impl Tower {
                 position)
         }
     }
+
+    pub fn set_rotation(&mut self, new_roation: f64) {
+        self.cannon_shape.set_rotation(new_roation);
+    }
 }
 
 impl Draw for Tower {
