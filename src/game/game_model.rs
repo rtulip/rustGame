@@ -11,6 +11,7 @@ use crate::game::consts::{
     map_idx_to_point2,
     PI,
     INF,
+    TILE_SIZE,
 };
 
 /// A structure to fully encapsulate all components of the game. The different
@@ -275,6 +276,43 @@ impl GameModel {
             for enemy in self.enemies.iter() {
 
                 let dir = enemy.shape.center_point() - tower.base_shape.center_point();
+                let slope = dir.y / dir.x;
+                let vertical_offset = tower.base_shape.center_point().y;
+                let x0 = (tower.base_shape.center_point().x / TILE_SIZE).floor() as i32;
+                let xn = (enemy.shape.center_point().x / TILE_SIZE).floor() as i32;
+
+                let mut wall_hit = false;
+                let previous = tower.base_shape.get_position();
+                let mut previous = MapIdx::new((previous.x / TILE_SIZE).floor() as i32, (previous.y / TILE_SIZE).floor() as i32);
+                for x in x0+1..xn {
+                    let y = ((slope * x as f64 + vertical_offset)/ TILE_SIZE).floor() as i32;
+                    if y != previous.y {
+                        if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, y)) {
+                            match tile.variant {
+                                TileVariant::Wall => {
+                                    wall_hit = true;
+                                    continue;
+                                },
+                                _ => (),
+                            }
+                        }
+                    }
+                    
+                    if let Some(tile) = self.level.map.get(&MapIdx::new(x, y)) {
+                        match tile.variant {
+                            TileVariant::Wall => {
+                                wall_hit = true;
+                                continue;
+                            },
+                            _ => (),
+                        }
+                    } 
+                    previous = MapIdx::new(x, y);
+                }
+                if wall_hit {
+                    continue;
+                }
+
                 let dist = dir.x.abs() + dir.y.abs();
                 if dist < min_dist {
                     min_dist = dist;
@@ -283,18 +321,21 @@ impl GameModel {
 
             }
 
-            let mut rad = new_dir.y / new_dir.x;
-            rad = rad.atan();
-            
-            match [new_dir.x < 0.0, new_dir.y < 0.0] {
-                [true, true] => rad = PI * 2.0 - rad,
-                [true, false] => rad = rad * -1.0,
-                [false, true] => rad = PI + rad * -1.0,
-                [false, false] => rad = PI - rad
-            }
+            if min_dist < tower.range {
+                
+                let mut rad = new_dir.y / new_dir.x;
+                rad = rad.atan();
+                
+                match [new_dir.x < 0.0, new_dir.y < 0.0] {
+                    [true, true] => rad = PI * 2.0 - rad,
+                    [true, false] => rad = rad * -1.0,
+                    [false, true] => rad = PI + rad * -1.0,
+                    [false, false] => rad = PI - rad
+                }
 
-            rad = PI - rad;
-            tower.set_rotation(rad);
+                rad = PI - rad;
+                tower.set_rotation(rad);
+            }
 
         }
 

@@ -7,11 +7,13 @@ use crate::game::consts::{
     TOWER_CANNON_WIDTH,
     TOWER_CANNON_HEIGHT,
     TOWER_CANNON_COLOR,
+    TOWER_RANGE,
 };
 
 pub struct Tower {
     pub base_shape: GenericShape,
     pub cannon_shape: GenericShape,
+    pub range: f64
 }
 
 impl Tower {
@@ -40,7 +42,8 @@ impl Tower {
 
         Self {
             cannon_shape:cannon_shape,
-            base_shape: base_shape, 
+            base_shape: base_shape,
+            range: TOWER_RANGE,
         }
     }
 
