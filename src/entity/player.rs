@@ -1,13 +1,15 @@
-use crate::traits::{entity, state};
+use crate::entity::attack::Attack;
 use crate::misc::vector2d::Vec2;
 use crate::misc::point2d::Point2;
 use crate::traits::draw::{GenericShape, ShapeVariant};
+use crate::traits::{entity, state};
 use crate::game::consts::{
     PLAYER_SIZE, 
     PLAYER_RADIUS, 
     PLAYER_COLOR, 
     PLAYER_SPEED, 
-    PLAYER_STARTING_HEALTH
+    PLAYER_STARTING_HEALTH,
+    PI,
 };
 
 /// A struct defining the different states a Player can have. While Stationary,
@@ -27,6 +29,7 @@ pub enum PlayerState{
 /// the logic surrounding how to update itself.
 pub struct Player {
     pub shape: GenericShape,
+    pub attack: Attack,
     pub health: i32,
     pub state: PlayerState,
     pub direction: Vec2,
@@ -45,7 +48,8 @@ impl Player {
                 },
                 PLAYER_COLOR,
                 start_position
-            ), 
+            ),
+            attack: Attack::new(), 
             health: PLAYER_STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: Vec2::new_unit(0.0, 1.0),
@@ -66,7 +70,23 @@ impl Player {
                     y: self.direction.y * PLAYER_SPEED
                 };
                 self.shape.update(delta, None);
+                self.attack.shape.update(delta, None);
             },
+            PlayerState::Attacking => {
+                let mut rad = self.direction.y / self.direction.x;
+                rad = rad.atan();
+                
+                match [self.direction.x < 0.0, self.direction.y < 0.0] {
+                    [true, true] => rad = PI * 2.0 - rad,
+                    [true, false] => rad = rad * -1.0,
+                    [false, true] => rad = PI + rad * -1.0,
+                    [false, false] => rad = PI - rad
+                }
+
+                rad = PI - rad;
+
+                self.attack.shape.set_rotation(rad);
+            }
             _ => {}
         }
     }
@@ -100,6 +120,10 @@ impl state::State for Player {
             [PlayerState::Attacking, PlayerState::FinishedAttacking] => {
                 self.state = new_state;
             },
+            [_, PlayerState::Attacking] => {
+                self.state = new_state;
+                self.attack.shape.set_position(self.shape.center_point());
+            }
             [PlayerState::FinishedAttacking, _] => {
                 self.state = new_state;
             },

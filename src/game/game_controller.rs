@@ -8,7 +8,6 @@ use crate::entity::tile::TileVariant;
 use crate::level::MapIdx;
 
 use std::collections::HashSet;
-use std::f64::consts::PI;
 
 use piston::input::{GenericEvent, Button, Key};
 
@@ -229,23 +228,8 @@ impl GameController {
 
             match self.model.player.state {
                 player::PlayerState::Attacking => {
-                    let p1 = Point2 {
-                        x:  self.view.settings.player_attack_animation.animation_position.x + 
-                            self.view.settings.player_attack_animation.animation_width * 
-                            self.view.settings.player_attack_animation.animation_rotation.cos(),
-                        y:  self.view.settings.player_attack_animation.animation_position.y - 
-                            self.view.settings.player_attack_animation.animation_width * 
-                            self.view.settings.player_attack_animation.animation_rotation.sin(),
-                    };
-                    let p2 = Point2 {
-                        x:  p1.x + 
-                            self.view.settings.player_attack_animation.animation_height *
-                            (PI / 2.0 - self.view.settings.player_attack_animation.animation_rotation).cos(),
-                        y:  p1.y + 
-                            self.view.settings.player_attack_animation.animation_height *
-                            (PI / 2.0 - self.view.settings.player_attack_animation.animation_rotation).sin(),
-                            
-                    };
+                    let p1 = self.model.player.attack.shape.top_right();
+                    let p2 = self.model.player.attack.shape.bottom_right();
 
                     if  (p1.x - enemy_center.x).abs() + (p1.y - enemy_center.y).abs() <= self.view.settings.enemy_radius || 
                         (p2.x - enemy_center.x).abs() + (p2.y - enemy_center.y).abs() <= self.view.settings.enemy_radius {
