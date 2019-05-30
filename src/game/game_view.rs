@@ -4,7 +4,7 @@ use crate::misc::point2d::Point2;
 use crate::traits::shape::Shape;
 use crate::traits::state::State;
 use crate::traits::draw::Draw;
-use crate::entity::{tile, attack};
+use crate::entity::attack;
 use graphics::{Context, Graphics, Transformed, Image};
 use graphics::types::Color;
 use graphics::character::CharacterCache;
@@ -171,7 +171,6 @@ impl GameView {
     /// Draws the Level of the GameModel by looping through each tile in the 
     /// Map.
     fn draw_level<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
-        let settings = &self.settings;
         for h in 0..model.level.height {
             for w in 0..model.level.width {
                 if let Some(tile) = model.level.map.get(&MapIdx::new(w, h)) {
