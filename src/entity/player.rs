@@ -73,7 +73,6 @@ impl Player {
                 self.attack.shape.update(delta, None);
             },
             PlayerState::Attacking => {
-                self.attack.shape.set_position(self.shape.center_point());
                 let mut rad = self.direction.y / self.direction.x;
                 rad = rad.atan();
                 
@@ -121,6 +120,10 @@ impl state::State for Player {
             [PlayerState::Attacking, PlayerState::FinishedAttacking] => {
                 self.state = new_state;
             },
+            [_, PlayerState::Attacking] => {
+                self.state = new_state;
+                self.attack.shape.set_position(self.shape.center_point());
+            }
             [PlayerState::FinishedAttacking, _] => {
                 self.state = new_state;
             },
