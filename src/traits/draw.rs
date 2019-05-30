@@ -110,20 +110,6 @@ impl GenericShape {
         }
     }
 
-    pub fn top_left(&self) -> Point2 {
-        match self.shape {
-            ShapeVariant::Square{size: val} => {
-                self.position  
-            }
-            ShapeVariant::Circle{size: val, radius: _rad} => {
-                self.position
-            },
-            ShapeVariant::Rect{width: w, height: h} => {
-                self.position
-            }
-        }
-    }
-
     pub fn top_right(&self) -> Point2 {
         match self.shape {
             ShapeVariant::Square{size: val} => {
