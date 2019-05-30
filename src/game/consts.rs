@@ -35,6 +35,13 @@ pub const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
 pub const BEACON_ROTATION_SPEED: f64 = 0.01;
 pub const BEACON_STARTING_HEALTH: i32 = 10000;
 
+pub const TOWER_COLOR: Color = [0.33, 0.33, 0.33, 1.0];
+pub const TOWER_SIZE: f64 = PLAYER_SIZE;
+pub const TOWER_RADIUS: f64 = TOWER_SIZE / 2.0;
+pub const TOWER_CANNON_COLOR: Color = PLAYER_ATTACK_COLOR;
+pub const TOWER_CANNON_WIDTH: f64 = PLAYER_ATTACK_WIDTH;
+pub const TOWER_CANNON_HEIGHT: f64 = PLAYER_ATTACK_HEIGHT;
+
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
     Point2 {x: idx.x as f64 * TILE_SIZE, y: idx.y as f64 * TILE_SIZE}
