@@ -110,6 +110,138 @@ impl GenericShape {
         }
     }
 
+    pub fn top_left(&self) -> Point2 {
+        match self.shape {
+            ShapeVariant::Square{size: val} => {
+                self.position  
+            }
+            ShapeVariant::Circle{size: val, radius: _rad} => {
+                self.position
+            },
+            ShapeVariant::Rect{width: w, height: h} => {
+                self.position
+            }
+        }
+    }
+
+    pub fn top_right(&self) -> Point2 {
+        match self.shape {
+            ShapeVariant::Square{size: val} => {
+                match self.rotation {
+                    Some(rot) => {
+                        let offset = Point2 {
+                            x: val * (-1.0 * rot).cos(),
+                            y: -val * (-1.0 * rot).sin(),
+                        };
+                        self.position + offset
+                    }
+                    None => {
+                        let offset = Point2 {
+                            x: val,
+                            y: 0.0,
+                        };
+                        self.position + offset
+                    }
+                }
+            }
+            ShapeVariant::Circle{size: val, radius: _rad} => {
+                match self.rotation {
+                    Some(rot) => {
+                        let offset = Point2 {
+                            x: val * (-1.0 * rot).cos(),
+                            y: -val * (-1.0 * rot).sin(),
+                        };
+                        self.position + offset
+                    }
+                    None => {
+                        let offset = Point2 {
+                            x: val,
+                            y: 0.0,
+                        };
+                        self.position + offset
+                    }
+                }
+            },
+            ShapeVariant::Rect{width: w, height: _h} => {
+                match self.rotation {
+                    Some(rot) => {
+                        let offset = Point2 {
+                            x: w * (-1.0 * rot).cos(),
+                            y: -w * (-1.0 * rot).sin(),
+                        };
+                        self.position + offset
+                    }
+                    None => {
+                        let offset = Point2 {
+                            x: w,
+                            y: 0.0,
+                        };
+                        self.position + offset
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn bottom_right(&self) -> Point2 {
+        match self.shape {
+            ShapeVariant::Square{size: val} => {
+                match self.rotation {
+                    Some(rot) => {
+                        let offset = Point2 {
+                            x: val * (PI / 2.0 + rot).cos(),
+                            y: val * (PI / 2.0 + rot).sin(),
+                        };
+                        self.top_right() + offset
+                    }
+                    None => {
+                        let offset = Point2 {
+                            x: val,
+                            y: val,
+                        };
+                        self.position + offset
+                    }
+                }
+            }
+            ShapeVariant::Circle{size: val, radius: _rad} => {
+                match self.rotation {
+                    Some(rot) => {
+                        let offset = Point2 {
+                            x: val * (PI / 2.0 + rot).cos(),
+                            y: val * (PI / 2.0 + rot).sin(),
+                        };
+                        self.top_right() + offset
+                    }
+                    None => {
+                        let offset = Point2 {
+                            x: val,
+                            y: val,
+                        };
+                        self.position + offset
+                    }
+                }
+            },
+            ShapeVariant::Rect{width: w, height: h} => {
+                match self.rotation {
+                    Some(rot) => {
+                        let offset = Point2 {
+                            x: h * (PI / 2.0 + rot).cos(),
+                            y: h * (PI / 2.0 + rot).sin(),
+                        };
+                        self.top_right() + offset
+                    }
+                    None => {
+                        let offset = Point2 {
+                            x: w,
+                            y: h,
+                        };
+                        self.position + offset
+                    }
+                }
+            }
+        }
+    }
+
     pub fn resize(&mut self, new_size: f64) {
         match self.shape {
             ShapeVariant::Square{size: _size} => {
