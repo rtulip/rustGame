@@ -70,8 +70,19 @@ impl Player {
                     y: self.direction.y * PLAYER_SPEED
                 };
                 self.shape.update(delta, None);
-                self.attack.shape.update(delta, None);
             },
+            _ => {}
+        }
+    }
+
+    /// Sets the Player direction to point towards the cursor. The direction 
+    /// must be a unit vector. 
+    pub fn update_direction(&mut self, cursor_pos: &Point2) {
+
+        let delta = *cursor_pos - self.shape.center_point();
+        self.direction = Vec2::new_unit_from_point(delta);
+    
+        match self.state {
             PlayerState::Attacking => {
                 let mut rad = self.direction.y / self.direction.x;
                 rad = rad.atan();
@@ -89,15 +100,7 @@ impl Player {
             }
             _ => {}
         }
-    }
 
-    /// Sets the Player direction to point towards the cursor. The direction 
-    /// must be a unit vector. 
-    pub fn update_direction(&mut self, cursor_pos: &Point2) {
-
-        let delta = *cursor_pos - self.shape.center_point();
-        self.direction = Vec2::new_unit_from_point(delta);
-    
     }
 
 }
