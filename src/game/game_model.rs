@@ -1,6 +1,7 @@
 pub use crate::level::{Level, MapIdx};
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::misc::point2d::Point2;
+use crate::misc::vector2d::Vec2;
 use crate::entity::player::Player;
 use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
@@ -9,7 +10,8 @@ use crate::entity::drops::Resource;
 use crate::entity::tower::Tower;
 use crate::game::consts::{
     map_idx_to_point2,
-    PI
+    PI,
+    INF,
 };
 
 /// A structure to fully encapsulate all components of the game. The different
@@ -266,15 +268,26 @@ impl GameModel {
 
     }
 
-    pub fn update_tower_rotation(&mut self, cursor: Point2){
+    pub fn update_tower_rotation(&mut self){
 
         for tower in self.towers.iter_mut() {
-            
-            let vec = cursor - tower.base_shape.get_position();
-            let mut rad = vec.y / vec.x;
+            let mut new_dir = Point2{x: 0.0, y: 0.0};
+            let mut min_dist = INF;
+            for enemy in self.enemies.iter() {
+
+                let dir = enemy.shape.center_point() - tower.base_shape.center_point();
+                let dist = dir.x.abs() + dir.y.abs();
+                if dist < min_dist {
+                    min_dist = dist;
+                    new_dir = dir; 
+                }
+
+            }
+
+            let mut rad = new_dir.y / new_dir.x;
             rad = rad.atan();
             
-            match [vec.x < 0.0, vec.y < 0.0] {
+            match [new_dir.x < 0.0, new_dir.y < 0.0] {
                 [true, true] => rad = PI * 2.0 - rad,
                 [true, false] => rad = rad * -1.0,
                 [false, true] => rad = PI + rad * -1.0,
