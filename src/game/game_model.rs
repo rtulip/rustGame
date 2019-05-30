@@ -8,7 +8,7 @@ use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
 use crate::entity::drops::Resource;
-use crate::entity::tower::{Tower, TowerState};
+use crate::entity::towers::tower::{Tower, TowerState};
 use crate::game::consts::{
     map_idx_to_point2,
     PI,

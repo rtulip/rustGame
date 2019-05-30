@@ -3,6 +3,7 @@ use crate::misc::vector2d::Vec2;
 use crate::traits::draw::{Draw, Context, Graphics, GenericShape, ShapeVariant};
 use crate::traits::state::State;
 use crate::traits::entity::Entity;
+use crate::entity::towers::bullet::Bullet;
 use crate::game::consts::{
     TOWER_COLOR,
     TOWER_SIZE,
@@ -11,10 +12,7 @@ use crate::game::consts::{
     TOWER_CANNON_HEIGHT,
     TOWER_CANNON_COLOR,
     TOWER_RANGE,
-    BULLET_WIDTH,
     BULLET_HEIGHT,
-    BULLET_COLOR,
-    BULLET_SPEED,
 };
 
 pub enum TowerState{
@@ -121,37 +119,3 @@ impl Entity for Tower {
     }
 }
 
-pub struct Bullet {
-    pub shape: GenericShape,
-    direction: Vec2,
-}
-
-impl Bullet {
-
-    fn new(position: Point2, direction: Vec2) -> Self {
-        Self {
-            shape: GenericShape::new(
-                ShapeVariant::Rect{
-                    width: BULLET_WIDTH,
-                    height: BULLET_HEIGHT,
-                }, 
-                BULLET_COLOR, 
-                position,
-            ),
-            direction: direction,
-        }
-    }
-
-}
-
-impl Entity for Bullet {
-    fn tick(&mut self) {
-        let delta = Point2{
-            x: self.direction.x * BULLET_SPEED,
-            y: self.direction.y * BULLET_SPEED,
-        };
-        self.shape.update(delta,None);
-        // println!("BULLET POSITION: {:?}", self.shape.get_position());
-
-    }
-}

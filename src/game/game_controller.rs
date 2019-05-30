@@ -5,7 +5,7 @@ use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::entity::player;
 use crate::entity::tile::TileVariant;
-use crate::entity::tower::TowerState;
+use crate::entity::towers::tower::TowerState;
 use crate::level::MapIdx;
 use crate::game::consts::{
     map_idx_to_point2,

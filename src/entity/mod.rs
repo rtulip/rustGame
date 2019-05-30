@@ -4,4 +4,4 @@ pub mod attack;
 pub mod beacon;
 pub mod enemy;
 pub mod drops;
-pub mod tower;
+pub mod towers;
