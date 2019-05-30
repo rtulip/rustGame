@@ -124,7 +124,8 @@ impl GameController {
             self.model.create_tower();
             self.keys_locked.insert(Key::E);
         }
-        self.model.update_tower_rotation();
+        self.model.tick_towers();
+
 
         // Tick player
         self.model.player.tick();

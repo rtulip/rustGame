@@ -1,4 +1,6 @@
-pub use crate::level::{Level, MapIdx};
+use crate::level::{Level, MapIdx};
+use crate::traits::state::State;
+use crate::traits::entity::Entity;
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::misc::point2d::Point2;
 use crate::entity::player::Player;
@@ -6,7 +8,7 @@ use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
 use crate::entity::drops::Resource;
-use crate::entity::tower::Tower;
+use crate::entity::tower::{Tower, TowerState};
 use crate::game::consts::{
     map_idx_to_point2,
     PI,
@@ -268,7 +270,7 @@ impl GameModel {
 
     }
 
-    pub fn update_tower_rotation(&mut self){
+    pub fn tick_towers(&mut self){
 
         for tower in self.towers.iter_mut() {
             let mut new_dir = Point2{x: 0.0, y: 0.0};
@@ -335,7 +337,14 @@ impl GameModel {
 
                 rad = PI - rad;
                 tower.set_rotation(rad);
+
+                match tower.state {
+                    TowerState::Ready => tower.change_state(TowerState::Attacking),
+                    _ => (),
+                }
             }
+
+            tower.tick();
 
         }
 

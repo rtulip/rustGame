@@ -45,7 +45,7 @@ pub const TOWER_CANNON_WIDTH: f64 = TOWER_SIZE;
 pub const TOWER_CANNON_HEIGHT: f64 = TOWER_SIZE / 3.0;
 pub const BULLET_WIDTH: f64 = TOWER_SIZE / 2.0;
 pub const BULLET_HEIGHT: f64 = TOWER_CANNON_HEIGHT * 0.75;
-pub const BULLET_COLOR: Color = [0.2, 0.2, 0.2,1.0];
+pub const BULLET_COLOR: Color = [0.0, 0.0, 0.0, 1.0];
 pub const BULLET_SPEED: f64 = ENEMY_SPEED * 2.0;
 
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {

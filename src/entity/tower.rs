@@ -74,12 +74,13 @@ impl Tower {
 impl Draw for Tower {
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G){
         self.base_shape.draw(c, g);
+        self.cannon_shape.draw(c, g);
         match self.state {
-            TowerState::Attacking => self.bullet.shape.draw(c, g),
+            TowerState::Attacking => {
+                self.bullet.shape.draw(c, g);
+            },
             _ => (),
         }
-        self.cannon_shape.draw(c, g);
-        
     }
 }
 
@@ -89,7 +90,7 @@ impl State for Tower {
     fn change_state(&mut self, new_state: Self::StateEnum) {
         match new_state {
             TowerState::Attacking => {
-                if let Some(rot) = self.base_shape.get_rotation() {
+                if let Some(rot) = self.cannon_shape.get_rotation() {
                     self.bullet = Bullet::new(
                         self.base_shape.center_point(),
                         Vec2::new(rot.cos(), rot.sin())
@@ -149,5 +150,7 @@ impl Entity for Bullet {
             y: self.direction.y * BULLET_SPEED,
         };
         self.shape.update(delta,None);
+        // println!("BULLET POSITION: {:?}", self.shape.get_position());
+
     }
 }
