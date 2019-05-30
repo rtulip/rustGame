@@ -6,6 +6,7 @@ use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
 use crate::entity::drops::Resource;
+use crate::entity::tower::Tower;
 use crate::game::consts::{
     map_idx_to_point2
 };
@@ -58,6 +59,7 @@ pub struct GameModel {
     pub max_enemies: usize,
     pub spawners: Vec<MapIdx>,
     pub resources: Vec<Resource>,
+    pub towers: Vec<Tower>,
     rng: RNG,
 }
 
@@ -77,6 +79,7 @@ impl GameModel {
         let enemies: Vec<Enemy> = Vec::new();
         let spawners: Vec<MapIdx> = Vec::new();
         let resources: Vec<Resource> = Vec::new();
+        let towers: Vec<Tower> = Vec::new();
         Self {
             level: level,
             player: player,
@@ -85,6 +88,7 @@ impl GameModel {
             max_enemies: 15,
             spawners: spawners,
             resources: resources,
+            towers: towers,
             rng: rng
         }
     }
