@@ -16,21 +16,31 @@ pub struct Tower {
 
 impl Tower {
     pub fn new(position: Point2) -> Self {
+        let base_shape = GenericShape::new(
+            ShapeVariant::Circle{
+                size: TOWER_SIZE, 
+                radius: TOWER_RADIUS
+            },
+            TOWER_COLOR,
+            position
+        );
+
+        let mut cannon_shape = GenericShape::new(
+            ShapeVariant::Rect{
+                width: TOWER_CANNON_WIDTH,
+                height: TOWER_CANNON_HEIGHT,
+            }, 
+            TOWER_CANNON_COLOR, 
+            base_shape.center_point()
+        );
+        cannon_shape.set_offset(Point2{
+            x: 0.0,
+            y: - TOWER_CANNON_HEIGHT / 2.0
+        });
+
         Self {
-            base_shape: GenericShape::new(
-                ShapeVariant::Circle{
-                    size: TOWER_SIZE, 
-                    radius: TOWER_RADIUS
-                },
-                TOWER_COLOR,
-                position),
-            cannon_shape: GenericShape::new(
-                ShapeVariant::Rect{
-                    width: TOWER_CANNON_WIDTH,
-                    height: TOWER_CANNON_HEIGHT,
-                }, 
-                TOWER_CANNON_COLOR, 
-                position)
+            cannon_shape:cannon_shape,
+            base_shape: base_shape, 
         }
     }
 
