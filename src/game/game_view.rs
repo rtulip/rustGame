@@ -189,34 +189,7 @@ impl GameView {
         // Draw the player's attack anmiation if in Active state. 
         match self.settings.player_attack_animation.state {
             AnimationEnum::Active => {
-                // Everything in this match statement should be moved to a separate function.
-                let shape = attack::Attack {};
-                let shape = shape.get_shape();
-                let pi = f64::consts::PI;
-                let dir = &model.player.direction;
-                let mut rad = model.player.direction.y / model.player.direction.x;
-                rad = rad.atan();
-                
-                match [dir.x < 0.0, dir.y < 0.0] {
-                    [true, true] => rad = pi * 2.0 - rad,
-                    [true, false] => rad = rad * -1.0,
-                    [false, true] => rad = pi + rad * -1.0,
-                    [false, false] => rad = pi - rad
-                }
-
-                rad = pi - rad;
-
-                let player_center = model.player.shape.center_point();
-                
-                let transform = c.transform.trans(player_center.x, player_center.y).rot_rad(rad);
-                shape.draw( self.settings.player_attack_animation.animation_color,
-                            [0.0, 0.0, self.settings.player_attack_animation.animation_width,
-                             self.settings.player_attack_animation.animation_height],
-                            transform, 
-                            c, 
-                            g);                
-                self.settings.player_attack_animation.animation_position = player_center;
-                self.settings.player_attack_animation.animation_rotation = rad * -1.0;
+                model.player.attack.shape.draw(c,g);
 
             },
             _ => ()

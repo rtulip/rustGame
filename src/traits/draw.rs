@@ -1,8 +1,8 @@
 use crate::misc::point2d::Point2;
+use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
 use graphics::types::Color;
-use std::f64::consts::PI;
 
 pub trait Draw {
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G);
@@ -10,6 +10,7 @@ pub trait Draw {
 
 pub enum ShapeVariant {
     Square { size: f64 },
+    Rect { width: f64, height: f64},
     Circle { size: f64, radius: f64 },
 }
 
@@ -54,6 +55,10 @@ impl GenericShape {
 
     }
 
+    pub fn set_color(&mut self, new_color: Color){
+        self.color = new_color;
+    }
+
     pub fn get_position(&self) -> Point2 {
         self.position
     }
@@ -62,8 +67,8 @@ impl GenericShape {
         self.position = new_pos;
     }
 
-    pub fn set_color(&mut self, new_color: Color){
-        self.color = new_color;
+    pub fn set_rotation(&mut self, new_rot: f64) {
+        self.rotation = Some(new_rot);
     }
 
     pub fn center_point(&self) -> Point2 {
@@ -90,6 +95,17 @@ impl GenericShape {
                 } else {
                     self.position + center_offset
                 } 
+            },
+            ShapeVariant::Rect{width: w, height: h} => {
+                let center_offset = Point2 {
+                    x: w / 2.0,
+                    y: h / 2.0,
+                };
+                if let Some(offset) = self.offset {
+                    self.position + center_offset + offset
+                } else {
+                    self.position + center_offset
+                }
             }
         }
     }
@@ -101,7 +117,9 @@ impl GenericShape {
             },
             ShapeVariant::Circle{size: _size, radius: rad} => {
                 self.shape = ShapeVariant::Circle{size: new_size, radius: rad};
-            }
+            },
+            ShapeVariant::Rect{width: _w, height: _h} => (),
+            
         }
     }
 
@@ -149,6 +167,14 @@ impl Draw for GenericShape {
             ShapeVariant::Circle{size, radius} => {
                 Rectangle::new_round(self.color, radius).draw(
                     [0.0,0.0,size,size],
+                    &c.draw_state, 
+                    transform, 
+                    g
+                )
+            },
+            ShapeVariant::Rect{width, height} => {
+                Rectangle::new(self.color).draw(
+                    [0.0,0.0,width,height], 
                     &c.draw_state, 
                     transform, 
                     g
