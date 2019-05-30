@@ -14,25 +14,19 @@ pub struct Attack {
 
 impl Attack {
     
-    pub fn new(position: Point2) -> Self {
-        let mut shape = GenericShape::new(
-            ShapeVariant::Rect{
-                width: PLAYER_ATTACK_WIDTH, 
-                height: PLAYER_ATTACK_HEIGHT
-            },
-            PLAYER_ATTACK_COLOR, 
-            position
-        );
-            
-        shape.update(
-            Point2{
-                x: PLAYER_SIZE / 2.0,
-                y: PLAYER_SIZE / 2.0,
-            },
-            None
-        );
+    pub fn new() -> Self {
         Self { 
-            shape: shape,
+            shape: GenericShape::new(
+                ShapeVariant::Rect{
+                    width: PLAYER_ATTACK_WIDTH, 
+                    height: PLAYER_ATTACK_HEIGHT
+                },
+                PLAYER_ATTACK_COLOR, 
+                Point2 {
+                    x: 0.0,
+                    y: 0.0,
+                }
+            ),
         }
     }
 

@@ -49,7 +49,7 @@ impl Player {
                 PLAYER_COLOR,
                 start_position
             ),
-            attack: Attack::new(start_position), 
+            attack: Attack::new(), 
             health: PLAYER_STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: Vec2::new_unit(0.0, 1.0),
@@ -73,6 +73,7 @@ impl Player {
                 self.attack.shape.update(delta, None);
             },
             PlayerState::Attacking => {
+                self.attack.shape.set_position(self.shape.center_point());
                 let mut rad = self.direction.y / self.direction.x;
                 rad = rad.atan();
                 
