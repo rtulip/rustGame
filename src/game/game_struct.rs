@@ -1,4 +1,4 @@
-use crate::game::{GameController, GameState};
+use crate::game::GameController;
 use crate::misc::random::Seed;
 
 use piston::window::WindowSettings;
@@ -39,11 +39,9 @@ impl Game {
         let mut gl = GlGraphics::new(self.opengl);
         
         while let Some(e) = events.next(&mut window) {
-            match self.controller.state {
-                GameState::Finished => break,
-                _ => (),
+            if !self.controller.check_state() {
+                break;
             }
-            
             self.controller.handle_event(&e);
             
             if let Some(args) = e.render_args() {
