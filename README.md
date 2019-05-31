@@ -3,7 +3,7 @@
 
 A survival tower defense game made in rust.
 
-![Game demo](images/game_demo.gif)
+![Game demo](images/game_demo_v0.1.0.gif)
 
 ## Install
 
@@ -26,7 +26,7 @@ Open a terminal and do the following
 2. Change directory
 
     ```bash
-    cd rustGame
+    cd rustGame/src
     ```
 
 3. Run the game to install dependencies and play
@@ -58,3 +58,6 @@ Move:
 Attack: 
 - `space` to attack
 - `cursor` for direction
+
+Place Turret: 
+- `e` to place turret
