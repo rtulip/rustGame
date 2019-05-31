@@ -183,8 +183,8 @@ impl GameModel {
     pub fn create_spawner(&mut self) {
            
         let mut canditate_spaces: Vec<MapIdx> = Vec::new();
-        for h in 0..self.level.height {
-            for w in 0..self.level.width {
+        for h in 1..self.level.height-1 {
+            for w in 1..self.level.width-1 {
                 
                 // Check surrounding neighbours
                 let pos = MapIdx::new(w,h);
