@@ -1,5 +1,5 @@
 use graphics::types::Color;
-use crate::level::MapIdx;
+use crate::levels::MapIdx;
 use crate::misc::point2d::Point2;
 use std::f64;
 

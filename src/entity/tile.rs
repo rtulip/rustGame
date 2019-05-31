@@ -1,6 +1,6 @@
 /// Used to represent different types of tiles which can be found in the map.
 use crate::traits::draw::{GenericShape,ShapeVariant};
-use crate::level::MapIdx;
+use crate::levels::MapIdx;
 use crate::game::consts::{
     TILE_SIZE,
     FLOOR_COLOR,

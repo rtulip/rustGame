@@ -1,4 +1,4 @@
-use crate::level::{Level, MapIdx};
+use crate::levels::{Level, MapIdx};
 use crate::traits::state::State;
 use crate::traits::entity::Entity;
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
