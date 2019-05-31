@@ -8,6 +8,7 @@ use crate::entity::tile::TileVariant;
 use crate::entity::towers::tower::TowerState;
 use crate::levels::map::MapIdx;
 use crate::game::consts::{
+    point2_to_map_idx,
     map_idx_to_point2,
     TILE_SIZE,
     PLAYER_SIZE,
@@ -161,14 +162,11 @@ impl GameController {
     /// circle's to rectangles in the future.
     fn check_player_collision(&mut self) {
 
-        let min_x = ( self.model.player.shape.get_position().x / TILE_SIZE).floor() as i32;
-        let max_x = ((self.model.player.shape.get_position().x + PLAYER_SIZE) / TILE_SIZE).floor() as i32 + 1;
-
-        let min_y = ( self.model.player.shape.get_position().y / TILE_SIZE).floor() as i32;
-        let max_y = ((self.model.player.shape.get_position().y + PLAYER_SIZE) / TILE_SIZE).floor() as i32 + 1;
+        let min_idx = point2_to_map_idx(self.model.player.shape.get_position());
+        let max_idx = point2_to_map_idx(self.model.player.shape.get_position() + Point2{x: PLAYER_SIZE, y: PLAYER_SIZE});
         
-        for h in min_y..max_y {
-            for w in min_x..max_x {
+        for h in min_idx.y..max_idx.y+1 {
+            for w in min_idx.x..max_idx.x+1 {
                 if let Some(tile) = self.model.level.map.get(&MapIdx::new(w,h)) {
                     match tile.variant {
                         TileVariant::Wall => {
@@ -303,9 +301,7 @@ impl GameController {
             match tower.state {
                 TowerState::Attacking => {
                     
-                    let x = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
-                    let y = (tower.bullet.shape.center_point().y / TILE_SIZE).floor() as i32;
-                    if let Some(tile) = self.model.level.map.get(&MapIdx::new(x, y)) {
+                    if let Some(tile) = self.model.level.map.get(&point2_to_map_idx(tower.bullet.shape.center_point())) {
                         match tile.variant {
                             TileVariant::Wall => {
                                 tower.change_state(TowerState::Ready);

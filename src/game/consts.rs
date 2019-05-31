@@ -59,6 +59,18 @@ pub const BULLET_SPEED: f64 = ENEMY_SPEED * 2.0;
 
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
-    Point2 {x: idx.x as f64 * TILE_SIZE, y: idx.y as f64 * TILE_SIZE}
+    Point2 {
+        x: idx.x as f64 * TILE_SIZE, 
+        y: idx.y as f64 * TILE_SIZE
+    }
+
+}
+
+pub fn point2_to_map_idx(p: Point2) -> MapIdx {
+
+    MapIdx::new(
+        (p.x / TILE_SIZE).floor() as i32,
+        (p.y / TILE_SIZE).floor() as i32
+    )
 
 }
