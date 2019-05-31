@@ -48,10 +48,6 @@ impl Game {
             }
             
             self.controller.handle_event(&e);
-            if let Some(args) = e.update_args() {
-                self.controller.tick(args.dt);
-                continue;
-            } 
             
             if let Some(args) = e.render_args() {
                 let ref mut glyphs = GlyphCache::new("assets/FiraSans-Regular.ttf", (), texture_settings)
