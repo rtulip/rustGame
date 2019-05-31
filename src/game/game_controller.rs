@@ -138,7 +138,7 @@ impl GameController {
         self.tick_enemies(dt);
 
         // Chreate spawner with constant chance
-        self.model.chanced_create_spawner(5000);
+        self.model.chanced_create_spawner(250);
         // Spawn enmies from spawners
         self.model.spawn_enemies();
         

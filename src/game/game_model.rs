@@ -234,7 +234,7 @@ impl GameModel {
         
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
-            if r % 1000 == 0 && self.enemies.len() < self.max_enemies {
+            if r % 50 == 0 && self.enemies.len() < self.max_enemies {
                 let target = &self.beacon.idx;
                 let mut enemy = Enemy::new(map_idx_to_point2(*spawner));
                 
