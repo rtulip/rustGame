@@ -46,9 +46,11 @@ impl Game {
                 GameState::Finished => break,
                 _ => (),
             }
+            
             self.controller.handle_event(&e);
             if let Some(args) = e.update_args() {
-                self.controller.tick(args.dt);    
+                self.controller.tick(args.dt);
+                continue;
             } 
             
             if let Some(args) = e.render_args() {

@@ -88,11 +88,16 @@ impl GameController {
     /// relseases. 
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
-            self.cursor_pos = Point2 {x: pos[0], y: pos[1]}; 
+            self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
+            return;
         }
-        self.model.player.update_direction(&self.cursor_pos);
+        if let Some(args) = e.update_args() {
+            self.tick(args.dt);
+            return;
+        } 
         if let Some(Button::Keyboard(key)) = e.press_args() {
             self.keys_pressed.insert(key);
+            return;
         }
         if let Some(Button::Keyboard(key)) = e.release_args() {
             if self.keys_pressed.contains(&key) {
@@ -105,11 +110,13 @@ impl GameController {
                     _ => (),
                 }
             }
+            return;
         }
     }
 
     /// Executes a single game tick 
     pub fn tick(&mut self, dt: f64) {
+        self.model.player.update_direction(&self.cursor_pos);
         // Update Movement state if W is pressed
         if self.keys_pressed.contains(&Key::W) {
             self.model.player.change_state(player::PlayerState::Moving);
