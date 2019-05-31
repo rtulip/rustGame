@@ -261,6 +261,7 @@ impl GameModel {
 
     }
 
+    /// Creates a tower at the player's position and consumes a resource.
     pub fn create_tower(&mut self) {
 
         if self.player.resources != 0 {
@@ -270,6 +271,9 @@ impl GameModel {
 
     }
 
+    /// Updates each tower in the tower list. If any enemies are close enough,
+    /// visible, and are within tower range the towers switch to Attacking, (if
+    /// not already attacking).
     pub fn tick_towers(&mut self){
 
         for tower in self.towers.iter_mut() {

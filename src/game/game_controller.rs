@@ -286,6 +286,8 @@ impl GameController {
 
     }
 
+    /// Checks the position of every Tower's bullet (if attacking) and checks
+    /// it against all Enemies and the Tile it's currently touching.
     fn check_bullet_collision(&mut self) {
         for tower in self.model.towers.iter_mut() {
             let mut to_remove: Vec<usize> = Vec::new();
