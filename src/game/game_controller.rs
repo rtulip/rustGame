@@ -279,6 +279,8 @@ impl GameController {
 
         //Check Gamestate to see if GameOver.
         if self.model.beacon.health == 0 || self.model.player.health == 0{
+            println!("Game Over!");
+            println!("Player Health: {}, Beacon Health: {}",self.model.player.health, self.model.beacon.health);
             self.change_state(GameState::Finished);
         }
 
