@@ -1,14 +1,8 @@
 use crate::game::GameModel;
 use crate::entity::player::PlayerState;
 use crate::level::MapIdx;
-use crate::misc::point2d::Point2;
 use crate::traits::draw::Draw;
-use graphics::{Context, Graphics, Transformed, Image};
-use graphics::character::CharacterCache;
-use crate::game::consts::{
-    ERROR_COLOR,
-    TILE_SIZE,
-};
+use graphics::{Context, Graphics};
 
 /// A structure responsible for drawing the GameModel.
 pub struct GameView {}
@@ -22,17 +16,14 @@ impl GameView {
 
     /// Draws the GameModel by first drawing the level, then the player, then
     /// the beacon, and finally all the enemies.
-    pub fn draw<G: Graphics, C>(
+    pub fn draw<G: Graphics>(
         &mut self, 
         model: &GameModel,
-        glyphs: &mut C, 
         c: &Context, 
         g: &mut G
-    ) 
-        where C: CharacterCache<Texture = G::Texture> {
+    ) {
         
         self.draw_level(model, c, g);
-        self.draw_text(model, glyphs, c, g);
         self.draw_beacon(model, c, g);
         self.draw_resources(model, c, g);
         self.draw_towers(model, c, g);
@@ -98,33 +89,5 @@ impl GameView {
             tower.draw(c, g);
         }
 
-    }
-
-    /// Draws all text. 
-    fn draw_text<G: Graphics, C>(
-        &mut self, 
-        model: &GameModel,
-        glyphs: &mut C, 
-        c: &Context, 
-        g: &mut G
-    ) 
-        where C: CharacterCache<Texture = G::Texture> {
-
-        let text_img = Image::new_color(ERROR_COLOR);
-        let score_string = model.player.resources.to_string();
-        let char_point = Point2 {
-            x: (model.level.width - 1) as f64 * TILE_SIZE,
-            y: 0.0
-        };
-        
-        for ch in score_string.chars() {
-            if let Ok(character) = glyphs.character(34, ch) {
-                text_img.draw(
-                    character.texture, 
-                    &c.draw_state,
-                    c.transform.trans(char_point.x, char_point.y),
-                    g);
-            };
-        }
     }
 }
