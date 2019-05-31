@@ -50,7 +50,7 @@ impl entity::Entity for Enemy {
     fn tick(&mut self, dt: f64) {
         if self.path.len() > 0 {
             let mut dist = self.path[0] - self.shape.get_position();
-            if (dist.x).abs() < 1.0 && (dist.y).abs() < 1.0 {
+            if (dist.x).abs() + (dist.y).abs() < 5.0 {
                 self.path.remove(0);
                 if self.path.len() > 0 {
                     dist = self.path[0] - self.shape.get_position();
