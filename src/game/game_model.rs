@@ -1,4 +1,5 @@
-use crate::level::{Level, MapIdx};
+use crate::levels::Level;
+use crate::levels::map::{MapIdx, pathfind};
 use crate::traits::state::State;
 use crate::traits::entity::Entity;
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
@@ -238,7 +239,7 @@ impl GameModel {
                 let target = &self.beacon.idx;
                 let mut enemy = Enemy::new(map_idx_to_point2(*spawner));
                 
-                if let Some(path) = self.level.pathfind(&spawner, target) {
+                if let Some(path) = pathfind(&self.level.map,&spawner, target) {
                     let mut enemy_path: Vec<Point2> = Vec::new();
                     for idx in path.0 {
                         enemy_path.push(map_idx_to_point2(idx));

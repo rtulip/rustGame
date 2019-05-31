@@ -1,6 +1,6 @@
 use crate::game::GameModel;
 use crate::entity::player::PlayerState;
-use crate::level::MapIdx;
+use crate::levels::map::MapIdx;
 use crate::traits::draw::Draw;
 use graphics::{Context, Graphics};
 

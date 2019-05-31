@@ -1,10 +1,14 @@
 use graphics::types::Color;
-use crate::level::MapIdx;
+use crate::levels::map::MapIdx;
 use crate::misc::point2d::Point2;
 use std::f64;
 
 pub const PI: f64 = f64::consts::PI;
 pub const INF: f64 = f64::INFINITY;
+
+pub const LEVEL_WIDTH: i32 = 50;
+pub const LEVEL_HEIGHT: i32 = 50;
+pub const LEVEL_GEN_ITERS: i32 = 5;
 
 pub const TILE_SIZE: f64 = 20.0;
 pub const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
