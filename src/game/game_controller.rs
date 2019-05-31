@@ -337,6 +337,15 @@ impl GameController {
         }
     }
 
+    pub fn check_state(&self) -> bool {
+
+        match self.state {
+            GameState::Finished => false,
+            GameState::Running => true,
+        }
+
+    }
+
 }
 
 // Basic state implementation for GameController.
