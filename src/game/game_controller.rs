@@ -337,6 +337,18 @@ impl GameController {
         }
     }
 
+    /// Function to check the state of the GameController. Used to keep the 
+    /// game loop running. Returns true while in the Running state, otherwise
+    /// returns false if in the Finished State.
+    pub fn check_state(&self) -> bool {
+
+        match self.state {
+            GameState::Finished => false,
+            GameState::Running => true,
+        }
+
+    }
+
 }
 
 // Basic state implementation for GameController.
