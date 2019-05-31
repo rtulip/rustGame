@@ -165,8 +165,8 @@ impl GameController {
         let min_idx = point2_to_map_idx(self.model.player.shape.get_position());
         let max_idx = point2_to_map_idx(self.model.player.shape.get_position() + Point2{x: PLAYER_SIZE, y: PLAYER_SIZE});
         
-        for h in min_idx.y..max_idx.y {
-            for w in min_idx.x..max_idx.x {
+        for h in min_idx.y..max_idx.y+1 {
+            for w in min_idx.x..max_idx.x+1 {
                 if let Some(tile) = self.model.level.map.get(&MapIdx::new(w,h)) {
                     match tile.variant {
                         TileVariant::Wall => {
