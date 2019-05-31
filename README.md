@@ -26,7 +26,7 @@ Open a terminal and do the following
 2. Change directory
 
     ```bash
-    cd rustGame
+    cd rustGame/src
     ```
 
 3. Run the game to install dependencies and play
@@ -58,3 +58,6 @@ Move:
 Attack: 
 - `space` to attack
 - `cursor` for direction
+
+Place Turret: 
+- `e` to place turret
