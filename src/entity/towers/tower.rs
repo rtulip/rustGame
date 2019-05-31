@@ -124,14 +124,14 @@ impl State for Tower {
 impl Entity for Tower {
     
     /// Function to move the Bullet each game Tick if Tower is Attacking.
-    fn tick(&mut self) {
+    fn tick(&mut self, dt: f64) {
         match self.state {
             TowerState::Attacking => {
-                self.bullet.tick();
+                self.bullet.tick(dt);
             }
             _ => (),
         }
     }
-    
+
 }
 

@@ -274,7 +274,7 @@ impl GameModel {
     /// Updates each tower in the tower list. If any enemies are close enough,
     /// visible, and are within tower range the towers switch to Attacking, (if
     /// not already attacking).
-    pub fn tick_towers(&mut self){
+    pub fn tick_towers(&mut self, dt: f64){
 
         for tower in self.towers.iter_mut() {
             let mut new_dir = Point2{x: 0.0, y: 0.0};
@@ -348,7 +348,7 @@ impl GameModel {
                 }
             }
 
-            tower.tick();
+            tower.tick(dt);
 
         }
 

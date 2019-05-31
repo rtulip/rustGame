@@ -33,7 +33,7 @@ impl Resource {
 
 impl entity::Entity for Resource {
     /// Rotates the Resource
-    fn tick(&mut self){
-        self.shape.update(Point2{x: 0.0, y: 0.0}, Some(DROP_ROTATION_SPEED));
+    fn tick(&mut self, dt: f64){
+        self.shape.update(Point2{x: 0.0, y: 0.0}, Some(DROP_ROTATION_SPEED * dt));
     }
 }
