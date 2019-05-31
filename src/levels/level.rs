@@ -2,12 +2,12 @@ extern crate pathfinding;
 use crate::entity::tile::{Tile, TileVariant};
 use crate::misc::random::{Seed,RNG,from_seed, next_u32};
 use crate::levels::map::{Map, MapIdx};
-use pathfinding::prelude::astar;
 use std::collections::HashMap;
-
-const WIDTH: i32 = 50;
-const HEIGHT: i32 = 50;
-const ITERS: i32 = 5;
+use crate::game::consts::{
+    LEVEL_WIDTH,
+    LEVEL_HEIGHT,
+    LEVEL_GEN_ITERS,
+};
 
 /// A structure to fully describe the game board. A Map is used to store the 
 /// Tiles representing the game board. Width and height are provided for easy
@@ -85,8 +85,8 @@ impl Level {
         let mut rng = from_seed(init);
 
         // Add initial Tile::Walls to the Map.
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
+        for h in 0..LEVEL_HEIGHT {
+            for w in 0..LEVEL_WIDTH {
                 // Any given tile has a 50/50 chance of being a wall initially.
                 if next_u32(&mut rng) % 2 == 1 {
                     map.insert(MapIdx::new(w,h), Tile::new(TileVariant::Wall, MapIdx::new(w, h)));
@@ -95,11 +95,11 @@ impl Level {
         }
 
         // Run Conway's Game of Life on the Tile::Walls in the Map
-        map = Level::iterate_map(map, ITERS);
+        map = Level::iterate_map(map, LEVEL_GEN_ITERS);
 
         // Fill the empty spaces in the Map with Tile::Floor
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
+        for h in 0..LEVEL_HEIGHT {
+            for w in 0..LEVEL_WIDTH {
                 match map.contains_key(&MapIdx::new(w,h)) {
                     false => {
                         map.insert(MapIdx::new(w,h), Tile::new(TileVariant::Floor, MapIdx::new(w, h)));
@@ -110,9 +110,9 @@ impl Level {
         }
         
         // Fill untraversable space with walls
-        map = Level::fill_walls(map, WIDTH, HEIGHT);
-        map = Level::fill_edge(map, WIDTH, HEIGHT);
-        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
+        map = Level::fill_walls(map, LEVEL_WIDTH, LEVEL_HEIGHT);
+        map = Level::fill_edge(map, LEVEL_WIDTH, LEVEL_HEIGHT);
+        Level {map: map, width: LEVEL_WIDTH, height: LEVEL_HEIGHT, rng: rng}
 
     }
 
