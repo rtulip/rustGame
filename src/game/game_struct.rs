@@ -32,8 +32,6 @@ impl Game {
         }
     }
 
-    /// run()
-    /// 
     /// A function to start the game loop.
     pub fn run(&mut self) {
         let mut window: GlutinWindow = self.window_settings.build().expect("Couldn't create window!");
