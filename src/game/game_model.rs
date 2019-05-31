@@ -291,10 +291,10 @@ impl GameModel {
 
                 let mut wall_hit = false;
                 let mut previous = point2_to_map_idx(tower.base_shape.get_position());
-                for x in p0.x+1..pn.x {
-                    let y = ((slope * x as f64 + vertical_offset)/ TILE_SIZE).floor() as i32;
-                    if y != previous.y {
-                        if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, y)) {
+                for x in p0.x..pn.x {
+                    let next = point2_to_map_idx(Point2{x: 0.0, y: slope * x as f64 + vertical_offset});
+                    if next.y != previous.y {
+                        if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, next.y)) {
                             match tile.variant {
                                 TileVariant::Wall => {
                                     wall_hit = true;
@@ -305,7 +305,7 @@ impl GameModel {
                         }
                     }
                     
-                    if let Some(tile) = self.level.map.get(&MapIdx::new(x, y)) {
+                    if let Some(tile) = self.level.map.get(&MapIdx::new(x, next.y)) {
                         match tile.variant {
                             TileVariant::Wall => {
                                 wall_hit = true;
@@ -314,7 +314,7 @@ impl GameModel {
                             _ => (),
                         }
                     } 
-                    previous = MapIdx::new(x, y);
+                    previous = MapIdx::new(x, next.y);
                 }
                 if wall_hit {
                     continue;
