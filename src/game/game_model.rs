@@ -12,6 +12,7 @@ use crate::entity::drops::Resource;
 use crate::entity::towers::tower::{Tower, TowerState};
 use crate::game::consts::{
     map_idx_to_point2,
+    point2_to_map_idx,
     PI,
     INF,
     TILE_SIZE,
@@ -285,13 +286,12 @@ impl GameModel {
                 let dir = enemy.shape.center_point() - tower.base_shape.center_point();
                 let slope = dir.y / dir.x;
                 let vertical_offset = tower.base_shape.center_point().y;
-                let x0 = (tower.base_shape.center_point().x / TILE_SIZE).floor() as i32;
-                let xn = (enemy.shape.center_point().x / TILE_SIZE).floor() as i32;
+                let p0 = point2_to_map_idx(tower.base_shape.center_point());
+                let pn = point2_to_map_idx(enemy.shape.center_point());
 
                 let mut wall_hit = false;
-                let previous = tower.base_shape.get_position();
-                let mut previous = MapIdx::new((previous.x / TILE_SIZE).floor() as i32, (previous.y / TILE_SIZE).floor() as i32);
-                for x in x0+1..xn {
+                let mut previous = point2_to_map_idx(tower.base_shape.get_position());
+                for x in p0.x+1..pn.x {
                     let y = ((slope * x as f64 + vertical_offset)/ TILE_SIZE).floor() as i32;
                     if y != previous.y {
                         if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, y)) {
