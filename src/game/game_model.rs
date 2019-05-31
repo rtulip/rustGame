@@ -1,4 +1,6 @@
-pub use crate::level::{Level, MapIdx};
+use crate::level::{Level, MapIdx};
+use crate::traits::state::State;
+use crate::traits::entity::Entity;
 use crate::misc::random::{Seed, RNG, from_seed, next_u32};
 use crate::misc::point2d::Point2;
 use crate::entity::player::Player;
@@ -6,8 +8,12 @@ use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
 use crate::entity::enemy::Enemy;
 use crate::entity::drops::Resource;
+use crate::entity::towers::tower::{Tower, TowerState};
 use crate::game::consts::{
-    map_idx_to_point2
+    map_idx_to_point2,
+    PI,
+    INF,
+    TILE_SIZE,
 };
 
 /// A structure to fully encapsulate all components of the game. The different
@@ -58,6 +64,7 @@ pub struct GameModel {
     pub max_enemies: usize,
     pub spawners: Vec<MapIdx>,
     pub resources: Vec<Resource>,
+    pub towers: Vec<Tower>,
     rng: RNG,
 }
 
@@ -77,6 +84,7 @@ impl GameModel {
         let enemies: Vec<Enemy> = Vec::new();
         let spawners: Vec<MapIdx> = Vec::new();
         let resources: Vec<Resource> = Vec::new();
+        let towers: Vec<Tower> = Vec::new();
         Self {
             level: level,
             player: player,
@@ -85,6 +93,7 @@ impl GameModel {
             max_enemies: 15,
             spawners: spawners,
             resources: resources,
+            towers: towers,
             rng: rng
         }
     }
@@ -248,6 +257,99 @@ impl GameModel {
         let r = next_u32(&mut self.rng);
         if r % 3 == 0 {
             self.resources.push(Resource::new(enemy.shape.center_point()));
+        }
+
+    }
+
+    /// Creates a tower at the player's position and consumes a resource.
+    pub fn create_tower(&mut self) {
+
+        if self.player.resources != 0 {
+            self.player.resources -= 1;
+            self.towers.push(Tower::new(self.player.shape.get_position()));
+        }
+
+    }
+
+    /// Updates each tower in the tower list. If any enemies are close enough,
+    /// visible, and are within tower range the towers switch to Attacking, (if
+    /// not already attacking).
+    pub fn tick_towers(&mut self){
+
+        for tower in self.towers.iter_mut() {
+            let mut new_dir = Point2{x: 0.0, y: 0.0};
+            let mut min_dist = INF;
+            for enemy in self.enemies.iter() {
+
+                let dir = enemy.shape.center_point() - tower.base_shape.center_point();
+                let slope = dir.y / dir.x;
+                let vertical_offset = tower.base_shape.center_point().y;
+                let x0 = (tower.base_shape.center_point().x / TILE_SIZE).floor() as i32;
+                let xn = (enemy.shape.center_point().x / TILE_SIZE).floor() as i32;
+
+                let mut wall_hit = false;
+                let previous = tower.base_shape.get_position();
+                let mut previous = MapIdx::new((previous.x / TILE_SIZE).floor() as i32, (previous.y / TILE_SIZE).floor() as i32);
+                for x in x0+1..xn {
+                    let y = ((slope * x as f64 + vertical_offset)/ TILE_SIZE).floor() as i32;
+                    if y != previous.y {
+                        if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, y)) {
+                            match tile.variant {
+                                TileVariant::Wall => {
+                                    wall_hit = true;
+                                    continue;
+                                },
+                                _ => (),
+                            }
+                        }
+                    }
+                    
+                    if let Some(tile) = self.level.map.get(&MapIdx::new(x, y)) {
+                        match tile.variant {
+                            TileVariant::Wall => {
+                                wall_hit = true;
+                                continue;
+                            },
+                            _ => (),
+                        }
+                    } 
+                    previous = MapIdx::new(x, y);
+                }
+                if wall_hit {
+                    continue;
+                }
+
+                let dist = dir.x.abs() + dir.y.abs();
+                if dist < min_dist {
+                    min_dist = dist;
+                    new_dir = dir; 
+                }
+
+            }
+
+            if min_dist < tower.range {
+                
+                let mut rad = new_dir.y / new_dir.x;
+                rad = rad.atan();
+                
+                match [new_dir.x < 0.0, new_dir.y < 0.0] {
+                    [true, true] => rad = PI * 2.0 - rad,
+                    [true, false] => rad = rad * -1.0,
+                    [false, true] => rad = PI + rad * -1.0,
+                    [false, false] => rad = PI - rad
+                }
+
+                rad = PI - rad;
+                tower.set_rotation(rad);
+
+                match tower.state {
+                    TowerState::Ready => tower.change_state(TowerState::Attacking),
+                    _ => (),
+                }
+            }
+
+            tower.tick();
+
         }
 
     }

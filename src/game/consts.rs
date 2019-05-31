@@ -4,6 +4,7 @@ use crate::misc::point2d::Point2;
 use std::f64;
 
 pub const PI: f64 = f64::consts::PI;
+pub const INF: f64 = f64::INFINITY;
 
 pub const TILE_SIZE: f64 = 20.0;
 pub const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
@@ -34,6 +35,18 @@ pub const BEACON_SIZE: f64 = 18.0;
 pub const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
 pub const BEACON_ROTATION_SPEED: f64 = 0.01;
 pub const BEACON_STARTING_HEALTH: i32 = 10000;
+
+pub const TOWER_COLOR: Color = [0.33, 0.33, 0.33, 1.0];
+pub const TOWER_SIZE: f64 = PLAYER_SIZE;
+pub const TOWER_RADIUS: f64 = TOWER_SIZE / 2.0;
+pub const TOWER_RANGE: f64 = TILE_SIZE * 4.0;
+pub const TOWER_CANNON_COLOR: Color = PLAYER_ATTACK_COLOR;
+pub const TOWER_CANNON_WIDTH: f64 = TOWER_SIZE;
+pub const TOWER_CANNON_HEIGHT: f64 = TOWER_SIZE / 3.0;
+pub const BULLET_WIDTH: f64 = TOWER_SIZE / 2.0;
+pub const BULLET_HEIGHT: f64 = TOWER_CANNON_HEIGHT * 0.75;
+pub const BULLET_COLOR: Color = [0.0, 0.0, 0.0, 1.0];
+pub const BULLET_SPEED: f64 = ENEMY_SPEED * 2.0;
 
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 

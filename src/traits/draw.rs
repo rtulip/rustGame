@@ -4,16 +4,20 @@ pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
 use graphics::types::Color;
 
+/// Trait for drawing objects to the screen.
 pub trait Draw {
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G);
 }
 
+/// Different Types of shapes. More complex shapes can be created by combining
+/// ShapeVariants. 
 pub enum ShapeVariant {
     Square { size: f64 },
     Rect { width: f64, height: f64},
     Circle { size: f64, radius: f64 },
 }
 
+/// A generic shape which can be used to draw every shape in the game.
 pub struct GenericShape {
     shape: ShapeVariant,
     color: Color,
@@ -24,6 +28,7 @@ pub struct GenericShape {
 
 impl GenericShape {
     
+    /// Creates a new GenericShape
     pub fn new(shape: ShapeVariant, color: Color, position: Point2)-> Self  {
             
         Self {
@@ -35,6 +40,8 @@ impl GenericShape {
         }
     }
 
+    /// Update function which moves the shape by delta_pos and can optionally
+    /// rotate the shape. 
     pub fn update(&mut self, delta_pos: Point2, delta_rad: Option<f64>){
 
         self.position = self.position + delta_pos;
@@ -55,22 +62,34 @@ impl GenericShape {
 
     }
 
+    /// Function to set the color.
     pub fn set_color(&mut self, new_color: Color){
         self.color = new_color;
     }
 
+    /// Function to return the private Position field.
     pub fn get_position(&self) -> Point2 {
         self.position
     }
 
+    /// Function to set the position of the GenericShape.
     pub fn set_position(&mut self, new_pos: Point2) {
         self.position = new_pos;
     }
 
+    /// Function to get the private Rotation field.
+    pub fn get_rotation(&self) -> Option<f64> {
+        self.rotation
+    }
+
+    /// Function to set the rotation of the shape.
     pub fn set_rotation(&mut self, new_rot: f64) {
         self.rotation = Some(new_rot);
     }
 
+    /// Function to return the center point of the GenericShape. The 
+    /// calculation depends on ShapeVariant because of the differnet enum 
+    /// struct fields.
     pub fn center_point(&self) -> Point2 {
         match self.shape {
             ShapeVariant::Square{size: val} => {
@@ -110,6 +129,8 @@ impl GenericShape {
         }
     }
 
+    /// Function to find the top right corner of the shape as a Point2. Depends
+    /// on the ShapeVariant and the Rotation of the GenericShape.
     pub fn top_right(&self) -> Point2 {
         match self.shape {
             ShapeVariant::Square{size: val} => {
@@ -169,6 +190,8 @@ impl GenericShape {
         }
     }
 
+    /// Function to find the bottom right corner of the shape as a Point2.
+    /// Depends on the ShapeVariant and the Rotation of the GenericShape.
     pub fn bottom_right(&self) -> Point2 {
         match self.shape {
             ShapeVariant::Square{size: val} => {
@@ -228,6 +251,7 @@ impl GenericShape {
         }
     }
 
+    /// Function to set the private Offset field.
     pub fn set_offset(&mut self, new_offset: Point2){
         self.offset = Some(new_offset);
     }
@@ -235,6 +259,7 @@ impl GenericShape {
 }
 
 impl Draw for GenericShape {
+    /// Function to draw the shape.
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G){
         let mut transform = c.transform;
         transform = transform.trans(self.position.x, self.position.y);

@@ -5,6 +5,7 @@ use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::entity::player;
 use crate::entity::tile::TileVariant;
+use crate::entity::towers::tower::TowerState;
 use crate::level::MapIdx;
 use crate::game::consts::{
     map_idx_to_point2,
@@ -54,6 +55,7 @@ pub struct GameController {
     pub state: GameState,
     cursor_pos: Point2,
     keys_pressed: HashSet<Key>,
+    keys_locked: HashSet<Key>,
 }
 
 impl GameController {
@@ -66,11 +68,19 @@ impl GameController {
         let mut model = GameModel::new(seed);
         let cursor_pos = Point2 {x: 0.0, y: 0.0};
         let keys_pressed = HashSet::new();
+        let keys_locked = HashSet::new();
 
         model.create_spawner();
         model.create_spawner();
 
-        Self {model: model, view: view, state: GameState::Running, cursor_pos: cursor_pos, keys_pressed: keys_pressed}
+        Self {
+            model: model, 
+            view: view, 
+            state: GameState::Running, 
+            cursor_pos: cursor_pos, 
+            keys_pressed: keys_pressed,
+            keys_locked: keys_locked,
+        }
 
     }
 
@@ -78,7 +88,7 @@ impl GameController {
     /// relseases. 
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
-            self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
+            self.cursor_pos = Point2 {x: pos[0], y: pos[1]}; 
         }
         self.model.player.update_direction(&self.cursor_pos);
         if let Some(Button::Keyboard(key)) = e.press_args() {
@@ -87,6 +97,7 @@ impl GameController {
         if let Some(Button::Keyboard(key)) = e.release_args() {
             if self.keys_pressed.contains(&key) {
                 self.keys_pressed.remove(&key);
+                self.keys_locked.remove(&key);
                 match key {
                     Key::Space => {
                         self.model.player.change_state(player::PlayerState::FinishedAttacking);
@@ -110,6 +121,12 @@ impl GameController {
             self.model.player.change_state(player::PlayerState::Attacking);
         }
 
+        if self.keys_pressed.contains(&Key::E) && !self.keys_locked.contains(&Key::E){
+            self.model.create_tower();
+            self.keys_locked.insert(Key::E);
+        }
+        self.model.tick_towers();
+        self.check_bullet_collision();
         // Tick player
         self.model.player.tick();
         // Check for collision
@@ -267,6 +284,48 @@ impl GameController {
             resource.tick();
         }
 
+    }
+
+    /// Checks the position of every Tower's bullet (if attacking) and checks
+    /// it against all Enemies and the Tile it's currently touching.
+    fn check_bullet_collision(&mut self) {
+        for tower in self.model.towers.iter_mut() {
+            let mut to_remove: Vec<usize> = Vec::new();
+            match tower.state {
+                TowerState::Attacking => {
+                    
+                    let x = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
+                    let y = (tower.bullet.shape.center_point().y / TILE_SIZE).floor() as i32;
+                    if let Some(tile) = self.model.level.map.get(&MapIdx::new(x, y)) {
+                        match tile.variant {
+                            TileVariant::Wall => {
+                                tower.change_state(TowerState::Ready);
+                                continue;
+                            },
+                            _ => (),
+                        }
+                    } else {
+                        tower.change_state(TowerState::Ready);
+                        continue;
+                    }
+                    
+                    for (i,enemy) in self.model.enemies.iter().enumerate().rev() {
+                        if (tower.bullet.shape.center_point().x - enemy.shape.center_point().x).abs() + 
+                           (tower.bullet.shape.center_point().y - enemy.shape.center_point().y).abs() <= ENEMY_RADIUS {
+                               to_remove.push(i);
+                               tower.change_state(TowerState::Ready);
+                           }
+                    }
+
+                    for i in to_remove {
+                        self.model.enemies.remove(i);
+                    }
+
+                },
+                _ => (),
+            }
+
+        }
     }
 
 }

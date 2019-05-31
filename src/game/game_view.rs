@@ -35,6 +35,7 @@ impl GameView {
         self.draw_text(model, glyphs, c, g);
         self.draw_beacon(model, c, g);
         self.draw_resources(model, c, g);
+        self.draw_towers(model, c, g);
         self.draw_enemies(model, c, g);
         self.draw_player(model, c, g);
         
@@ -55,7 +56,7 @@ impl GameView {
 
     /// Draws the Player of the GameModel. If the player is attacking, the 
     /// Player's sword is drawn as well.
-    fn draw_player<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+    fn draw_player<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         // Draw the player
         model.player.shape.draw(c, g);
         // Draw the player's attack anmiation if in Active state. 
@@ -69,24 +70,32 @@ impl GameView {
     }
 
     /// Draws the GameModel's Beacon
-    fn draw_beacon<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+    fn draw_beacon<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         model.beacon.shape.draw(c, g);
     }
 
     /// Draws each enemy in the GameModel enemy list
-    fn draw_enemies<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+    fn draw_enemies<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         for enemy in model.enemies.iter() {
             enemy.shape.draw(c,g);
         }
     }
 
     /// Draws each resource in the GameModels resource list
-    fn draw_resources<G: Graphics>(&mut self, model: &GameModel, c: &Context, g: &mut G) {
+    fn draw_resources<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
 
         for resource in model.resources.iter() {
 
             resource.shape.draw(c,g);
 
+        }
+
+    }
+
+    fn draw_towers<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G){
+
+        for tower in model.towers.iter() {
+            tower.draw(c, g);
         }
 
     }
