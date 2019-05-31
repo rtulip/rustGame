@@ -47,10 +47,10 @@ impl Enemy {
 }
 
 impl entity::Entity for Enemy {
-    fn tick(&mut self) {
+    fn tick(&mut self, dt: f64) {
         if self.path.len() > 0 {
             let mut dist = self.path[0] - self.shape.get_position();
-            if (dist.x).abs() < 1.0 && (dist.y).abs() < 1.0 {
+            if (dist.x).abs() + (dist.y).abs() < 5.0 {
                 self.path.remove(0);
                 if self.path.len() > 0 {
                     dist = self.path[0] - self.shape.get_position();
@@ -60,8 +60,8 @@ impl entity::Entity for Enemy {
             }
             self.direction = vector2d::Vec2::new_unit_from_point(dist);
             let delta = point2d::Point2 { 
-                x: self.direction.x * ENEMY_SPEED, 
-                y: self.direction.y * ENEMY_SPEED
+                x: self.direction.x * ENEMY_SPEED * dt, 
+                y: self.direction.y * ENEMY_SPEED * dt
             };
             self.shape.update(delta, None);
         }

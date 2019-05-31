@@ -35,10 +35,10 @@ impl Bullet {
 
 impl Entity for Bullet {
     /// Moves the bullet forward every tick.
-    fn tick(&mut self) {
+    fn tick(&mut self, dt: f64) {
         let delta = Point2{
-            x: self.direction.x * BULLET_SPEED,
-            y: self.direction.y * BULLET_SPEED,
+            x: self.direction.x * BULLET_SPEED * dt,
+            y: self.direction.y * BULLET_SPEED * dt,
         };
         self.shape.update(delta,None);
     }

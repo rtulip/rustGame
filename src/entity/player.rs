@@ -62,12 +62,12 @@ impl Player {
     /// moves while in the Moving state.
     /// 
     /// Assumes that direction is a unit vector.
-    pub fn update_position(&mut self) {
+    pub fn update_position(&mut self, dt: f64) {
         match self.state {
             PlayerState::Moving => {
                 let delta = Point2{
-                    x: self.direction.x * PLAYER_SPEED,
-                    y: self.direction.y * PLAYER_SPEED
+                    x: self.direction.x * PLAYER_SPEED * dt,
+                    y: self.direction.y * PLAYER_SPEED * dt
                 };
                 self.shape.update(delta, None);
             },
@@ -106,8 +106,8 @@ impl Player {
 }
 
 impl entity::Entity for Player {
-    fn tick(&mut self) {
-        self.update_position();
+    fn tick(&mut self, dt: f64) {
+        self.update_position(dt);
     }
 }
 

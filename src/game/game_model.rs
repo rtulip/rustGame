@@ -234,7 +234,7 @@ impl GameModel {
         
         for spawner in self.spawners.iter() {
             let r = next_u32(&mut self.rng);
-            if r % 1000 == 0 && self.enemies.len() < self.max_enemies {
+            if r % 50 == 0 && self.enemies.len() < self.max_enemies {
                 let target = &self.beacon.idx;
                 let mut enemy = Enemy::new(map_idx_to_point2(*spawner));
                 
@@ -274,7 +274,7 @@ impl GameModel {
     /// Updates each tower in the tower list. If any enemies are close enough,
     /// visible, and are within tower range the towers switch to Attacking, (if
     /// not already attacking).
-    pub fn tick_towers(&mut self){
+    pub fn tick_towers(&mut self, dt: f64){
 
         for tower in self.towers.iter_mut() {
             let mut new_dir = Point2{x: 0.0, y: 0.0};
@@ -348,7 +348,7 @@ impl GameModel {
                 }
             }
 
-            tower.tick();
+            tower.tick(dt);
 
         }
 

@@ -88,11 +88,16 @@ impl GameController {
     /// relseases. 
     pub fn handle_event<E: GenericEvent>(&mut self, e: &E) {
         if let Some(pos) = e.mouse_cursor_args() {
-            self.cursor_pos = Point2 {x: pos[0], y: pos[1]}; 
+            self.cursor_pos = Point2 {x: pos[0], y: pos[1]};
+            return;
         }
-        self.model.player.update_direction(&self.cursor_pos);
+        if let Some(args) = e.update_args() {
+            self.tick(args.dt);
+            return;
+        } 
         if let Some(Button::Keyboard(key)) = e.press_args() {
             self.keys_pressed.insert(key);
+            return;
         }
         if let Some(Button::Keyboard(key)) = e.release_args() {
             if self.keys_pressed.contains(&key) {
@@ -105,11 +110,13 @@ impl GameController {
                     _ => (),
                 }
             }
+            return;
         }
     }
 
     /// Executes a single game tick 
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self, dt: f64) {
+        self.model.player.update_direction(&self.cursor_pos);
         // Update Movement state if W is pressed
         if self.keys_pressed.contains(&Key::W) {
             self.model.player.change_state(player::PlayerState::Moving);
@@ -125,20 +132,20 @@ impl GameController {
             self.model.create_tower();
             self.keys_locked.insert(Key::E);
         }
-        self.model.tick_towers();
+        self.model.tick_towers(dt);
         self.check_bullet_collision();
         // Tick player
-        self.model.player.tick();
+        self.model.player.tick(dt);
         // Check for collision
         self.check_player_collision();
         // Tick Beacon
-        self.model.beacon.tick();
-        self.tick_resources();
+        self.model.beacon.tick(dt);
+        self.tick_resources(dt);
         // Tick enemies and check for collision.
-        self.tick_enemies();
+        self.tick_enemies(dt);
 
         // Chreate spawner with constant chance
-        self.model.chanced_create_spawner(5000);
+        self.model.chanced_create_spawner(250);
         // Spawn enmies from spawners
         self.model.spawn_enemies();
         
@@ -224,12 +231,12 @@ impl GameController {
     /// 
     /// For checking collisions with the Player, the Player and the Enemy must
     /// overlap. 
-    fn tick_enemies(&mut self) {
+    fn tick_enemies(&mut self, dt: f64) {
         let mut to_remove: Vec<(usize, bool)> = Vec::new();
         // Loop through enemies
         for (i, enemy) in self.model.enemies.iter_mut().enumerate().rev() {
             // move enemy
-            enemy.tick();
+            enemy.tick(dt);
             
             // check for collision with beacon. 
             let beacon_center = self.model.beacon.shape.center_point();
@@ -278,10 +285,10 @@ impl GameController {
     }
 
     /// Ticks each resource in the GameModels resource list
-    fn tick_resources(&mut self) {
+    fn tick_resources(&mut self, dt: f64) {
 
         for resource in self.model.resources.iter_mut() {
-            resource.tick();
+            resource.tick(dt);
         }
 
     }

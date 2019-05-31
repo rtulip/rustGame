@@ -50,11 +50,11 @@ impl Beacon {
 }
 
 impl entity::Entity for Beacon {
-    fn tick(&mut self) {
+    fn tick(&mut self, dt: f64) {
         let delta = Point2{
             x: 0.0,
             y: 0.0,
         };
-        self.shape.update(delta, Some(BEACON_ROTATION_SPEED));
+        self.shape.update(delta, Some(BEACON_ROTATION_SPEED * dt));
     }
 }
