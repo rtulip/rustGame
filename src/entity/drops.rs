@@ -16,7 +16,10 @@ impl Resource {
     /// Creates a new Resource
     pub fn new(position: Point2) -> Self {
         let mut shape = GenericShape::new(
-            ShapeVariant::Square{size: DROP_SIZE},
+            ShapeVariant::Rect{
+                width: DROP_SIZE,
+                height: DROP_SIZE,
+            },
             RESOURCE_COLOR, 
             position
         );

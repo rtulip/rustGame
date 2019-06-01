@@ -25,7 +25,10 @@ impl Beacon {
     /// Creates a new beacon.
     pub fn new(pos: MapIdx) -> Self {
         let mut shape = GenericShape::new(
-            ShapeVariant::Square{size: BEACON_SIZE},
+            ShapeVariant::Rect{
+                width: BEACON_SIZE,
+                height: BEACON_SIZE,
+            },
             BEACON_COLOR,
             map_idx_to_point2(pos)
         );
