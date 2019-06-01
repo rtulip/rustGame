@@ -15,7 +15,6 @@ use crate::game::consts::{
     point2_to_map_idx,
     PI,
     INF,
-    TILE_SIZE,
 };
 
 /// A structure to fully encapsulate all components of the game. The different
