@@ -163,79 +163,139 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
 
         if let Some(s2_corners) = s2.get_corners() {
             
+            let mut proj_x1: Vec<Point2> = Vec::new();
+            let mut proj_y1: Vec<Point2> = Vec::new();
+            let mut proj_x2: Vec<Point2> = Vec::new();
+            let mut proj_y2: Vec<Point2> = Vec::new();
+
             let mut rad = 0.0;
             if let Some(rot) = s1.get_rotation(){
                 rad = rot; 
             }
             let line = Vec2::new(rad.cos(), rad.sin());
             let norm = line.normal_unit();
-            
-            let mut proj_x: Vec<Point2> = Vec::new();
-            let mut proj_y: Vec<Point2> = Vec::new();
-
-            for point in s2_corners {
-                let v = Vec2::new_from_point(s1.get_position() - point);
+            for point in s2_corners.iter() {
+                let v = Vec2::new_from_point(s1.get_position() - *point);
                 let py = s1.get_position() + project(v, line);
                 let px = s1.get_position() + project(v, norm);
-                proj_x.push(px);
-                proj_y.push(py);
+                proj_x1.push(px);
+                proj_y1.push(py);
             }
 
-            let mut ls_x = [proj_x[0], proj_x[0]];
-            let mut ls_y = [proj_y[0], proj_y[0]];
+            let mut rad = 0.0;
+            if let Some(rot) = s2.get_rotation(){
+                rad = rot; 
+            }
+            let line = Vec2::new(rad.cos(), rad.sin());
+            let norm = line.normal_unit();
+            for point in s1_corners.iter() {
+                let v = Vec2::new_from_point(s2.get_position() - *point);
+                let py = s2.get_position() + project(v, line);
+                let px = s2.get_position() + project(v, norm);
+                proj_x2.push(px);
+                proj_y2.push(py);
+            }
+
+            let mut ls_x1 = [proj_x1[0], proj_x1[0]];
+            let mut ls_y1 = [proj_y1[0], proj_y1[0]];
+            let mut ls_x2 = [proj_x1[0], proj_x1[0]];
+            let mut ls_y2 = [proj_y1[0], proj_y1[0]];
             for i in 0..4 {
                 for j in i+1..4 {
 
-                    let d = proj_x[i] - proj_x[j];
+                    let d = proj_x1[i] - proj_x1[j];
                     let d = Vec2::new_from_point(d);
 
-                    let ls = ls_x[0] - ls_x[1];
+                    let ls = ls_x1[0] - ls_x1[1];
                     let ls = Vec2::new_from_point(ls);
 
                     if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
-                        ls_x[0] = proj_x[i];
-                        ls_x[1] = proj_x[j];
+                        ls_x1[0] = proj_x1[i];
+                        ls_x1[1] = proj_x1[j];
                     }
 
-                    let d = proj_y[i] - proj_y[j];
+                    let d = proj_y1[i] - proj_y1[j];
                     let d = Vec2::new_from_point(d);
 
-                    let ls = ls_y[0] - ls_y[1];
+                    let ls = ls_y1[0] - ls_y1[1];
                     let ls = Vec2::new_from_point(ls);
 
                     if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
-                        ls_y[0] = proj_y[i];
-                        ls_y[1] = proj_y[j];
+                        ls_y1[0] = proj_y1[i];
+                        ls_y1[1] = proj_y1[j];
                     }
 
+                    let d = proj_x2[i] - proj_x2[j];
+                    let d = Vec2::new_from_point(d);
+
+                    let ls = ls_x2[0] - ls_x2[1];
+                    let ls = Vec2::new_from_point(ls);
+
+                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
+                        ls_x2[0] = proj_x2[i];
+                        ls_x2[1] = proj_x2[j];
+                    }
+
+                    let d = proj_y2[i] - proj_y2[j];
+                    let d = Vec2::new_from_point(d);
+
+                    let ls = ls_y2[0] - ls_y2[1];
+                    let ls = Vec2::new_from_point(ls);
+
+                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
+                        ls_y2[0] = proj_y2[i];
+                        ls_y2[1] = proj_y2[j];
+                    }
                 }
             }
 
-            let q1 = ls_x[0];
-            let s1 = ls_x[1];
+            let q1 = ls_x1[0];
+            let s1 = ls_x1[1];
 
-            let q2 = ls_y[0];
-            let s2 = ls_y[1];
+            let q2 = ls_y1[0];
+            let s2 = ls_y1[1];
 
-            p1.set_position(q1);
-            p2.set_position(s1);
-            p3.set_position(q2);
-            p4.set_position(s2);
+            let q3 = ls_x2[0];
+            let s3 = ls_x2[1];
 
-            let dist_ls_x = Vec2::new_from_point(s2 - q2);
-            let dist_ls_x = Vec2::dot_product(dist_ls_x, dist_ls_x);
-            let dist_p1_r1 = Vec2::new_from_point(s1_corners[1] - s1_corners[0]);
-            let dist_p1_r1 = Vec2::dot_product(dist_p1_r1, dist_p1_r1);
+            let q4 = ls_y2[0];
+            let s4 = ls_y2[1];
+
+            p1.set_position(q3);
+            p2.set_position(s3);
+            p3.set_position(q4);
+            p4.set_position(s4);
+
+            let dist_ls_x1 = Vec2::new_from_point(s2 - q2);
+            let dist_ls_x1 = Vec2::dot_product(dist_ls_x1, dist_ls_x1);
+            let dist_p_r11 = Vec2::new_from_point(s1_corners[1] - s1_corners[0]);
+            let dist_p_r11 = Vec2::dot_product(dist_p_r11, dist_p_r11);
             
-            let dist_ls_y = Vec2::new_from_point(s1 - q1);
-            let dist_ls_y = Vec2::dot_product(dist_ls_y, dist_ls_y);
-            let dist_p2_r2 = Vec2::new_from_point(s1_corners[2] - s1_corners[0]);
-            let dist_p2_r2 = Vec2::dot_product(dist_p2_r2, dist_p2_r2);
-            
-            let max_dist_x = find_max_dist(s1_corners[0], s1_corners[1], q2, s2);
-            let max_dist_y = find_max_dist(s1_corners[0], s1_corners[2], q1, s1);
+            let dist_ls_y1 = Vec2::new_from_point(s1 - q1);
+            let dist_ls_y1 = Vec2::dot_product(dist_ls_y1, dist_ls_y1);
+            let dist_p_r12 = Vec2::new_from_point(s1_corners[2] - s1_corners[0]);
+            let dist_p_r12 = Vec2::dot_product(dist_p_r12, dist_p_r12);
 
-            if max_dist_x.sqrt() <= dist_ls_x.sqrt() + dist_p1_r1.sqrt() && max_dist_y.sqrt() <= dist_ls_y.sqrt() + dist_p2_r2.sqrt() {
+            let dist_ls_x2 = Vec2::new_from_point(s4 - q4);
+            let dist_ls_x2 = Vec2::dot_product(dist_ls_x2, dist_ls_x2);
+            let dist_p_r21 = Vec2::new_from_point(s2_corners[1] - s2_corners[0]);
+            let dist_p_r21 = Vec2::dot_product(dist_p_r21, dist_p_r21);
+            
+            let dist_ls_y2 = Vec2::new_from_point(s3 - q3);
+            let dist_ls_y2 = Vec2::dot_product(dist_ls_y2, dist_ls_y2);
+            let dist_p_r22 = Vec2::new_from_point(s2_corners[2] - s2_corners[0]);
+            let dist_p_r22 = Vec2::dot_product(dist_p_r22, dist_p_r22);
+            
+            let max_dist_x1 = find_max_dist(s1_corners[0], s1_corners[1], q2, s2);
+            let max_dist_y1 = find_max_dist(s1_corners[0], s1_corners[2], q1, s1);
+            let max_dist_x2 = find_max_dist(s2_corners[0], s2_corners[1], q4, s4);
+            let max_dist_y2 = find_max_dist(s2_corners[0], s2_corners[2], q3, s3);
+
+
+            if max_dist_x1.sqrt() <= dist_ls_x1.sqrt() + dist_p_r11.sqrt() &&
+               max_dist_y1.sqrt() <= dist_ls_y1.sqrt() + dist_p_r12.sqrt() &&
+               max_dist_x2.sqrt() <= dist_ls_x2.sqrt() + dist_p_r21.sqrt() &&
+               max_dist_y2.sqrt() <= dist_ls_y2.sqrt() + dist_p_r22.sqrt() {
                 true
             } else {
                 false
