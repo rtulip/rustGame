@@ -46,11 +46,11 @@ impl Vec2 {
         Vec2 {x: vector.x * ratio, y: vector.y * ratio}
     }
 
-    fn dot_product(vec1: Vec2, vec2: Vec2) -> f64 {
+    pub fn dot_product(vec1: Vec2, vec2: Vec2) -> f64 {
         vec1.x * vec2.x + vec1.y * vec2.y
     }
 
-    fn normal_unit(&self) -> Vec2 {
+    pub fn normal_unit(&self) -> Vec2 {
         Vec2::normalize(Self {
             x: self.y, 
             y: -self.x

@@ -20,7 +20,7 @@ pub enum ShapeVariant {
 /// A generic shape which can be used to draw every shape in the game.
 #[derive(Clone, Copy)]
 pub struct GenericShape {
-    shape: ShapeVariant,
+    pub shape: ShapeVariant,
     color: Color,
     position: Point2,
     rotation: Option<f64>,
