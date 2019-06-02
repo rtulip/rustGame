@@ -11,7 +11,7 @@ use crate::game::consts::{
 
 use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings};
-use piston::input::{RenderEvent, MouseCursorEvent};
+use piston::input::{RenderEvent, MouseCursorEvent, MouseScrollEvent};
 use glutin_window::GlutinWindow;
 use opengl_graphics::{OpenGL, GlGraphics};
 
@@ -65,7 +65,7 @@ impl Game {
         s1.set_rotation(rot);
         s1.set_offset(offset);
 
-        let rot = PI/2.0;
+        let rot = -PI/3.56;
         let offset = Point2{x: 0.0, y: 0.0};
 
         let mut s2 = GenericShape::new(
@@ -109,16 +109,16 @@ impl Game {
                     s2.set_color(c1);
                 }
 
-                // if let Some(rot) = s1.get_rotation(){
-                //     let line = Vec2::new(rot.cos(), rot.sin());
-                //     let cursor_point = Point2{x: args[0], y: args[1]};
-                //     let proj = project(Vec2::new_from_point(s1.get_position() - cursor_point), line);
-                //     p1.set_position(proj + s1.get_position());
+            }
 
-                //     let normal_line = line.normal_unit();
-                //     let proj = project(Vec2::new_from_point(s1.get_position() - cursor_point), normal_line);
-                //     p2.set_position(proj + s1.get_position()); 
-                // }
+            if let Some(args) = e.mouse_scroll_args() {
+
+                s1.update(Point2{x: 0.0, y: 0.0}, Some(PI/6.0 * args[1]));
+
+                if let Some(rot) = s1.get_rotation() {
+                    v1.set_rotation(rot);
+                    n1.set_rotation(rot + PI/2.0)
+                }
 
             }
 
@@ -181,16 +181,16 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
                 let py = s1.get_position() + project(v, line);
                 let px = s1.get_position() + project(v, norm);
 
-                if py.x < min1_y.x {
-                    min1_y = py;
-                } else if py.x > max1_y.x {
-                    max1_y = py;
+                if py.x < min1_x.x {
+                    min1_x = py;
+                } else if py.x > max1_x.x {
+                    max1_x = py;
                 }
 
-                if px.y < min1_x.y {
-                    min1_x = px;
-                } else if px.y > max1_x.y {
-                    max1_x = px;
+                if px.y < min1_y.y {
+                    min1_y = px;
+                } else if px.y > max1_y.y {
+                    max1_y = px;
                 }
 
             }
@@ -199,6 +199,18 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             p2.set_position(min1_y);
             p3.set_position(max1_x);
             p4.set_position(min1_x);
+
+            let d1 = s1_corners[0] - max1_x;
+            let d2 = min1_x - s1_corners[1];
+            let d3 = s1_corners[0] - max1_y;
+            let d4 = min1_y - s1_corners[2];
+
+            println!("d1: {:?}", d1);
+            println!("d2: {:?}", d2);
+            println!("------------");
+            println!("d3: {:?}", d3);
+            println!("d4: {:?}", d4);
+
 
             false
 

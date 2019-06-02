@@ -21,3 +21,22 @@ impl std::ops::Sub for Point2 {
         Point2 { x: self.x - other.x, y: self.y - other.y}
     }
 }
+
+impl std::ops::Mul<f64> for Point2 {
+    type Output = Self;
+    fn mul (self, rhs: f64) -> Self {
+
+        Self{x: self.x * rhs, y: self.y * rhs}
+
+    }
+}
+
+impl std::ops::Mul<Point2> for f64 {
+    type Output = Point2;
+
+    fn mul (self, rhs: Point2) -> Self::Output {
+
+        Point2{x: rhs.x * self, y: rhs.y * self}
+
+    }
+}
