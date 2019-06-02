@@ -1,5 +1,5 @@
 use crate::game::GameController;
-use crate::misc::random::Seed;
+use crate::math::random::Seed;
 use crate::game::consts::{
     OPEN_GL_VERSION,
     WINDOW_HEIGHT,

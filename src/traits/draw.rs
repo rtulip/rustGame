@@ -1,4 +1,4 @@
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;

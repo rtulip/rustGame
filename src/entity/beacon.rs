@@ -1,7 +1,7 @@
 use crate::traits::entity;
 use crate::traits::draw::{GenericShape, ShapeVariant};
 use crate::levels::map::MapIdx;
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 use crate::game::consts::{
     BEACON_SIZE,
     BEACON_COLOR,

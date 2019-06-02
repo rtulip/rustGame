@@ -1,4 +1,4 @@
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 #[derive(Clone,Copy,Debug)]
 /// A structure to represent a vector in 2d space.
 pub struct Vec2 {

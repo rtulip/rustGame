@@ -1,6 +1,6 @@
 use crate::traits::{entity, state};
 use crate::traits::draw::{GenericShape,ShapeVariant};
-use crate::misc::{vector2d, point2d};
+use crate::math::{Vec2, Point2};
 use crate::game::consts::{
     ENEMY_SIZE, 
     ENEMY_RADIUS, 
@@ -20,15 +20,15 @@ pub enum EnemyState {
 /// the Beacon and the Player. 
 pub struct Enemy {
     pub shape: GenericShape,
-    pub direction: vector2d::Vec2,
-    pub path: Vec<point2d::Point2>,
+    pub direction: Vec2,
+    pub path: Vec<Point2>,
     pub state: EnemyState,
 }
 
 impl Enemy {
 
     /// Creates a new enemy in the start position.
-    pub fn new(start_position: point2d::Point2) -> Self {
+    pub fn new(start_position: Point2) -> Self {
         Self {
             shape: GenericShape::new(
                 ShapeVariant::Circle{
@@ -38,7 +38,7 @@ impl Enemy {
                 ENEMY_COLOR,
                 start_position
             ),
-            direction: vector2d::Vec2 {x: 0.0, y: 0.0},
+            direction: Vec2 {x: 0.0, y: 0.0},
             path: Vec::new(),
             state: EnemyState::Beacon
         }
@@ -58,8 +58,8 @@ impl entity::Entity for Enemy {
                     return;
                 }
             }
-            self.direction = vector2d::Vec2::new_unit_from_point(dist);
-            let delta = point2d::Point2 { 
+            self.direction = Vec2::new_unit_from_point(dist);
+            let delta = Point2 { 
                 x: self.direction.x * ENEMY_SPEED * dt, 
                 y: self.direction.y * ENEMY_SPEED * dt
             };

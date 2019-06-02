@@ -1,6 +1,6 @@
 extern crate pathfinding;
 use crate::entity::tile::{Tile, TileVariant};
-use crate::misc::random::{Seed,RNG,from_seed, next_u32};
+use crate::math::random::{Seed,RNG,from_seed, next_u32};
 use crate::levels::map::{Map, MapIdx};
 use std::collections::HashMap;
 use crate::game::consts::{

@@ -1,6 +1,6 @@
 use crate::entity::attack::Attack;
-use crate::misc::vector2d::Vec2;
-use crate::misc::point2d::Point2;
+use crate::math::Vec2;
+use crate::math::Point2;
 use crate::traits::draw::{GenericShape, ShapeVariant};
 use crate::traits::{entity, state};
 use crate::game::consts::{

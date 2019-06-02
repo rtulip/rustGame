@@ -1,7 +1,7 @@
 use graphics::types::Color;
 use opengl_graphics::OpenGL;
 use crate::levels::map::MapIdx;
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 use std::f64;
 
 pub const PI: f64 = f64::consts::PI;

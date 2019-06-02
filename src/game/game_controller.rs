@@ -1,6 +1,6 @@
 use crate::game::{GameModel, GameView};
-use crate::misc::random::Seed;
-use crate::misc::point2d::Point2;
+use crate::math::random::Seed;
+use crate::math::Point2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::entity::player;
