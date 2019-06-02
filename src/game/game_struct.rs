@@ -113,7 +113,7 @@ impl Game {
 
             if let Some(args) = e.mouse_scroll_args() {
 
-                s1.update(Point2{x: 0.0, y: 0.0}, Some(PI/6.0 * args[1]));
+                s1.update(Point2{x: 0.0, y: 0.0}, Some(PI/12.0 * args[1]));
 
                 if let Some(rot) = s1.get_rotation() {
                     v1.set_rotation(rot);
@@ -176,24 +176,52 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let line = Vec2::new(rad.cos(), rad.sin());
             let norm = line.normal_unit();
             
+            let mut proj_x: Vec<Point2> = Vec::new();
+            let mut proj_y: Vec<Point2> = Vec::new();
+
             for point in s2_corners {
                 let v = Vec2::new_from_point(s1.get_position() - point);
                 let py = s1.get_position() + project(v, line);
                 let px = s1.get_position() + project(v, norm);
-
-                if py.x < min1_x.x {
-                    min1_x = py;
-                } else if py.x > max1_x.x {
-                    max1_x = py;
-                }
-
-                if px.y < min1_y.y {
-                    min1_y = px;
-                } else if px.y > max1_y.y {
-                    max1_y = px;
-                }
-
+                proj_x.push(px);
+                proj_y.push(py);
             }
+
+            let mut ls_x = [proj_x[0], proj_x[0]];
+            let mut ls_y = [proj_y[0], proj_y[0]];
+            for i in 0..4 {
+                for j in i+1..4 {
+
+                    let d = proj_x[i] - proj_x[j];
+                    let d = Vec2::new_from_point(d);
+
+                    let ls = ls_x[0] - ls_x[1];
+                    let ls = Vec2::new_from_point(ls);
+
+                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
+                        ls_x[0] = proj_x[i];
+                        ls_x[1] = proj_x[j];
+                    }
+
+                    let d = proj_y[i] - proj_y[j];
+                    let d = Vec2::new_from_point(d);
+
+                    let ls = ls_y[0] - ls_y[1];
+                    let ls = Vec2::new_from_point(ls);
+
+                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
+                        ls_y[0] = proj_y[i];
+                        ls_y[1] = proj_y[j];
+                    }
+
+                }
+            }
+
+            let min1_x = ls_x[0];
+            let max1_x = ls_x[1];
+
+            let min1_y = ls_y[0];
+            let max1_y = ls_y[1];
 
             p1.set_position(max1_y);
             p2.set_position(min1_y);
@@ -205,6 +233,7 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let d3 = s1_corners[0] - max1_y;
             let d4 = min1_y - s1_corners[2];
 
+            println!("");
             println!("d1: {:?}", d1);
             println!("d2: {:?}", d2);
             println!("------------");
