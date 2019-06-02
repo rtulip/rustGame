@@ -5,6 +5,8 @@ use crate::game::consts::{
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
     PI,
+    INF,
+    MIN
 };
 
 use piston::window::WindowSettings;
@@ -49,7 +51,7 @@ impl Game {
         let width = 100.0;
         let height = width/2.0;
         let pos = Point2{x: WINDOW_WIDTH / 2.0, y: WINDOW_HEIGHT / 2.0};
-        let rot = PI/5.0;
+        let rot = 0.0;
         let offset = Point2{x: 0.0, y: 0.0};
 
         let mut s1 = GenericShape::new(
@@ -63,7 +65,7 @@ impl Game {
         s1.set_rotation(rot);
         s1.set_offset(offset);
 
-        let rot = 0.0;
+        let rot = PI/2.0;
         let offset = Point2{x: 0.0, y: 0.0};
 
         let mut s2 = GenericShape::new(
@@ -85,6 +87,9 @@ impl Game {
 
         let mut p1 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
         let mut p2 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
+        let mut p3 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
+        let mut p4 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
+        
         if let Some(rot) = s1.get_rotation() {
             v1.set_rotation(rot);
             n1.set_rotation(rot + PI/2.0)
@@ -98,24 +103,22 @@ impl Game {
             
             if let Some(args) = e.mouse_cursor_args() {
                 s2.set_position(Point2{x: args[0], y: args[1]});
-                if check_collision(s1,s2) {
+                if check_collision(s1,s2,&mut p1, &mut p2, &mut p3, &mut p4) {
                     s2.set_color(c2);
                 } else {
                     s2.set_color(c1);
                 }
 
-                if let Some(rot) = s1.get_rotation(){
-                    let line = Vec2::new(rot.cos(), rot.sin());
-                    let cursor_point = Point2{x: args[0], y: args[1]};
-                    let proj = project(Vec2::new_from_point(s1.get_position() - cursor_point), line);
-                    let p = Point2{x: (-rot).sin() * s1.get_position().x, y: (-rot).cos() *s1.get_position().y};
-                    // p1.set_offset(p);
-                    p1.set_position(proj + s1.get_position());
+                // if let Some(rot) = s1.get_rotation(){
+                //     let line = Vec2::new(rot.cos(), rot.sin());
+                //     let cursor_point = Point2{x: args[0], y: args[1]};
+                //     let proj = project(Vec2::new_from_point(s1.get_position() - cursor_point), line);
+                //     p1.set_position(proj + s1.get_position());
 
-                    let normal_line = line.normal_unit();
-                    let proj = project(Vec2::new_from_point(s1.get_position() - cursor_point), normal_line);
-                    p2.set_position(proj + s1.get_position()); 
-                }
+                //     let normal_line = line.normal_unit();
+                //     let proj = project(Vec2::new_from_point(s1.get_position() - cursor_point), normal_line);
+                //     p2.set_position(proj + s1.get_position()); 
+                // }
 
             }
 
@@ -126,11 +129,13 @@ impl Game {
                     clear([1.0; 4], g);
                     // self.controller.view.draw(&self.controller.model, &c, g);
                     s1.draw(&c, g);
-                    // s2.draw(&c, g);
+                    s2.draw(&c, g);
                     v1.draw(&c, g);
                     n1.draw(&c, g);
                     p1.draw(&c, g);
                     p2.draw(&c, g);
+                    p3.draw(&c, g);
+                    p4.draw(&c, g);
                 })
             }
         }
@@ -138,12 +143,64 @@ impl Game {
 
 }
 
-fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
+fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2: &mut GenericShape, p3: &mut GenericShape, p4: &mut GenericShape) -> bool {
     
     if let Some(s1_corners) = s1.get_corners() {
 
         if let Some(s2_corners) = s2.get_corners() {
-            true
+            
+            let mut min1_x = Point2 {
+                x: INF, 
+                y: INF,
+            };
+
+            let mut max1_x = Point2 {
+                x: MIN,
+                y: MIN,
+            };
+
+            let mut min1_y = Point2 {
+                x: INF, 
+                y: INF,
+            };
+
+            let mut max1_y = Point2 {
+                x: MIN,
+                y: MIN,
+            };
+
+            let mut rad = 0.0;
+            if let Some(rot) = s1.get_rotation(){
+                rad = rot; 
+            }
+            let line = Vec2::new(rad.cos(), rad.sin());
+            let norm = line.normal_unit();
+            
+            for point in s2_corners {
+                let v = Vec2::new_from_point(s1.get_position() - point);
+                let py = s1.get_position() + project(v, line);
+                let px = s1.get_position() + project(v, norm);
+
+                if py.x < min1_y.x {
+                    min1_y = py;
+                } else if py.x > max1_y.x {
+                    max1_y = py;
+                }
+
+                if px.y < min1_x.y {
+                    min1_x = px;
+                } else if px.y > max1_x.y {
+                    max1_x = px;
+                }
+
+            }
+
+            p1.set_position(max1_y);
+            p2.set_position(min1_y);
+            p3.set_position(max1_x);
+            p4.set_position(min1_x);
+
+            false
 
         } else {
             false 
