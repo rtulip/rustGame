@@ -245,6 +245,10 @@ impl GenericShape {
         self.offset = Some(new_offset);
     }
 
+    pub fn get_offset(&self) -> Option<Point2> {
+        self.offset
+    }
+
 }
 
 impl Draw for GenericShape {
