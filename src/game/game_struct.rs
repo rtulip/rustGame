@@ -81,9 +81,14 @@ impl Game {
 
         let mut v1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
         let mut n1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
-
         v1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
         n1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
+
+
+        let mut v2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
+        let mut n2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
+        v2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
+        n2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
 
         let mut p1 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
         let mut p2 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
@@ -95,6 +100,11 @@ impl Game {
             n1.set_rotation(rot + PI/2.0)
         }
 
+        if let Some(rot) = s2.get_rotation() {
+            v2.set_rotation(rot);
+            n2.set_rotation(rot + PI/2.0)
+        }
+
         while let Some(e) = events.next(&mut window) {
             // if !self.controller.check_state() {
             //     break;
@@ -103,6 +113,8 @@ impl Game {
             
             if let Some(args) = e.mouse_cursor_args() {
                 s2.set_position(Point2{x: args[0], y: args[1]});
+                v2.set_position(s2.get_position());
+                n2.set_position(s2.get_position());
                 if check_collision(s1,s2,&mut p1, &mut p2, &mut p3, &mut p4) {
                     s2.set_color(c2);
                 } else {
@@ -128,10 +140,12 @@ impl Game {
                     
                     clear([1.0; 4], g);
                     // self.controller.view.draw(&self.controller.model, &c, g);
-                    s1.draw(&c, g);
-                    s2.draw(&c, g);
                     v1.draw(&c, g);
                     n1.draw(&c, g);
+                    s1.draw(&c, g);
+                    s2.draw(&c, g);
+                    v2.draw(&c, g);
+                    n2.draw(&c, g);
                     p1.draw(&c, g);
                     p2.draw(&c, g);
                     p3.draw(&c, g);
