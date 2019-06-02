@@ -8,9 +8,12 @@ use crate::game::consts::{
 
 use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings};
-use piston::input::{RenderEvent};
+use piston::input::{RenderEvent, MouseCursorEvent};
 use glutin_window::GlutinWindow;
 use opengl_graphics::{OpenGL, GlGraphics};
+
+use crate::traits::draw::{Draw, GenericShape, ShapeVariant};
+use crate::math::Point2;
 
 /// Game 
 /// 
@@ -39,18 +42,55 @@ impl Game {
         let mut events = Events::new(EventSettings::new());
         let mut gl = GlGraphics::new(self.opengl);
         
+        let c1 = [0.0, 0.0, 1.0, 1.0];
+        let c2 = [1.0, 0.0, 0.0, 1.0];
+
+        let width = 100.0;
+        let height = width/2.0;
+        let pos = Point2{x: WINDOW_WIDTH / 2.0, y: WINDOW_HEIGHT / 2.0};
+        let rot = 0.0;
+        let offset = Point2{x: 0.0, y: 0.0};
+
+        let mut s1 = GenericShape::new(
+            ShapeVariant::Rect{
+                width: width,
+                height: height,
+            }, 
+            c1, 
+            pos
+        );
+        s1.set_rotation(rot);
+        s1.set_offset(offset);
+
+        let mut s2 = GenericShape::new(
+            ShapeVariant::Rect{
+                width: width,
+                height: height,
+            }, 
+            c1, 
+            pos
+        );
+        s2.set_rotation(rot);
+        s2.set_offset(offset);
+
         while let Some(e) = events.next(&mut window) {
-            if !self.controller.check_state() {
-                break;
-            }
-            self.controller.handle_event(&e);
+            // if !self.controller.check_state() {
+            //     break;
+            // }
+            // self.controller.handle_event(&e);
             
+            if let Some(args) = e.mouse_cursor_args() {
+                s2.set_position(Point2{x: args[0], y: args[1]})
+            }
+
             if let Some(args) = e.render_args() {
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
                     
                     clear([1.0; 4], g);
-                    self.controller.view.draw(&self.controller.model, &c, g);
+                    // self.controller.view.draw(&self.controller.model, &c, g);
+                    s1.draw(&c, g);
+                    s2.draw(&c, g);
                 })
             }
         }
