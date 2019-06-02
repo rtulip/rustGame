@@ -87,8 +87,8 @@ impl Game {
 
         let mut p1 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
         let mut p2 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
-        let mut p3 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
-        let mut p4 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
+        let mut p3 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.0,1.0,0.0,1.0], s1.get_position());
+        let mut p4 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.0,1.0,0.0,1.0], s1.get_position());
         
         if let Some(rot) = s1.get_rotation() {
             v1.set_rotation(rot);
@@ -113,7 +113,7 @@ impl Game {
 
             if let Some(args) = e.mouse_scroll_args() {
 
-                s1.update(Point2{x: 0.0, y: 0.0}, Some(PI/12.0 * args[1]));
+                s1.update(Point2{x: 0.0, y: 0.0}, Some(PI/12.0 * -args[1]));
 
                 if let Some(rot) = s1.get_rotation() {
                     v1.set_rotation(rot);
@@ -149,26 +149,6 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
 
         if let Some(s2_corners) = s2.get_corners() {
             
-            let mut min1_x = Point2 {
-                x: INF, 
-                y: INF,
-            };
-
-            let mut max1_x = Point2 {
-                x: MIN,
-                y: MIN,
-            };
-
-            let mut min1_y = Point2 {
-                x: INF, 
-                y: INF,
-            };
-
-            let mut max1_y = Point2 {
-                x: MIN,
-                y: MIN,
-            };
-
             let mut rad = 0.0;
             if let Some(rot) = s1.get_rotation(){
                 rad = rot; 
@@ -217,31 +197,30 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
                 }
             }
 
-            let min1_x = ls_x[0];
-            let max1_x = ls_x[1];
+            let q1 = ls_x[0];
+            let s1 = ls_x[1];
 
-            let min1_y = ls_y[0];
-            let max1_y = ls_y[1];
+            let q2 = ls_y[0];
+            let s2 = ls_y[1];
 
-            p1.set_position(max1_y);
-            p2.set_position(min1_y);
-            p3.set_position(max1_x);
-            p4.set_position(min1_x);
+            p1.set_position(q1);
+            p2.set_position(s1);
+            p3.set_position(q2);
+            p4.set_position(s2);
 
-            let d1 = s1_corners[0] - max1_x;
-            let d2 = min1_x - s1_corners[1];
-            let d3 = s1_corners[0] - max1_y;
-            let d4 = min1_y - s1_corners[2];
+            let dist_ls_x = Vec2::new_from_point(s2 - q2);
+            let dist_ls_x = Vec2::dot_product(dist_ls_x, dist_ls_x);
 
-            println!("");
-            println!("d1: {:?}", d1);
-            println!("d2: {:?}", d2);
-            println!("------------");
-            println!("d3: {:?}", d3);
-            println!("d4: {:?}", d4);
+            let dist_p_r = Vec2::new_from_point(s1_corners[1] - s1_corners[0]);
+            let dist_p_r = Vec2::dot_product(dist_p_r, dist_p_r);
 
-
-            false
+            let max_dist = find_max_dist(s1_corners[0], s1_corners[1], q2, s2);
+            
+            if max_dist.sqrt() <= dist_ls_x.sqrt() + dist_p_r.sqrt() {
+                true
+            } else {
+                false
+            }
 
         } else {
             false 
@@ -261,4 +240,25 @@ fn project(vec: Vec2, line: Vec2) -> Point2 {
 
     Point2{x: norm.x * -c, y: norm.y * -c}
 
+}
+
+fn find_max_dist(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> f64 {
+
+    let p = vec![p1,p2];
+    let q = vec![q1,q2];
+
+    let mut max_dist = 0.0;
+    for i in 0..2 {
+        for j in 0..2 {
+
+            let v = Vec2::new_from_point(p[i] - q[j]);
+            let d = Vec2::dot_product(v, v);
+            if d > max_dist {
+                max_dist = d;
+            }
+
+        }
+    }
+
+    max_dist
 }
