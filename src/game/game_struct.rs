@@ -52,7 +52,7 @@ impl Game {
         let height = width/2.0;
         let pos = Point2{x: WINDOW_WIDTH / 2.0, y: WINDOW_HEIGHT / 2.0};
         let rot = 0.0;
-        let offset = Point2{x: 0.0, y: 0.0};
+        let offset = Point2{x: -width / 2.0, y: -height / 2.0};
 
         let mut s1 = GenericShape::new(
             ShapeVariant::Rect{
@@ -64,6 +64,11 @@ impl Game {
         );
         s1.set_rotation(rot);
         s1.set_offset(offset);
+
+        let mut v1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
+        let mut n1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
+        v1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + offset);
+        n1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + Point2{x: offset.y, y: -offset.x});
 
         let rot = -PI/3.56;
         let offset = Point2{x: 0.0, y: 0.0};
@@ -78,12 +83,6 @@ impl Game {
         );
         s2.set_rotation(rot);
         s2.set_offset(offset);
-
-        let mut v1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
-        let mut n1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
-        v1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
-        n1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
-
 
         let mut v2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
         let mut n2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
