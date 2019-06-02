@@ -210,13 +210,18 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
 
             let dist_ls_x = Vec2::new_from_point(s2 - q2);
             let dist_ls_x = Vec2::dot_product(dist_ls_x, dist_ls_x);
-
-            let dist_p_r = Vec2::new_from_point(s1_corners[1] - s1_corners[0]);
-            let dist_p_r = Vec2::dot_product(dist_p_r, dist_p_r);
-
-            let max_dist = find_max_dist(s1_corners[0], s1_corners[1], q2, s2);
+            let dist_p1_r1 = Vec2::new_from_point(s1_corners[1] - s1_corners[0]);
+            let dist_p1_r1 = Vec2::dot_product(dist_p1_r1, dist_p1_r1);
             
-            if max_dist.sqrt() <= dist_ls_x.sqrt() + dist_p_r.sqrt() {
+            let dist_ls_y = Vec2::new_from_point(s1 - q1);
+            let dist_ls_y = Vec2::dot_product(dist_ls_y, dist_ls_y);
+            let dist_p2_r2 = Vec2::new_from_point(s1_corners[2] - s1_corners[0]);
+            let dist_p2_r2 = Vec2::dot_product(dist_p2_r2, dist_p2_r2);
+            
+            let max_dist_x = find_max_dist(s1_corners[0], s1_corners[1], q2, s2);
+            let max_dist_y = find_max_dist(s1_corners[0], s1_corners[2], q1, s1);
+
+            if max_dist_x.sqrt() <= dist_ls_x.sqrt() + dist_p1_r1.sqrt() && max_dist_y.sqrt() <= dist_ls_y.sqrt() + dist_p2_r2.sqrt() {
                 true
             } else {
                 false
