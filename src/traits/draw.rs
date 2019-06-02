@@ -202,6 +202,42 @@ impl GenericShape {
         }
     }
 
+    pub fn get_corners(&self) -> Option<Vec<Point2>> {
+
+        match self.shape {
+            ShapeVariant::Rect{width: w, height: h} => {
+
+                let mut rot: f64 = 0.0;
+                if let Some(rotation) = self.rotation {
+                    rot = rotation;
+                }
+
+                let horizontal_offset = Point2 {
+                    x: w * rot.cos(),
+                    y: w * rot.sin(),
+                };
+                let vertical_offset = Point2 {
+                    x: h * (PI/2.0 + rot).cos(), 
+                    y: h * (PI/2.0 + rot).sin()
+                };
+
+                Some(vec![
+                    self.position, 
+                    self.position + horizontal_offset, 
+                    self.position + vertical_offset,
+                    self.position+ horizontal_offset + vertical_offset,
+                ])
+
+            },
+            ShapeVariant::Circle{size: _s, radius: _r} => {
+
+               None
+
+            }
+        }
+
+    }
+
     /// Function to set the private Offset field.
     pub fn set_offset(&mut self, new_offset: Point2){
         self.offset = Some(new_offset);
