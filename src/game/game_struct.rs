@@ -62,6 +62,9 @@ impl Game {
         s1.set_rotation(rot);
         s1.set_offset(offset);
 
+        let rot = 0.0;
+        let offset = Point2{x: 0.0, y: 0.0};
+
         let mut s2 = GenericShape::new(
             ShapeVariant::Rect{
                 width: width,
@@ -80,7 +83,13 @@ impl Game {
             // self.controller.handle_event(&e);
             
             if let Some(args) = e.mouse_cursor_args() {
-                s2.set_position(Point2{x: args[0], y: args[1]})
+                s2.set_position(Point2{x: args[0], y: args[1]});
+                if check_collision(s1,s2) {
+                    s2.set_color(c2);
+                } else {
+                    s2.set_color(c1);
+                }
+
             }
 
             if let Some(args) = e.render_args() {
@@ -95,5 +104,23 @@ impl Game {
             }
         }
     }
+
+}
+
+fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
+    
+    if let Some(s1_corners) = s1.get_corners() {
+
+        if let Some(s2_corners) = s2.get_corners() {
+            true
+
+        } else {
+            false 
+        }
+
+    } else {
+        false
+    }
+
 
 }

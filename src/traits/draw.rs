@@ -11,12 +11,14 @@ pub trait Draw {
 
 /// Different Types of shapes. More complex shapes can be created by combining
 /// ShapeVariants. 
+#[derive(Clone, Copy)]
 pub enum ShapeVariant {
     Rect { width: f64, height: f64},
     Circle { size: f64, radius: f64 },
 }
 
 /// A generic shape which can be used to draw every shape in the game.
+#[derive(Clone, Copy)]
 pub struct GenericShape {
     shape: ShapeVariant,
     color: Color,
