@@ -52,7 +52,8 @@ impl Game {
         let height = width/2.0;
         let pos = Point2{x: WINDOW_WIDTH / 2.0, y: WINDOW_HEIGHT / 2.0};
         let rot = 0.0;
-        let offset = Point2{x: -width / 2.0, y: -height / 2.0};
+        // let offset = Point2{x: -width / 2.0, y: -height / 2.0};
+        let offset = Point2{x: 0.0, y: 0.0};
 
         let mut s1 = GenericShape::new(
             ShapeVariant::Rect{
@@ -93,6 +94,10 @@ impl Game {
         let mut p2 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
         let mut p3 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.0,1.0,0.0,1.0], s1.get_position());
         let mut p4 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.0,1.0,0.0,1.0], s1.get_position());
+        let mut p5 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.82, 0.5, 0.1, 1.0], s2.get_position());
+        let mut p6 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.82, 0.5, 0.1, 1.0], s2.get_position());
+        let mut p7 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.85,0.1,0.85,1.0], s2.get_position());
+        let mut p8 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.85,0.1,0.85,1.0], s2.get_position());
         
         if let Some(rot) = s1.get_rotation() {
             v1.set_rotation(rot);
@@ -114,7 +119,7 @@ impl Game {
                 s2.set_position(Point2{x: args[0], y: args[1]});
                 v2.set_position(s2.get_position());
                 n2.set_position(s2.get_position());
-                if check_collision(s1,s2,&mut p1, &mut p2, &mut p3, &mut p4) {
+                if check_collision(s1,s2,&mut p1, &mut p2, &mut p3, &mut p4, &mut p5, &mut p6, &mut p7, &mut p8  ) {
                     s2.set_color(c2);
                 } else {
                     s2.set_color(c1);
@@ -149,6 +154,10 @@ impl Game {
                     p2.draw(&c, g);
                     p3.draw(&c, g);
                     p4.draw(&c, g);
+                    p5.draw(&c, g);
+                    p6.draw(&c, g);
+                    p7.draw(&c, g);
+                    p8.draw(&c, g);
                 })
             }
         }
@@ -156,7 +165,8 @@ impl Game {
 
 }
 
-fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2: &mut GenericShape, p3: &mut GenericShape, p4: &mut GenericShape) -> bool {
+fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2: &mut GenericShape, p3: &mut GenericShape, p4: &mut GenericShape,
+    p5: &mut GenericShape, p6: &mut GenericShape, p7: &mut GenericShape, p8: &mut GenericShape) -> bool {
     
     if let Some(s1_corners) = s1.get_corners() {
 
@@ -167,11 +177,7 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let mut proj_x2: Vec<Point2> = Vec::new();
             let mut proj_y2: Vec<Point2> = Vec::new();
 
-            let mut rad = 0.0;
-            if let Some(rot) = s1.get_rotation(){
-                rad = rot; 
-            }
-            let line = Vec2::new(rad.cos(), rad.sin());
+            let line = Vec2::new(s1_corners[1].x - s1_corners[0].x, s1_corners[1].y - s1_corners[0].y);
             let norm = line.normal_unit();
             for point in s2_corners.iter() {
                 let v = Vec2::new_from_point(s1.get_position() - *point);
@@ -181,11 +187,7 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
                 proj_y1.push(py);
             }
 
-            let mut rad = 0.0;
-            if let Some(rot) = s2.get_rotation(){
-                rad = rot; 
-            }
-            let line = Vec2::new(rad.cos(), rad.sin());
+            let line = Vec2::new(s2_corners[2].x - s2_corners[0].x, s2_corners[2].y - s2_corners[0].y);
             let norm = line.normal_unit();
             for point in s1_corners.iter() {
                 let v = Vec2::new_from_point(s2.get_position() - *point);
@@ -260,45 +262,16 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let q4 = ls_y2[0];
             let s4 = ls_y2[1];
 
-            p1.set_position(q3);
-            p2.set_position(s3);
-            p3.set_position(q4);
-            p4.set_position(s4);
+            p1.set_position(q1);
+            p2.set_position(s1);
+            p3.set_position(q2);
+            p4.set_position(s2);
+            p5.set_position(q3);
+            p6.set_position(s3);
+            p7.set_position(q4);
+            p8.set_position(s4);
 
-            let dist_ls_x1 = Vec2::new_from_point(s2 - q2);
-            let dist_ls_x1 = Vec2::dot_product(dist_ls_x1, dist_ls_x1);
-            let dist_p_r11 = Vec2::new_from_point(s1_corners[1] - s1_corners[0]);
-            let dist_p_r11 = Vec2::dot_product(dist_p_r11, dist_p_r11);
-            
-            let dist_ls_y1 = Vec2::new_from_point(s1 - q1);
-            let dist_ls_y1 = Vec2::dot_product(dist_ls_y1, dist_ls_y1);
-            let dist_p_r12 = Vec2::new_from_point(s1_corners[2] - s1_corners[0]);
-            let dist_p_r12 = Vec2::dot_product(dist_p_r12, dist_p_r12);
-
-            let dist_ls_x2 = Vec2::new_from_point(s4 - q4);
-            let dist_ls_x2 = Vec2::dot_product(dist_ls_x2, dist_ls_x2);
-            let dist_p_r21 = Vec2::new_from_point(s2_corners[1] - s2_corners[0]);
-            let dist_p_r21 = Vec2::dot_product(dist_p_r21, dist_p_r21);
-            
-            let dist_ls_y2 = Vec2::new_from_point(s3 - q3);
-            let dist_ls_y2 = Vec2::dot_product(dist_ls_y2, dist_ls_y2);
-            let dist_p_r22 = Vec2::new_from_point(s2_corners[2] - s2_corners[0]);
-            let dist_p_r22 = Vec2::dot_product(dist_p_r22, dist_p_r22);
-            
-            let max_dist_x1 = find_max_dist(s1_corners[0], s1_corners[1], q2, s2);
-            let max_dist_y1 = find_max_dist(s1_corners[0], s1_corners[2], q1, s1);
-            let max_dist_x2 = find_max_dist(s2_corners[0], s2_corners[1], q4, s4);
-            let max_dist_y2 = find_max_dist(s2_corners[0], s2_corners[2], q3, s3);
-
-
-            if max_dist_x1.sqrt() <= dist_ls_x1.sqrt() + dist_p_r11.sqrt() &&
-               max_dist_y1.sqrt() <= dist_ls_y1.sqrt() + dist_p_r12.sqrt() &&
-               max_dist_x2.sqrt() <= dist_ls_x2.sqrt() + dist_p_r21.sqrt() &&
-               max_dist_y2.sqrt() <= dist_ls_y2.sqrt() + dist_p_r22.sqrt() {
-                true
-            } else {
-                false
-            }
+            false
 
         } else {
             false 
