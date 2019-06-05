@@ -183,8 +183,8 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
                 let v = Vec2::new_from_point(s1_corners[0] - *point);
                 let py = s1_corners[0] + project(v, line);
                 let px = s1_corners[0] + project(v, norm);
-                proj_x1.push(px);
-                proj_y1.push(py);
+                proj_y1.push(px);
+                proj_x1.push(py);
             }
 
             let line = Vec2::new(s2_corners[2].x - s2_corners[0].x, s2_corners[2].y - s2_corners[0].y);
@@ -193,14 +193,14 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
                 let v = Vec2::new_from_point(s2_corners[0] - *point);
                 let py = s2_corners[0] + project(v, line);
                 let px = s2_corners[0] + project(v, norm);
-                proj_x2.push(px);
-                proj_y2.push(py);
+                proj_y2.push(px);
+                proj_x2.push(py);
             }
 
             let mut ls_x1 = [proj_x1[0], proj_x1[0]];
             let mut ls_y1 = [proj_y1[0], proj_y1[0]];
-            let mut ls_x2 = [proj_x1[0], proj_x1[0]];
-            let mut ls_y2 = [proj_y1[0], proj_y1[0]];
+            let mut ls_x2 = [proj_x2[0], proj_x2[0]];
+            let mut ls_y2 = [proj_y2[0], proj_y2[0]];
             for i in 0..4 {
                 for j in i+1..4 {
 
@@ -262,16 +262,24 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let a4 = ls_y2[0];
             let b4 = ls_y2[1];
 
-            p1.set_position(a1);
-            p2.set_position(b1);
-            p3.set_position(a2);
-            p4.set_position(b2);
-            p5.set_position(a3);
-            p6.set_position(b3);
+            p1.set_position(a4);
+            p2.set_position(b4);
+            p3.set_position(a4);
+            p4.set_position(b4);
+            p5.set_position(a4);
+            p6.set_position(b4);
             p7.set_position(a4);
             p8.set_position(b4);
 
-            false
+            let i1 = line_intersection(s1_corners[0], s1_corners[1], a1, b1);
+            let i2 = line_intersection(s1_corners[0], s1_corners[2], a2, b2);
+            let i3 = line_intersection(s2_corners[0], s2_corners[2], a3, b3);
+            let i4 = line_intersection(s2_corners[0], s2_corners[1], a4, b4);
+            if i1 && i2 && i3 && i4 {
+                true
+            } else {
+                false
+            }
 
         } else {
             false 
@@ -293,7 +301,7 @@ fn project(vec: Vec2, line: Vec2) -> Point2 {
 
 }
 
-fn find_max_dist(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> f64 {
+fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool {
 
     let p = vec![p1,p2];
     let q = vec![q1,q2];
@@ -310,6 +318,17 @@ fn find_max_dist(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> f64 {
 
         }
     }
+    
+    let dist_p = Vec2::new_from_point(p2-p1);
+    let dist_p = Vec2::dot_product(dist_p, dist_p);
 
-    max_dist
+    let dist_q = Vec2::new_from_point(q2-q1);
+    let dist_q = Vec2::dot_product(dist_q, dist_q);
+
+    if max_dist.sqrt() <= dist_p.sqrt() + dist_q.sqrt(){
+        true
+    } else {
+        false
+    }
+
 }
