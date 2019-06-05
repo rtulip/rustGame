@@ -243,7 +243,7 @@ impl GameController {
             }
             if check_collision(self.model.player.shape, enemy.shape) {
                 to_remove.push((i,false));
-                self.model.player.health -= 1;
+                self.model.player.damage();
             }
 
             match self.model.player.state {

@@ -126,6 +126,26 @@ impl Player {
 
     }
 
+    pub fn damage(&mut self) {
+        self.health -= 1;
+        self.health_bar = GenericShape::new(
+            ShapeVariant::Rect{
+                width: PLAYER_SIZE * self.health as f64 / PLAYER_STARTING_HEALTH as f64,
+                height: HEALTH_BAR_HEIGHT 
+            }, 
+            HEALTH_COLOR,
+            self.health_bar.get_position(),
+        );
+        self.damage_bar = GenericShape::new(
+            ShapeVariant::Rect{
+                width: PLAYER_SIZE * (PLAYER_STARTING_HEALTH - self.health) as f64 / PLAYER_STARTING_HEALTH as f64,
+                height: HEALTH_BAR_HEIGHT 
+            }, 
+            DAMAGE_COLOR,
+            self.health_bar.get_position() + Point2{x: PLAYER_SIZE * self.health as f64 / PLAYER_STARTING_HEALTH as f64, y: 0.0}
+        );
+    }
+
 }
 
 impl entity::Entity for Player {
