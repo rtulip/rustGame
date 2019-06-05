@@ -187,9 +187,13 @@ impl GameController {
                             if min_move == shift_left || min_move == shift_right {
                                 let delta = Point2{x: min_move, y: 0.0};
                                 self.model.player.shape.update(delta, None);
+                                self.model.player.health_bar.update(delta, None);
+                                self.model.player.damage_bar.update(delta, None);
                             } else {
                                 let delta = Point2{x: 0.0, y: min_move};
                                 self.model.player.shape.update(delta, None);
+                                self.model.player.health_bar.update(delta, None);
+                                self.model.player.damage_bar.update(delta, None);
                             }
                         }
                         _ => (),
