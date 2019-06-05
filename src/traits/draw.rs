@@ -362,80 +362,15 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
                 proj_x2.push(py);
             }
 
-            let mut ls_x1 = [proj_x1[0], proj_x1[0]];
-            let mut ls_y1 = [proj_y1[0], proj_y1[0]];
-            let mut ls_x2 = [proj_x2[0], proj_x2[0]];
-            let mut ls_y2 = [proj_y2[0], proj_y2[0]];
-            for i in 0..4 {
-                for j in i+1..4 {
+            let ls_x1 = find_extrema(proj_x1);
+            let ls_y1 = find_extrema(proj_y1);
+            let ls_x2 = find_extrema(proj_x2);
+            let ls_y2 = find_extrema(proj_y2);
 
-                    let d = proj_x1[i] - proj_x1[j];
-                    let d = Vec2::new_from_point(d);
-
-                    let ls = ls_x1[0] - ls_x1[1];
-                    let ls = Vec2::new_from_point(ls);
-
-                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
-                        ls_x1[0] = proj_x1[i];
-                        ls_x1[1] = proj_x1[j];
-                    }
-
-                    let d = proj_y1[i] - proj_y1[j];
-                    let d = Vec2::new_from_point(d);
-
-                    let ls = ls_y1[0] - ls_y1[1];
-                    let ls = Vec2::new_from_point(ls);
-
-                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
-                        ls_y1[0] = proj_y1[i];
-                        ls_y1[1] = proj_y1[j];
-                    }
-
-                    let d = proj_x2[i] - proj_x2[j];
-                    let d = Vec2::new_from_point(d);
-
-                    let ls = ls_x2[0] - ls_x2[1];
-                    let ls = Vec2::new_from_point(ls);
-
-                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
-                        ls_x2[0] = proj_x2[i];
-                        ls_x2[1] = proj_x2[j];
-                    }
-
-                    let d = proj_y2[i] - proj_y2[j];
-                    let d = Vec2::new_from_point(d);
-
-                    let ls = ls_y2[0] - ls_y2[1];
-                    let ls = Vec2::new_from_point(ls);
-
-                    if Vec2::dot_product(d,d) > Vec2::dot_product(ls, ls) {
-                        ls_y2[0] = proj_y2[i];
-                        ls_y2[1] = proj_y2[j];
-                    }
-                }
-            }
-
-            let a1 = ls_x1[0];
-            let b1 = ls_x1[1];
-
-            let a2 = ls_y1[0];
-            let b2 = ls_y1[1];
-
-            let a3 = ls_x2[0];
-            let b3 = ls_x2[1];
-
-            let a4 = ls_y2[0];
-            let b4 = ls_y2[1];
-
-            let i1 = line_intersection(s1_corners[0], s1_corners[1], a1, b1);
-            let i2 = line_intersection(s1_corners[0], s1_corners[2], a2, b2);
-            let i3 = line_intersection(s2_corners[0], s2_corners[2], a3, b3);
-            let i4 = line_intersection(s2_corners[0], s2_corners[1], a4, b4);
-            if i1 && i2 && i3 && i4 {
-                true
-            } else {
-                false
-            }
+            line_intersection(s1_corners[0], s1_corners[1], ls_x1[0], ls_x1[1]) &&
+            line_intersection(s1_corners[0], s1_corners[2], ls_y1[0], ls_y1[1]) &&
+            line_intersection(s2_corners[0], s2_corners[2], ls_x2[0], ls_x2[1]) &&
+            line_intersection(s2_corners[0], s2_corners[1], ls_y2[0], ls_y2[1]) 
 
         } else {
 
@@ -489,6 +424,27 @@ fn project(vec: Vec2, line: Vec2) -> Point2 {
 
 }
 
+fn find_extrema(points: Vec<Point2>) -> Vec<Point2>{
+
+    let mut extremes = vec![points[0], points[0]];
+    for i in 0..4 {
+        for j in i..4 {
+            let d = points[i] - points[j];
+            let d = Vec2::new_from_point(d);
+
+            let line_seg = extremes[0] - extremes[1];
+            let line_seg = Vec2::new_from_point(line_seg);
+
+            if Vec2::dot_product(d,d) > Vec2::dot_product(line_seg, line_seg) {
+                extremes[0] = extremes[i];
+                extremes[1] = extremes[j];
+            }
+        }
+    }
+    extremes
+
+}
+
 fn circle_intersection(c: Point2, r: f64, corners: Vec<Point2>) -> bool {
 
     let p1 = corners[0] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[1].x - corners[0].x, corners[1].y - corners[0].y));
@@ -509,7 +465,6 @@ fn circle_intersection(c: Point2, r: f64, corners: Vec<Point2>) -> bool {
 
     let r_2 = r.powi(2);
 
-    // println!("{}, {}", d2 <= r_2, point_on_line(p2, corners[0], corners[2]));
     (d1 <= r_2 && point_on_line(p1, corners[1], corners[0])) || 
     (d2 <= r_2 && point_on_line(p2, corners[2], corners[0])) ||
     (d3 <= r_2 && point_on_line(p3, corners[3], corners[2])) ||

@@ -13,8 +13,6 @@ use crate::game::consts::{
     map_idx_to_point2,
     TILE_SIZE,
     PLAYER_SIZE,
-    PLAYER_RADIUS,
-    ENEMY_RADIUS,
 };
 
 use std::collections::HashSet;
@@ -203,14 +201,11 @@ impl GameController {
         let mut to_remove: Vec<usize> = Vec::new();
         for (i,resource) in self.model.resources.iter_mut().enumerate().rev() {
             
-            if check_collision(resource.shape, self.model.player.shape){
+            if check_collision(resource.shape, self.model.player.shape) {
                 to_remove.push(i);
-                if self.model.player.resources < 9 {
-                    self.model.player.resources += 1;
-                }
+                self.model.player.resources += 1;
             }
-                
-            
+
         }
 
         for i in to_remove {
@@ -250,7 +245,7 @@ impl GameController {
             match self.model.player.state {
                 player::PlayerState::Attacking => {
                     
-                    if check_collision(self.model.player.attack.shape, enemy.shape){
+                    if check_collision(self.model.player.attack.shape, enemy.shape) {
                         to_remove.push((i,true));
                     }
                 },
