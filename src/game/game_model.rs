@@ -1,8 +1,9 @@
-use crate::level::{Level, MapIdx};
+use crate::levels::Level;
+use crate::levels::map::{MapIdx, pathfind};
 use crate::traits::state::State;
 use crate::traits::entity::Entity;
-use crate::misc::random::{Seed, RNG, from_seed, next_u32};
-use crate::misc::point2d::Point2;
+use crate::math::random::{Seed, RNG, from_seed, next_u32};
+use crate::math::Point2;
 use crate::entity::player::Player;
 use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
@@ -11,9 +12,9 @@ use crate::entity::drops::Resource;
 use crate::entity::towers::tower::{Tower, TowerState};
 use crate::game::consts::{
     map_idx_to_point2,
+    point2_to_map_idx,
     PI,
     INF,
-    TILE_SIZE,
 };
 
 /// A structure to fully encapsulate all components of the game. The different
@@ -182,8 +183,8 @@ impl GameModel {
     pub fn create_spawner(&mut self) {
            
         let mut canditate_spaces: Vec<MapIdx> = Vec::new();
-        for h in 0..self.level.height {
-            for w in 0..self.level.width {
+        for h in 1..self.level.height-1 {
+            for w in 1..self.level.width-1 {
                 
                 // Check surrounding neighbours
                 let pos = MapIdx::new(w,h);
@@ -238,7 +239,7 @@ impl GameModel {
                 let target = &self.beacon.idx;
                 let mut enemy = Enemy::new(map_idx_to_point2(*spawner));
                 
-                if let Some(path) = self.level.pathfind(&spawner, target) {
+                if let Some(path) = pathfind(&self.level.map,&spawner, target) {
                     let mut enemy_path: Vec<Point2> = Vec::new();
                     for idx in path.0 {
                         enemy_path.push(map_idx_to_point2(idx));
@@ -284,16 +285,15 @@ impl GameModel {
                 let dir = enemy.shape.center_point() - tower.base_shape.center_point();
                 let slope = dir.y / dir.x;
                 let vertical_offset = tower.base_shape.center_point().y;
-                let x0 = (tower.base_shape.center_point().x / TILE_SIZE).floor() as i32;
-                let xn = (enemy.shape.center_point().x / TILE_SIZE).floor() as i32;
+                let p0 = point2_to_map_idx(tower.base_shape.center_point());
+                let pn = point2_to_map_idx(enemy.shape.center_point());
 
                 let mut wall_hit = false;
-                let previous = tower.base_shape.get_position();
-                let mut previous = MapIdx::new((previous.x / TILE_SIZE).floor() as i32, (previous.y / TILE_SIZE).floor() as i32);
-                for x in x0+1..xn {
-                    let y = ((slope * x as f64 + vertical_offset)/ TILE_SIZE).floor() as i32;
-                    if y != previous.y {
-                        if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, y)) {
+                let mut previous = point2_to_map_idx(tower.base_shape.get_position());
+                for x in p0.x..pn.x {
+                    let next = point2_to_map_idx(Point2{x: 0.0, y: slope * x as f64 + vertical_offset});
+                    if next.y != previous.y {
+                        if let Some(tile) = self.level.map.get(&MapIdx::new(previous.x, next.y)) {
                             match tile.variant {
                                 TileVariant::Wall => {
                                     wall_hit = true;
@@ -304,7 +304,7 @@ impl GameModel {
                         }
                     }
                     
-                    if let Some(tile) = self.level.map.get(&MapIdx::new(x, y)) {
+                    if let Some(tile) = self.level.map.get(&MapIdx::new(x, next.y)) {
                         match tile.variant {
                             TileVariant::Wall => {
                                 wall_hit = true;
@@ -313,7 +313,7 @@ impl GameModel {
                             _ => (),
                         }
                     } 
-                    previous = MapIdx::new(x, y);
+                    previous = MapIdx::new(x, next.y);
                 }
                 if wall_hit {
                     continue;

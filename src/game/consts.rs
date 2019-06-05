@@ -1,10 +1,20 @@
 use graphics::types::Color;
-use crate::level::MapIdx;
-use crate::misc::point2d::Point2;
+use opengl_graphics::OpenGL;
+use crate::levels::map::MapIdx;
+use crate::math::Point2;
 use std::f64;
 
 pub const PI: f64 = f64::consts::PI;
 pub const INF: f64 = f64::INFINITY;
+pub const MIN: f64 = f64::MIN;
+
+pub const WINDOW_WIDTH: f64 = 1000.0;
+pub const WINDOW_HEIGHT: f64 = 1000.0;
+pub const OPEN_GL_VERSION: OpenGL = OpenGL::V3_2;
+
+pub const LEVEL_WIDTH: i32 = 50;
+pub const LEVEL_HEIGHT: i32 = 50;
+pub const LEVEL_GEN_ITERS: i32 = 5;
 
 pub const TILE_SIZE: f64 = 20.0;
 pub const FLOOR_COLOR: Color = [0.2, 0.13, 0.08, 1.0];
@@ -48,8 +58,24 @@ pub const BULLET_HEIGHT: f64 = TOWER_CANNON_HEIGHT * 0.75;
 pub const BULLET_COLOR: Color = [0.0, 0.0, 0.0, 1.0];
 pub const BULLET_SPEED: f64 = ENEMY_SPEED * 2.0;
 
+pub const HEALTH_BAR_HEIGHT: f64 = 5.0;
+pub const HEALTH_COLOR: Color = [0.0, 1.0, 0.0, 1.0];
+pub const DAMAGE_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
+
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
-    Point2 {x: idx.x as f64 * TILE_SIZE, y: idx.y as f64 * TILE_SIZE}
+    Point2 {
+        x: idx.x as f64 * TILE_SIZE, 
+        y: idx.y as f64 * TILE_SIZE
+    }
+
+}
+
+pub fn point2_to_map_idx(p: Point2) -> MapIdx {
+
+    MapIdx::new(
+        (p.x / TILE_SIZE).floor() as i32,
+        (p.y / TILE_SIZE).floor() as i32
+    )
 
 }

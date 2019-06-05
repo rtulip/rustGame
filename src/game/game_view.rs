@@ -1,6 +1,6 @@
 use crate::game::GameModel;
 use crate::entity::player::PlayerState;
-use crate::level::MapIdx;
+use crate::levels::map::MapIdx;
 use crate::traits::draw::Draw;
 use graphics::{Context, Graphics};
 
@@ -50,6 +50,8 @@ impl GameView {
     fn draw_player<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         // Draw the player
         model.player.shape.draw(c, g);
+        model.player.health_bar.draw(c, g);
+        model.player.damage_bar.draw(c, g);
         // Draw the player's attack anmiation if in Active state. 
         match model.player.state {
             PlayerState::Attacking => {
@@ -57,12 +59,16 @@ impl GameView {
             },
             _ => (),
         }
+
+
         
     }
 
     /// Draws the GameModel's Beacon
     fn draw_beacon<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         model.beacon.shape.draw(c, g);
+        model.beacon.health_bar.draw(c, g);
+        model.beacon.damage_bar.draw(c, g);
     }
 
     /// Draws each enemy in the GameModel enemy list

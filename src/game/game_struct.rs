@@ -1,15 +1,16 @@
-use crate::game::{GameController, GameState};
-use crate::misc::random::Seed;
+use crate::game::GameController;
+use crate::math::random::Seed;
+use crate::game::consts::{
+    OPEN_GL_VERSION,
+    WINDOW_HEIGHT,
+    WINDOW_WIDTH,
+};
 
 use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings};
-use piston::input::{RenderEvent};
+use piston::input::RenderEvent;
 use glutin_window::GlutinWindow;
 use opengl_graphics::{OpenGL, GlGraphics};
-
-const WINDOW_WIDTH: f64 = 1000.0;
-const WINDOW_HEIGHT: f64 = 1000.0;
-const OPEN_GL_VERSION: OpenGL = OpenGL::V3_2;
 
 /// Game 
 /// 
@@ -37,15 +38,13 @@ impl Game {
         let mut window: GlutinWindow = self.window_settings.build().expect("Couldn't create window!");
         let mut events = Events::new(EventSettings::new());
         let mut gl = GlGraphics::new(self.opengl);
-        
+
         while let Some(e) = events.next(&mut window) {
-            match self.controller.state {
-                GameState::Finished => break,
-                _ => (),
+            if !self.controller.check_state() {
+                break;
             }
-            
             self.controller.handle_event(&e);
-            
+
             if let Some(args) = e.render_args() {
                 gl.draw(args.viewport(), |c, g| {
                     use graphics::{clear};
@@ -56,5 +55,5 @@ impl Game {
             }
         }
     }
-
 }
+

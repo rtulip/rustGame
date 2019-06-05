@@ -1,4 +1,4 @@
-use crate::misc::point2d::Point2;
+use crate::math::{Point2, Vec2};
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
@@ -11,15 +11,16 @@ pub trait Draw {
 
 /// Different Types of shapes. More complex shapes can be created by combining
 /// ShapeVariants. 
+#[derive(Clone, Copy)]
 pub enum ShapeVariant {
-    Square { size: f64 },
     Rect { width: f64, height: f64},
     Circle { size: f64, radius: f64 },
 }
 
 /// A generic shape which can be used to draw every shape in the game.
+#[derive(Clone, Copy)]
 pub struct GenericShape {
-    shape: ShapeVariant,
+    pub shape: ShapeVariant,
     color: Color,
     position: Point2,
     rotation: Option<f64>,
@@ -68,7 +69,7 @@ impl GenericShape {
     }
 
     /// Function to return the private Position field.
-    pub fn get_position(&self) -> Point2 {
+    pub fn get_position(&self) -> Point2 { 
         self.position
     }
 
@@ -92,18 +93,6 @@ impl GenericShape {
     /// struct fields.
     pub fn center_point(&self) -> Point2 {
         match self.shape {
-            ShapeVariant::Square{size: val} => {
-                let center_offset = Point2 {
-                    x: val / 2.0,
-                    y: val / 2.0,
-                };
-                if let Some(offset) = self.offset {
-                    self.position + center_offset + offset
-                } else {
-                    self.position + center_offset
-                }
-                
-            }
             ShapeVariant::Circle{size: val, radius: _rad} => {
                 let center_offset = Point2 {
                     x: val / 2.0,
@@ -133,24 +122,6 @@ impl GenericShape {
     /// on the ShapeVariant and the Rotation of the GenericShape.
     pub fn top_right(&self) -> Point2 {
         match self.shape {
-            ShapeVariant::Square{size: val} => {
-                match self.rotation {
-                    Some(rot) => {
-                        let offset = Point2 {
-                            x: val * (-1.0 * rot).cos(),
-                            y: -val * (-1.0 * rot).sin(),
-                        };
-                        self.position + offset
-                    }
-                    None => {
-                        let offset = Point2 {
-                            x: val,
-                            y: 0.0,
-                        };
-                        self.position + offset
-                    }
-                }
-            }
             ShapeVariant::Circle{size: val, radius: _rad} => {
                 match self.rotation {
                     Some(rot) => {
@@ -194,24 +165,6 @@ impl GenericShape {
     /// Depends on the ShapeVariant and the Rotation of the GenericShape.
     pub fn bottom_right(&self) -> Point2 {
         match self.shape {
-            ShapeVariant::Square{size: val} => {
-                match self.rotation {
-                    Some(rot) => {
-                        let offset = Point2 {
-                            x: val * (PI / 2.0 + rot).cos(),
-                            y: val * (PI / 2.0 + rot).sin(),
-                        };
-                        self.top_right() + offset
-                    }
-                    None => {
-                        let offset = Point2 {
-                            x: val,
-                            y: val,
-                        };
-                        self.position + offset
-                    }
-                }
-            },
             ShapeVariant::Circle{size: val, radius: _rad} => {
                 match self.rotation {
                     Some(rot) => {
@@ -251,9 +204,89 @@ impl GenericShape {
         }
     }
 
+    pub fn get_corners(&self) -> Option<Vec<Point2>> {
+
+        match self.shape {
+            ShapeVariant::Rect{width: w, height: h} => {
+
+                let mut rot: f64 = 0.0;
+                if let Some(rotation) = self.rotation {
+                    rot = rotation;
+                }
+                let mut offset = Point2{x: 0.0, y: 0.0};
+                if let Some(offs) = self.offset {
+                    offset = offs
+                }
+
+                let o = Point2{
+                    x: self.position.x,
+                    y: self.position.y,
+                };
+
+                let p1 = Point2{
+                    x: self.position.x,
+                    y: self.position.y,
+                };
+                let p1 = p1 + offset;
+                let p1 = Point2{
+                    x: p1.x * rot.cos() - p1.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p1.x * rot.sin() + p1.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
+                };
+                
+                let p2 = Point2{
+                    x: self.position.x + w,
+                    y: self.position.y,
+                };
+                let p2 = p2 + offset;
+                let p2 = Point2{
+                    x: p2.x * rot.cos() - p2.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p2.x * rot.sin() + p2.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
+                };
+
+                let p3 = Point2{
+                    x: self.position.x,
+                    y: self.position.y + h,
+                };
+                let p3 = p3 + offset;
+                let p3 = Point2{
+                    x: p3.x * rot.cos() - p3.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p3.x * rot.sin() + p3.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
+                };
+
+                let p4 = Point2{
+                    x: self.position.x + w,
+                    y: self.position.y + h,
+                };
+                let p4 = p4 + offset;
+                let p4 = Point2{
+                    x: p4.x * rot.cos() - p4.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p4.x * rot.sin() + p4.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
+                };
+
+                Some(vec![
+                    p1, 
+                    p2, 
+                    p3,
+                    p4,
+                ])
+
+            },
+            ShapeVariant::Circle{size: _s, radius: _r} => {
+
+               None
+
+            }
+        }
+
+    }
+
     /// Function to set the private Offset field.
     pub fn set_offset(&mut self, new_offset: Point2){
         self.offset = Some(new_offset);
+    }
+
+    pub fn get_offset(&self) -> Option<Point2> {
+        self.offset
     }
 
 }
@@ -277,14 +310,6 @@ impl Draw for GenericShape {
         }
 
         match self.shape {
-            ShapeVariant::Square{ size } => {
-                Rectangle::new(self.color).draw(
-                    [0.0,0.0,size, size],
-                    &c.draw_state,
-                    transform,
-                    g
-                );
-            },
             ShapeVariant::Circle{size, radius} => {
                 Rectangle::new_round(self.color, radius).draw(
                     [0.0,0.0,size,size],
@@ -304,6 +329,193 @@ impl Draw for GenericShape {
         }
 
     }
+}
+
+pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
+    
+    if let Some(s1_corners) = s1.get_corners() {
+
+        if let Some(s2_corners) = s2.get_corners() {
+            
+            let mut proj_x1: Vec<Point2> = Vec::new();
+            let mut proj_y1: Vec<Point2> = Vec::new();
+            let mut proj_x2: Vec<Point2> = Vec::new();
+            let mut proj_y2: Vec<Point2> = Vec::new();
+
+            let line = Vec2::new(s1_corners[1].x - s1_corners[0].x, s1_corners[1].y - s1_corners[0].y);
+            let norm = line.normal_unit();
+            for point in s2_corners.iter() {
+                let v = Vec2::new_from_point(s1_corners[0] - *point);
+                let py = s1_corners[0] + project(v, line);
+                let px = s1_corners[0] + project(v, norm);
+                proj_y1.push(px);
+                proj_x1.push(py);
+            }
+
+            let line = Vec2::new(s2_corners[2].x - s2_corners[0].x, s2_corners[2].y - s2_corners[0].y);
+            let norm = line.normal_unit();
+            for point in s1_corners.iter() {
+                let v = Vec2::new_from_point(s2_corners[0] - *point);
+                let py = s2_corners[0] + project(v, line);
+                let px = s2_corners[0] + project(v, norm);
+                proj_y2.push(px);
+                proj_x2.push(py);
+            }
+
+            let ls_x1 = find_extrema(proj_x1);
+            let ls_y1 = find_extrema(proj_y1);
+            let ls_x2 = find_extrema(proj_x2);
+            let ls_y2 = find_extrema(proj_y2);
+
+            line_intersection(s1_corners[0], s1_corners[1], ls_x1[0], ls_x1[1]) &&
+            line_intersection(s1_corners[0], s1_corners[2], ls_y1[0], ls_y1[1]) &&
+            line_intersection(s2_corners[0], s2_corners[2], ls_x2[0], ls_x2[1]) &&
+            line_intersection(s2_corners[0], s2_corners[1], ls_y2[0], ls_y2[1]) 
+
+        } else {
+
+            match s2.shape {
+                ShapeVariant::Circle{size: _s, radius: r} => {
+                    circle_intersection(s2.center_point(), r, s1_corners)
+                },
+                _ => false
+            }
+
+        }
+
+    } else {
+        
+        if let Some(s2_corners) = s2.get_corners() {
+
+            match s1.shape {
+                ShapeVariant::Circle{size: _s, radius: r} => {
+                    circle_intersection(s1.center_point(), r, s2_corners)
+                },
+                _ => false
+            }
+
+        } else {
+            
+            match [s1.shape, s2.shape] {
+                [ShapeVariant::Circle{size: _s1, radius: r1}, ShapeVariant::Circle{size: _s2, radius: r2}] => {
+
+                    let d = Vec2::new_from_point(s1.center_point() - s2.center_point());
+                    let d = Vec2::dot_product(d, d);
+
+                    d < (r1 + r2).powi(2) 
+
+                },
+                _ => false
+            }
+
+        }
+
+    }
+
+
+}
+
+fn project(vec: Vec2, line: Vec2) -> Point2 {
+
+    let norm = Vec2::new_unit(line.x, line.y);
+    let c = Vec2::dot_product(vec, norm) / Vec2::dot_product(norm, norm);
+
+    Point2{x: norm.x * -c, y: norm.y * -c}
+
+}
+
+fn find_extrema(points: Vec<Point2>) -> Vec<Point2>{
+
+    let mut extremes = vec![points[0], points[0]];
+    for i in 0..4 {
+        for j in i..4 {
+            let d = points[i] - points[j];
+            let d = Vec2::new_from_point(d);
+
+            let line_seg = extremes[0] - extremes[1];
+            let line_seg = Vec2::new_from_point(line_seg);
+
+            if Vec2::dot_product(d,d) > Vec2::dot_product(line_seg, line_seg) {
+                extremes[0] = extremes[i];
+                extremes[1] = extremes[j];
+            }
+        }
+    }
+    extremes
+
+}
+
+fn circle_intersection(c: Point2, r: f64, corners: Vec<Point2>) -> bool {
+
+    let p1 = corners[0] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[1].x - corners[0].x, corners[1].y - corners[0].y));
+    let d1 = Vec2::new_from_point(p1 - c);
+    let d1 = Vec2::dot_product(d1, d1);
+
+    let p2 = corners[0] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[2].x - corners[0].x, corners[2].y - corners[0].y));     
+    let d2 = Vec2::new_from_point(p2 - c);
+    let d2 = Vec2::dot_product(d2, d2);
+
+    let p3 = corners[2] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[3].x - corners[2].x, corners[3].y - corners[2].y));
+    let d3 = Vec2::new_from_point(p3- c);
+    let d3 = Vec2::dot_product(d3, d3);
+
+    let p4 = corners[1] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[3].x - corners[1].x, corners[3].y - corners[1].y));
+    let d4 = Vec2::new_from_point(p4 - c);
+    let d4 = Vec2::dot_product(d4, d4);
+
+    let r_2 = r.powi(2);
+
+    (d1 <= r_2 && point_on_line(p1, corners[1], corners[0])) || 
+    (d2 <= r_2 && point_on_line(p2, corners[2], corners[0])) ||
+    (d3 <= r_2 && point_on_line(p3, corners[3], corners[2])) ||
+    (d4 <= r_2 && point_on_line(p4, corners[3], corners[1])) 
+
+}
+
+fn point_on_line(p: Point2, l1: Point2, l2: Point2) -> bool {
+
+    if l1.x != l2.x {
+        within(p.x, l1.x, l2.x)
+    } else {
+        within(p.y, l1.y, l2.y)
+    }
+
+}
+
+fn within(p: f64, q: f64, r: f64) -> bool{
+    (q <= p && p <= r) || (r <= p && p <= q)
+}
+
+fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool {
+
+    let p = vec![p1,p2];
+    let q = vec![q1,q2];
+
+    let mut max_dist = 0.0;
+    for i in 0..2 {
+        for j in 0..2 {
+
+            let v = Vec2::new_from_point(p[i] - q[j]);
+            let d = Vec2::dot_product(v, v);
+            if d > max_dist {
+                max_dist = d;
+            }
+
+        }
+    }
+    
+    let dist_p = Vec2::new_from_point(p2-p1);
+    let dist_p = Vec2::dot_product(dist_p, dist_p);
+
+    let dist_q = Vec2::new_from_point(q2-q1);
+    let dist_q = Vec2::dot_product(dist_q, dist_q);
+
+    if max_dist.sqrt() <= dist_p.sqrt() + dist_q.sqrt(){
+        true
+    } else {
+        false
+    }
+
 }
 
 

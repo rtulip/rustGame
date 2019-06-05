@@ -1,96 +1,13 @@
 extern crate pathfinding;
 use crate::entity::tile::{Tile, TileVariant};
-use crate::misc::random::{Seed,RNG,from_seed, next_u32};
-use pathfinding::prelude::{absdiff, astar};
+use crate::math::random::{Seed,RNG,from_seed, next_u32};
+use crate::levels::map::{Map, MapIdx};
 use std::collections::HashMap;
-
-const WIDTH: i32 = 50;
-const HEIGHT: i32 = 50;
-const ITERS: i32 = 5;
-
-/// A struct for indexing into a Map.
-/// 
-/// # Example 
-/// ```
-/// extern crate rust_game;
-/// use rust_game::Level::MapIdx;
-/// 
-/// // create an index for the point (5,3)
-/// fn main() {
-///     let idx = MapIdx::new(5, 3);
-///     assert_eq(idx.x, 5);
-///     assert_eq(idx.y, 3);
-/// 
-///     // The new function doesn't need to be used
-///     let idx = MapIdx {x: 5, y: 3};
-///     assert_eq(idx.x, 5);
-///     assert_eq(idx.y, 3);
-/// }
-/// ```
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct MapIdx {
-    pub x: i32,
-    pub y: i32
-}
-
-impl MapIdx {
-    
-    /// Create new MapIdx
-    pub fn new(x: i32, y: i32) -> Self {
-        Self {x: x, y: y}
-    }
-
-    /// Calculates the straight line distance between two MapIdx points.
-    /// Used as a heuristic for A* pathfinding in a Map.
-    fn distance(&self, other: &MapIdx) -> u32 {
-        (absdiff(self.x, other.x) + absdiff(self.y, other.y)) as u32
-    }
-
-    /// Returns the positions surrounding a MapIdx to the north, south, east, 
-    /// and west. Used to navigate a Map using A*. 
-    pub fn neighbours(&self) -> Vec<MapIdx> {
-        vec![MapIdx::new(self.x-1, self.y), MapIdx::new(self.x, self.y-1),
-             MapIdx::new(self.x+1, self.y), MapIdx::new(self.x, self.y+1)]
-    }
-
-    /// Returns a the positions surronding a MapIdx which are traversable in the 
-    /// input Map and a cost. If the space is traversable, the cost is 1. Only
-    /// Tile::Floor and Tile::Spawner variants are traversable. Any other Tile
-    /// variant surrounding the MapIdx will be counted as impassable.
-    fn successors(&self, map: &Map) -> Vec<(MapIdx, u32)> {
-        // Find surrounding spaces
-        let mut neighbours = self.neighbours();
-        // A list of indicies to remove 
-        let mut remove: Vec<usize> = Vec::new();
-        // Traverse the neibhbours backwards, so that removing by index doesn't
-        // cause any issues
-        for (i, idx) in neighbours.iter().enumerate().rev() {
-            // If map.get(idx) contains a Tile::Floor do nothing, otherwise mark
-            // the tile for removal
-            if let Some(tile) = map.get(idx) {
-                match tile.variant {
-                    TileVariant::Floor => (),
-                    TileVariant::Spawner => (),
-                    _ => {
-                        remove.push(i);
-                    }
-                }
-            } else {
-                remove.push(i);
-            }
-        }
-        // Remove all marked tiles from neighbour list
-        for i in remove {
-            neighbours.remove(i);
-        }
-        // return the traversable tiles mapped with a traversal cost of 1
-        neighbours.into_iter().map(|p| (p, 1)).collect()
-
-    }
-}
-
-/// A HashMap mapping MapIdxs to Tiles. Used to represent the game board.
-pub type Map = HashMap<MapIdx, Tile>;
+use crate::game::consts::{
+    LEVEL_WIDTH,
+    LEVEL_HEIGHT,
+    LEVEL_GEN_ITERS,
+};
 
 /// A structure to fully describe the game board. A Map is used to store the 
 /// Tiles representing the game board. Width and height are provided for easy
@@ -168,8 +85,8 @@ impl Level {
         let mut rng = from_seed(init);
 
         // Add initial Tile::Walls to the Map.
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
+        for h in 0..LEVEL_HEIGHT {
+            for w in 0..LEVEL_WIDTH {
                 // Any given tile has a 50/50 chance of being a wall initially.
                 if next_u32(&mut rng) % 2 == 1 {
                     map.insert(MapIdx::new(w,h), Tile::new(TileVariant::Wall, MapIdx::new(w, h)));
@@ -178,11 +95,11 @@ impl Level {
         }
 
         // Run Conway's Game of Life on the Tile::Walls in the Map
-        map = Level::iterate_map(map, ITERS);
+        map = Level::iterate_map(map, LEVEL_GEN_ITERS);
 
         // Fill the empty spaces in the Map with Tile::Floor
-        for h in 0..HEIGHT {
-            for w in 0..WIDTH {
+        for h in 0..LEVEL_HEIGHT {
+            for w in 0..LEVEL_WIDTH {
                 match map.contains_key(&MapIdx::new(w,h)) {
                     false => {
                         map.insert(MapIdx::new(w,h), Tile::new(TileVariant::Floor, MapIdx::new(w, h)));
@@ -193,9 +110,9 @@ impl Level {
         }
         
         // Fill untraversable space with walls
-        map = Level::fill_walls(map, WIDTH, HEIGHT);
-        map = Level::fill_edge(map, WIDTH, HEIGHT);
-        Level {map: map, width: WIDTH, height: HEIGHT, rng: rng}
+        map = Level::fill_walls(map, LEVEL_WIDTH, LEVEL_HEIGHT);
+        map = Level::fill_edge(map, LEVEL_WIDTH, LEVEL_HEIGHT);
+        Level {map: map, width: LEVEL_WIDTH, height: LEVEL_HEIGHT, rng: rng}
 
     }
 
@@ -358,14 +275,6 @@ impl Level {
         }
 
         map
-
-    }
-
-    /// Returns a list of MapIdx and a total cost if there exists a path from
-    /// start to target, otherwise returns None.
-    pub fn pathfind(&self, start: &MapIdx, target: &MapIdx) -> Option<(Vec<MapIdx>, u32)> {
-
-        astar(start, |p| p.successors(&self.map), |p| p.distance(&target) / 3,|p| *p == *target)
 
     }
 

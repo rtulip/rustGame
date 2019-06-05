@@ -1,18 +1,18 @@
 use crate::game::{GameModel, GameView};
-use crate::misc::random::Seed;
-use crate::misc::point2d::Point2;
+use crate::math::random::Seed;
+use crate::math::Point2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
+use crate::traits::draw::check_collision;
 use crate::entity::player;
 use crate::entity::tile::TileVariant;
 use crate::entity::towers::tower::TowerState;
-use crate::level::MapIdx;
+use crate::levels::map::MapIdx;
 use crate::game::consts::{
+    point2_to_map_idx,
     map_idx_to_point2,
     TILE_SIZE,
     PLAYER_SIZE,
-    PLAYER_RADIUS,
-    ENEMY_RADIUS,
 };
 
 use std::collections::HashSet;
@@ -161,14 +161,11 @@ impl GameController {
     /// circle's to rectangles in the future.
     fn check_player_collision(&mut self) {
 
-        let min_x = ( self.model.player.shape.get_position().x / TILE_SIZE).floor() as i32;
-        let max_x = ((self.model.player.shape.get_position().x + PLAYER_SIZE) / TILE_SIZE).floor() as i32 + 1;
-
-        let min_y = ( self.model.player.shape.get_position().y / TILE_SIZE).floor() as i32;
-        let max_y = ((self.model.player.shape.get_position().y + PLAYER_SIZE) / TILE_SIZE).floor() as i32 + 1;
+        let min_idx = point2_to_map_idx(self.model.player.shape.get_position());
+        let max_idx = point2_to_map_idx(self.model.player.shape.get_position() + Point2{x: PLAYER_SIZE, y: PLAYER_SIZE});
         
-        for h in min_y..max_y {
-            for w in min_x..max_x {
+        for h in min_idx.y..max_idx.y+1 {
+            for w in min_idx.x..max_idx.x+1 {
                 if let Some(tile) = self.model.level.map.get(&MapIdx::new(w,h)) {
                     match tile.variant {
                         TileVariant::Wall => {
@@ -190,9 +187,13 @@ impl GameController {
                             if min_move == shift_left || min_move == shift_right {
                                 let delta = Point2{x: min_move, y: 0.0};
                                 self.model.player.shape.update(delta, None);
+                                self.model.player.health_bar.update(delta, None);
+                                self.model.player.damage_bar.update(delta, None);
                             } else {
                                 let delta = Point2{x: 0.0, y: min_move};
                                 self.model.player.shape.update(delta, None);
+                                self.model.player.health_bar.update(delta, None);
+                                self.model.player.damage_bar.update(delta, None);
                             }
                         }
                         _ => (),
@@ -201,16 +202,14 @@ impl GameController {
             }
         }
 
-        let player_center = self.model.player.shape.center_point();
         let mut to_remove: Vec<usize> = Vec::new();
         for (i,resource) in self.model.resources.iter_mut().enumerate().rev() {
-            let resource_center = resource.shape.center_point();
-            if (resource_center.x - player_center.x).abs() + (resource_center.y - player_center.y).abs() <= PLAYER_RADIUS {
+            
+            if check_collision(resource.shape, self.model.player.shape) {
                 to_remove.push(i);
-                if self.model.player.resources < 9 {
-                    self.model.player.resources += 1;
-                }
+                self.model.player.resources += 1;
             }
+
         }
 
         for i in to_remove {
@@ -238,30 +237,21 @@ impl GameController {
             // move enemy
             enemy.tick(dt);
             
-            // check for collision with beacon. 
-            let beacon_center = self.model.beacon.shape.center_point();
-            let enemy_center = enemy.shape.center_point();
-            if (beacon_center.x - enemy_center.x).abs() + (beacon_center.y - enemy_center.y).abs() <= ENEMY_RADIUS {
+            if check_collision(self.model.beacon.shape, enemy.shape) {
                 to_remove.push((i,false));
-                self.model.beacon.health -= 1;
-            } 
-            // check for collision with the player.
-            let player_center = self.model.player.shape.center_point();
-            if (player_center.x - enemy_center.x).abs() + (player_center.y - enemy_center.y).abs() <= ENEMY_RADIUS + PLAYER_RADIUS {
+                self.model.beacon.damage();
+            }
+            if check_collision(self.model.player.shape, enemy.shape) {
                 to_remove.push((i,false));
-                self.model.player.health -= 1;
+                self.model.player.damage();
             }
 
             match self.model.player.state {
                 player::PlayerState::Attacking => {
-                    let p1 = self.model.player.attack.shape.top_right();
-                    let p2 = self.model.player.attack.shape.bottom_right();
-
-                    if  (p1.x - enemy_center.x).abs() + (p1.y - enemy_center.y).abs() <= ENEMY_RADIUS || 
-                        (p2.x - enemy_center.x).abs() + (p2.y - enemy_center.y).abs() <= ENEMY_RADIUS {
+                    
+                    if check_collision(self.model.player.attack.shape, enemy.shape) {
                         to_remove.push((i,true));
                     }
-                    
                 },
                 _ => (),
             }
@@ -303,9 +293,7 @@ impl GameController {
             match tower.state {
                 TowerState::Attacking => {
                     
-                    let x = (tower.bullet.shape.center_point().x / TILE_SIZE).floor() as i32;
-                    let y = (tower.bullet.shape.center_point().y / TILE_SIZE).floor() as i32;
-                    if let Some(tile) = self.model.level.map.get(&MapIdx::new(x, y)) {
+                    if let Some(tile) = self.model.level.map.get(&point2_to_map_idx(tower.bullet.shape.center_point())) {
                         match tile.variant {
                             TileVariant::Wall => {
                                 tower.change_state(TowerState::Ready);
@@ -319,11 +307,10 @@ impl GameController {
                     }
                     
                     for (i,enemy) in self.model.enemies.iter().enumerate().rev() {
-                        if (tower.bullet.shape.center_point().x - enemy.shape.center_point().x).abs() + 
-                           (tower.bullet.shape.center_point().y - enemy.shape.center_point().y).abs() <= ENEMY_RADIUS {
-                               to_remove.push(i);
+                        if check_collision(tower.bullet.shape, enemy.shape){
+                            to_remove.push(i);
                                tower.change_state(TowerState::Ready);
-                           }
+                        }
                     }
 
                     for i in to_remove {
@@ -335,6 +322,18 @@ impl GameController {
             }
 
         }
+    }
+
+    /// Function to check the state of the GameController. Used to keep the 
+    /// game loop running. Returns true while in the Running state, otherwise
+    /// returns false if in the Finished State.
+    pub fn check_state(&self) -> bool {
+
+        match self.state {
+            GameState::Finished => false,
+            GameState::Running => true,
+        }
+
     }
 
 }

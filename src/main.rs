@@ -1,6 +1,6 @@
 use rust_game::game::Game;
 use rust_game::input;
-use rust_game::misc::random;
+use rust_game::math::random;
 
 fn main() {
     
