@@ -58,6 +58,10 @@ pub const BULLET_HEIGHT: f64 = TOWER_CANNON_HEIGHT * 0.75;
 pub const BULLET_COLOR: Color = [0.0, 0.0, 0.0, 1.0];
 pub const BULLET_SPEED: f64 = ENEMY_SPEED * 2.0;
 
+pub const HEALTH_BAR_HEIGHT: f64 = 5.0;
+pub const HEALTH_COLOR: Color = [0.0, 1.0, 0.0, 1.0];
+pub const DAMAGE_COLOR: Color = [1.0, 0.0, 0.0, 1.0];
+
 pub fn map_idx_to_point2(idx: MapIdx) -> Point2 {
 
     Point2 {
