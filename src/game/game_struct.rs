@@ -66,12 +66,12 @@ impl Game {
         s1.set_offset(offset);
 
         let rot = -PI/3.56;
-        let offset = Point2{x: -width / 2.0, y: -height / 2.0};
+        let offset = Point2{x: -height / 2.0, y: -height / 2.0};
 
         let mut s2 = GenericShape::new(
-            ShapeVariant::Rect{
-                width: width,
-                height: height
+            ShapeVariant::Circle{
+                size: height,
+                radius: height/2.0
             },
             c1, 
             pos
@@ -283,7 +283,19 @@ fn check_collision(s1: GenericShape, s2: GenericShape, point1: &mut GenericShape
             }
 
         } else {
-            false
+            
+            match [s1.shape, s2.shape] {
+                [ShapeVariant::Circle{size: _s1, radius: r1}, ShapeVariant::Circle{size: _s2, radius: r2}] => {
+
+                    let d = Vec2::new_from_point(s1.center_point() - s2.center_point());
+                    let d = Vec2::dot_product(d, d);
+
+                    d < (r1 + r2).powi(2) 
+
+                },
+                _ => false
+            }
+
         }
 
     }
