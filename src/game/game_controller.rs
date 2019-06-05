@@ -3,6 +3,7 @@ use crate::math::random::Seed;
 use crate::math::Point2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
+use crate::traits::draw::check_collision;
 use crate::entity::player;
 use crate::entity::tile::TileVariant;
 use crate::entity::towers::tower::TowerState;
@@ -199,16 +200,17 @@ impl GameController {
             }
         }
 
-        let player_center = self.model.player.shape.center_point();
         let mut to_remove: Vec<usize> = Vec::new();
         for (i,resource) in self.model.resources.iter_mut().enumerate().rev() {
-            let resource_center = resource.shape.center_point();
-            if (resource_center.x - player_center.x).abs() + (resource_center.y - player_center.y).abs() <= PLAYER_RADIUS {
+            
+            if check_collision(resource.shape, self.model.player.shape){
                 to_remove.push(i);
                 if self.model.player.resources < 9 {
                     self.model.player.resources += 1;
                 }
             }
+                
+            
         }
 
         for i in to_remove {
@@ -236,30 +238,21 @@ impl GameController {
             // move enemy
             enemy.tick(dt);
             
-            // check for collision with beacon. 
-            let beacon_center = self.model.beacon.shape.center_point();
-            let enemy_center = enemy.shape.center_point();
-            if (beacon_center.x - enemy_center.x).abs() + (beacon_center.y - enemy_center.y).abs() <= ENEMY_RADIUS {
+            if check_collision(self.model.beacon.shape, enemy.shape) {
                 to_remove.push((i,false));
                 self.model.beacon.health -= 1;
-            } 
-            // check for collision with the player.
-            let player_center = self.model.player.shape.center_point();
-            if (player_center.x - enemy_center.x).abs() + (player_center.y - enemy_center.y).abs() <= ENEMY_RADIUS + PLAYER_RADIUS {
+            }
+            if check_collision(self.model.player.shape, enemy.shape) {
                 to_remove.push((i,false));
                 self.model.player.health -= 1;
             }
 
             match self.model.player.state {
                 player::PlayerState::Attacking => {
-                    let p1 = self.model.player.attack.shape.top_right();
-                    let p2 = self.model.player.attack.shape.bottom_right();
-
-                    if  (p1.x - enemy_center.x).abs() + (p1.y - enemy_center.y).abs() <= ENEMY_RADIUS || 
-                        (p2.x - enemy_center.x).abs() + (p2.y - enemy_center.y).abs() <= ENEMY_RADIUS {
+                    
+                    if check_collision(self.model.player.attack.shape, enemy.shape){
                         to_remove.push((i,true));
                     }
-                    
                 },
                 _ => (),
             }
@@ -315,11 +308,10 @@ impl GameController {
                     }
                     
                     for (i,enemy) in self.model.enemies.iter().enumerate().rev() {
-                        if (tower.bullet.shape.center_point().x - enemy.shape.center_point().x).abs() + 
-                           (tower.bullet.shape.center_point().y - enemy.shape.center_point().y).abs() <= ENEMY_RADIUS {
-                               to_remove.push(i);
+                        if check_collision(tower.bullet.shape, enemy.shape){
+                            to_remove.push(i);
                                tower.change_state(TowerState::Ready);
-                           }
+                        }
                     }
 
                     for i in to_remove {

@@ -331,7 +331,7 @@ impl Draw for GenericShape {
     }
 }
 
-fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
+pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
     
     if let Some(s1_corners) = s1.get_corners() {
 

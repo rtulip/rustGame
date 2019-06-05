@@ -4,9 +4,6 @@ use crate::game::consts::{
     OPEN_GL_VERSION,
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
-    PI,
-    INF,
-    MIN
 };
 
 use piston::window::WindowSettings;
