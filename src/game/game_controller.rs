@@ -235,7 +235,7 @@ impl GameController {
             
             if check_collision(self.model.beacon.shape, enemy.shape) {
                 to_remove.push((i,false));
-                self.model.beacon.health -= 1;
+                self.model.beacon.damage();
             }
             if check_collision(self.model.player.shape, enemy.shape) {
                 to_remove.push((i,false));
