@@ -1,11 +1,12 @@
 use graphics::types::Color;
 use opengl_graphics::OpenGL;
 use crate::levels::map::MapIdx;
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 use std::f64;
 
 pub const PI: f64 = f64::consts::PI;
 pub const INF: f64 = f64::INFINITY;
+pub const MIN: f64 = f64::MIN;
 
 pub const WINDOW_WIDTH: f64 = 1000.0;
 pub const WINDOW_HEIGHT: f64 = 1000.0;

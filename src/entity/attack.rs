@@ -1,5 +1,5 @@
 use crate::traits::draw::{GenericShape, ShapeVariant};
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 use crate::game::consts::{
     PLAYER_ATTACK_HEIGHT,
     PLAYER_ATTACK_WIDTH,

@@ -1,6 +1,6 @@
 use crate::traits::{entity};
 use crate::traits::draw::{GenericShape, ShapeVariant};
-use crate::misc::point2d::Point2;
+use crate::math::Point2;
 use crate::game::consts::{
     DROP_SIZE,
     DROP_ROTATION_SPEED,
@@ -16,7 +16,10 @@ impl Resource {
     /// Creates a new Resource
     pub fn new(position: Point2) -> Self {
         let mut shape = GenericShape::new(
-            ShapeVariant::Square{size: DROP_SIZE},
+            ShapeVariant::Rect{
+                width: DROP_SIZE,
+                height: DROP_SIZE,
+            },
             RESOURCE_COLOR, 
             position
         );

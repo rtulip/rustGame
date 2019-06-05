@@ -2,8 +2,8 @@ use crate::levels::Level;
 use crate::levels::map::{MapIdx, pathfind};
 use crate::traits::state::State;
 use crate::traits::entity::Entity;
-use crate::misc::random::{Seed, RNG, from_seed, next_u32};
-use crate::misc::point2d::Point2;
+use crate::math::random::{Seed, RNG, from_seed, next_u32};
+use crate::math::Point2;
 use crate::entity::player::Player;
 use crate::entity::tile::{Tile, TileVariant};
 use crate::entity::beacon::Beacon;
@@ -15,7 +15,6 @@ use crate::game::consts::{
     point2_to_map_idx,
     PI,
     INF,
-    TILE_SIZE,
 };
 
 /// A structure to fully encapsulate all components of the game. The different

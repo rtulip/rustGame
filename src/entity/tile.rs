@@ -29,7 +29,10 @@ impl Tile {
                 Self {
                     variant: variant,
                     shape: GenericShape::new(
-                        ShapeVariant::Square{size: TILE_SIZE},
+                        ShapeVariant::Rect{
+                            width: TILE_SIZE,
+                            height: TILE_SIZE
+                        },
                         FLOOR_COLOR, 
                         map_idx_to_point2(idx)
                     ),
@@ -39,7 +42,10 @@ impl Tile {
                 Self {
                     variant: variant,
                     shape: GenericShape::new(
-                        ShapeVariant::Square{size: TILE_SIZE},
+                        ShapeVariant::Rect{
+                            width: TILE_SIZE,
+                            height: TILE_SIZE
+                        },
                         WALL_COLOR, 
                         map_idx_to_point2(idx)
                     ),
@@ -49,7 +55,10 @@ impl Tile {
                 Self {
                     variant: variant,
                     shape: GenericShape::new(
-                        ShapeVariant::Square{size: TILE_SIZE},
+                        ShapeVariant::Rect{
+                            width: TILE_SIZE,
+                            height: TILE_SIZE
+                        },
                         SPAWNER_COLOR, 
                         map_idx_to_point2(idx)
                     ),
@@ -59,7 +68,10 @@ impl Tile {
                 Self {
                     variant: variant,
                     shape: GenericShape::new(
-                        ShapeVariant::Square{size: TILE_SIZE},
+                        ShapeVariant::Rect{
+                            width: TILE_SIZE,
+                            height: TILE_SIZE
+                        },
                         ERROR_COLOR, 
                         map_idx_to_point2(idx)
                     ),
