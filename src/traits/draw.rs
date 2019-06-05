@@ -69,7 +69,7 @@ impl GenericShape {
     }
 
     /// Function to return the private Position field.
-    pub fn get_position(&self) -> Point2 {
+    pub fn get_position(&self) -> Point2 { 
         self.position
     }
 
@@ -218,66 +218,49 @@ impl GenericShape {
                     offset = offs
                 }
 
-                let point_of_rotation = self.position + offset;
-
-                let p1 = Point2{
-                    x: 
-                        self.position.x * rot.cos() - 
-                        self.position.y * rot.sin() + 
-                        point_of_rotation.x - 
-                        point_of_rotation.x * rot.cos() + 
-                        point_of_rotation.y * rot.sin(),
-                    y: 
-                        self.position.x * rot.sin() + 
-                        self.position.y * rot.cos() + 
-                        point_of_rotation.y - 
-                        point_of_rotation.x * rot.sin() - 
-                        point_of_rotation.y * rot.cos()
+                let o = Point2{
+                    x: self.position.x,
+                    y: self.position.y,
                 };
 
+                let p1 = Point2{
+                    x: self.position.x,
+                    y: self.position.y,
+                };
+                let p1 = p1 + offset;
+                let p1 = Point2{
+                    x: p1.x * rot.cos() - p1.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p1.x * rot.sin() + p1.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
+                };
+                
                 let p2 = Point2{
-                    x: 
-                        (self.position.x + w) * rot.cos() - 
-                        self.position.y * rot.sin() + 
-                        point_of_rotation.x - 
-                        point_of_rotation.x * rot.cos() + 
-                        point_of_rotation.y * rot.sin(),
-                    y: 
-                        (self.position.x + w) * rot.sin() + 
-                        self.position.y * rot.cos() + 
-                        point_of_rotation.y - 
-                        point_of_rotation.x * rot.sin() - 
-                        point_of_rotation.y * rot.cos()
+                    x: self.position.x + w,
+                    y: self.position.y,
+                };
+                let p2 = p2 + offset;
+                let p2 = Point2{
+                    x: p2.x * rot.cos() - p2.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p2.x * rot.sin() + p2.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
                 };
 
                 let p3 = Point2{
-                    x: 
-                        self.position.x * rot.cos() - 
-                        (self.position.y + h) * rot.sin() + 
-                        point_of_rotation.x - 
-                        point_of_rotation.x * rot.cos() + 
-                        point_of_rotation.y * rot.sin(),
-                    y: 
-                        self.position.x * rot.sin() + 
-                        (self.position.y + h) * rot.cos() + 
-                        point_of_rotation.y - 
-                        point_of_rotation.x * rot.sin() - 
-                        point_of_rotation.y * rot.cos()
+                    x: self.position.x,
+                    y: self.position.y + h,
+                };
+                let p3 = p3 + offset;
+                let p3 = Point2{
+                    x: p3.x * rot.cos() - p3.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p3.x * rot.sin() + p3.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
                 };
 
                 let p4 = Point2{
-                    x: 
-                        (self.position.x + w) * rot.cos() - 
-                        (self.position.y + h) * rot.sin() + 
-                        point_of_rotation.x - 
-                        point_of_rotation.x * rot.cos() + 
-                        point_of_rotation.y * rot.sin(),
-                    y: 
-                        (self.position.x + w) * rot.sin() + 
-                        (self.position.y + h) * rot.cos() + 
-                        point_of_rotation.y - 
-                        point_of_rotation.x * rot.sin() - 
-                        point_of_rotation.y * rot.cos()
+                    x: self.position.x + w,
+                    y: self.position.y + h,
+                };
+                let p4 = p4 + offset;
+                let p4 = Point2{
+                    x: p4.x * rot.cos() - p4.y * rot.sin() + o.x - o.x * rot.cos() + o.y * rot.sin(),
+                    y: p4.x * rot.sin() + p4.y * rot.cos() + o.y - o.x * rot.sin() - o.y * rot.cos()
                 };
 
                 Some(vec![

@@ -52,8 +52,8 @@ impl Game {
         let height = width/2.0;
         let pos = Point2{x: WINDOW_WIDTH / 2.0, y: WINDOW_HEIGHT / 2.0};
         let rot = 0.0;
-        // let offset = Point2{x: -width / 2.0, y: -height / 2.0};
-        let offset = Point2{x: 0.0, y: 0.0};
+        let offset = Point2{x: -width / 2.0, y: -height / 2.0};
+        // let offset = Point2{x: 0.0, y: 0.0};
 
         let mut s1 = GenericShape::new(
             ShapeVariant::Rect{
@@ -72,7 +72,7 @@ impl Game {
         n1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + Point2{x: offset.y, y: -offset.x});
 
         let rot = -PI/3.56;
-        let offset = Point2{x: 0.0, y: 0.0};
+        let offset = Point2{x: -width / 2.0, y: -height / 2.0};
 
         let mut s2 = GenericShape::new(
             ShapeVariant::Rect{
@@ -87,8 +87,8 @@ impl Game {
 
         let mut v2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
         let mut n2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
-        v2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
-        n2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0});
+        v2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + offset);
+        n2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + Point2{x: offset.y, y: -offset.x});
 
         let mut p1 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
         let mut p2 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
@@ -180,9 +180,9 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let line = Vec2::new(s1_corners[1].x - s1_corners[0].x, s1_corners[1].y - s1_corners[0].y);
             let norm = line.normal_unit();
             for point in s2_corners.iter() {
-                let v = Vec2::new_from_point(s1.get_position() - *point);
-                let py = s1.get_position() + project(v, line);
-                let px = s1.get_position() + project(v, norm);
+                let v = Vec2::new_from_point(s1_corners[0] - *point);
+                let py = s1_corners[0] + project(v, line);
+                let px = s1_corners[0] + project(v, norm);
                 proj_x1.push(px);
                 proj_y1.push(py);
             }
@@ -190,9 +190,9 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let line = Vec2::new(s2_corners[2].x - s2_corners[0].x, s2_corners[2].y - s2_corners[0].y);
             let norm = line.normal_unit();
             for point in s1_corners.iter() {
-                let v = Vec2::new_from_point(s2.get_position() - *point);
-                let py = s2.get_position() + project(v, line);
-                let px = s2.get_position() + project(v, norm);
+                let v = Vec2::new_from_point(s2_corners[0] - *point);
+                let py = s2_corners[0] + project(v, line);
+                let px = s2_corners[0] + project(v, norm);
                 proj_x2.push(px);
                 proj_y2.push(py);
             }
@@ -250,26 +250,26 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
                 }
             }
 
-            let q1 = ls_x1[0];
-            let s1 = ls_x1[1];
+            let a1 = ls_x1[0];
+            let b1 = ls_x1[1];
 
-            let q2 = ls_y1[0];
-            let s2 = ls_y1[1];
+            let a2 = ls_y1[0];
+            let b2 = ls_y1[1];
 
-            let q3 = ls_x2[0];
-            let s3 = ls_x2[1];
+            let a3 = ls_x2[0];
+            let b3 = ls_x2[1];
 
-            let q4 = ls_y2[0];
-            let s4 = ls_y2[1];
+            let a4 = ls_y2[0];
+            let b4 = ls_y2[1];
 
-            p1.set_position(q1);
-            p2.set_position(s1);
-            p3.set_position(q2);
-            p4.set_position(s2);
-            p5.set_position(q3);
-            p6.set_position(s3);
-            p7.set_position(q4);
-            p8.set_position(s4);
+            p1.set_position(a1);
+            p2.set_position(b1);
+            p3.set_position(a2);
+            p4.set_position(b2);
+            p5.set_position(a3);
+            p6.set_position(b3);
+            p7.set_position(a4);
+            p8.set_position(b4);
 
             false
 
