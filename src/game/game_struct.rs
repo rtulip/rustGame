@@ -53,23 +53,17 @@ impl Game {
         let pos = Point2{x: WINDOW_WIDTH / 2.0, y: WINDOW_HEIGHT / 2.0};
         let rot = 0.0;
         let offset = Point2{x: -width / 2.0, y: -height / 2.0};
-        // let offset = Point2{x: 0.0, y: 0.0};
 
         let mut s1 = GenericShape::new(
-            ShapeVariant::Rect{
-                width: width,
-                height: height,
-            }, 
+            ShapeVariant::Circle{
+                size: height,
+                radius: height/2.0
+            },
             c1, 
             pos
         );
         s1.set_rotation(rot);
         s1.set_offset(offset);
-
-        let mut v1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
-        let mut n1 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.0,0.0,0.0,1.0], s1.get_position());
-        v1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + offset);
-        n1.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + Point2{x: offset.y, y: -offset.x});
 
         let rot = -PI/3.56;
         let offset = Point2{x: -width / 2.0, y: -height / 2.0};
@@ -77,37 +71,46 @@ impl Game {
         let mut s2 = GenericShape::new(
             ShapeVariant::Rect{
                 width: width,
-                height: height,
-            }, 
+                height: height
+            },
             c1, 
             pos
         );
         s2.set_rotation(rot);
         s2.set_offset(offset);
 
-        let mut v2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
-        let mut n2 = GenericShape::new(ShapeVariant::Rect{width: WINDOW_WIDTH, height: 3.0}, [0.5,0.5,0.5,1.0], s2.get_position());
-        v2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + offset);
-        n2.set_offset(Point2{x: -WINDOW_WIDTH/ 2.0, y: 0.0} + Point2{x: offset.y, y: -offset.x});
-
-        let mut p1 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
-        let mut p2 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, c2, s1.get_position());
-        let mut p3 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.0,1.0,0.0,1.0], s1.get_position());
-        let mut p4 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.0,1.0,0.0,1.0], s1.get_position());
-        let mut p5 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.82, 0.5, 0.1, 1.0], s2.get_position());
-        let mut p6 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.82, 0.5, 0.1, 1.0], s2.get_position());
-        let mut p7 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.85,0.1,0.85,1.0], s2.get_position());
-        let mut p8 = GenericShape::new(ShapeVariant::Rect{width: 5.0, height: 5.0}, [0.85,0.1,0.85,1.0], s2.get_position());
-        
-        if let Some(rot) = s1.get_rotation() {
-            v1.set_rotation(rot);
-            n1.set_rotation(rot + PI/2.0)
-        }
-
-        if let Some(rot) = s2.get_rotation() {
-            v2.set_rotation(rot);
-            n2.set_rotation(rot + PI/2.0)
-        }
+        let mut point1 = GenericShape::new(
+            ShapeVariant::Circle{
+                size: 5.0,
+                radius: 1.5,
+            }, 
+            [0.0,0.0,0.0,1.0],
+            s1.get_position()
+        );
+        let mut point2 = GenericShape::new(
+            ShapeVariant::Circle{
+                size: 5.0,
+                radius: 1.5,
+            }, 
+            [0.0,0.0,0.0,1.0],
+            s1.get_position()
+        );
+        let mut point3 = GenericShape::new(
+            ShapeVariant::Circle{
+                size: 5.0,
+                radius: 1.5,
+            }, 
+            [0.0,0.0,0.0,1.0],
+            s1.get_position()
+        );
+        let mut point4 = GenericShape::new(
+            ShapeVariant::Circle{
+                size: 5.0,
+                radius: 1.5,
+            }, 
+            [0.0,0.0,0.0,1.0],
+            s1.get_position()
+        );
 
         while let Some(e) = events.next(&mut window) {
             // if !self.controller.check_state() {
@@ -117,9 +120,7 @@ impl Game {
             
             if let Some(args) = e.mouse_cursor_args() {
                 s2.set_position(Point2{x: args[0], y: args[1]});
-                v2.set_position(s2.get_position());
-                n2.set_position(s2.get_position());
-                if check_collision(s1,s2,&mut p1, &mut p2, &mut p3, &mut p4, &mut p5, &mut p6, &mut p7, &mut p8  ) {
+                if check_collision(s1,s2, &mut point1, &mut point2, &mut point3, &mut point4) {
                     s2.set_color(c2);
                 } else {
                     s2.set_color(c1);
@@ -131,11 +132,6 @@ impl Game {
 
                 s1.update(Point2{x: 0.0, y: 0.0}, Some(PI/12.0 * -args[1]));
 
-                if let Some(rot) = s1.get_rotation() {
-                    v1.set_rotation(rot);
-                    n1.set_rotation(rot + PI/2.0)
-                }
-
             }
 
             if let Some(args) = e.render_args() {
@@ -144,20 +140,13 @@ impl Game {
                     
                     clear([1.0; 4], g);
                     // self.controller.view.draw(&self.controller.model, &c, g);
-                    v1.draw(&c, g);
-                    n1.draw(&c, g);
                     s1.draw(&c, g);
                     s2.draw(&c, g);
-                    v2.draw(&c, g);
-                    n2.draw(&c, g);
-                    p1.draw(&c, g);
-                    p2.draw(&c, g);
-                    p3.draw(&c, g);
-                    p4.draw(&c, g);
-                    p5.draw(&c, g);
-                    p6.draw(&c, g);
-                    p7.draw(&c, g);
-                    p8.draw(&c, g);
+                    point1.draw(&c, g);
+                    point2.draw(&c, g);
+                    point3.draw(&c, g);
+                    point4.draw(&c, g);
+
                 })
             }
         }
@@ -165,8 +154,7 @@ impl Game {
 
 }
 
-fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2: &mut GenericShape, p3: &mut GenericShape, p4: &mut GenericShape,
-    p5: &mut GenericShape, p6: &mut GenericShape, p7: &mut GenericShape, p8: &mut GenericShape) -> bool {
+fn check_collision(s1: GenericShape, s2: GenericShape, point1: &mut GenericShape,point2: &mut GenericShape,point3: &mut GenericShape,point4: &mut GenericShape) -> bool {
     
     if let Some(s1_corners) = s1.get_corners() {
 
@@ -262,15 +250,6 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             let a4 = ls_y2[0];
             let b4 = ls_y2[1];
 
-            p1.set_position(a4);
-            p2.set_position(b4);
-            p3.set_position(a4);
-            p4.set_position(b4);
-            p5.set_position(a4);
-            p6.set_position(b4);
-            p7.set_position(a4);
-            p8.set_position(b4);
-
             let i1 = line_intersection(s1_corners[0], s1_corners[1], a1, b1);
             let i2 = line_intersection(s1_corners[0], s1_corners[2], a2, b2);
             let i3 = line_intersection(s2_corners[0], s2_corners[2], a3, b3);
@@ -282,11 +261,31 @@ fn check_collision(s1: GenericShape, s2: GenericShape, p1: &mut GenericShape, p2
             }
 
         } else {
-            false 
+
+            match s2.shape {
+                ShapeVariant::Circle{size: _s, radius: r} => {
+                    circle_intersection(s2.center_point(), r, s1_corners, point1, point2, point3, point4)
+                },
+                _ => false
+            }
+
         }
 
     } else {
-        false
+        
+        if let Some(s2_corners) = s2.get_corners() {
+
+            match s1.shape {
+                ShapeVariant::Circle{size: _s, radius: r} => {
+                    circle_intersection(s1.center_point(), r, s2_corners, point1, point2, point3, point4)
+                },
+                _ => false
+            }
+
+        } else {
+            false
+        }
+
     }
 
 
@@ -299,6 +298,52 @@ fn project(vec: Vec2, line: Vec2) -> Point2 {
 
     Point2{x: norm.x * -c, y: norm.y * -c}
 
+}
+
+fn circle_intersection(c: Point2, r: f64, corners: Vec<Point2>, point1: &mut GenericShape,point2: &mut GenericShape,point3: &mut GenericShape,point4: &mut GenericShape,) -> bool {
+
+    let p1 = corners[0] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[1].x - corners[0].x, corners[1].y - corners[0].y));
+    let d1 = Vec2::new_from_point(p1 - c);
+    let d1 = Vec2::dot_product(d1, d1);
+
+    let p2 = corners[0] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[2].x - corners[0].x, corners[2].y - corners[0].y));     
+    let d2 = Vec2::new_from_point(p2 - c);
+    let d2 = Vec2::dot_product(d2, d2);
+
+    let p3 = corners[2] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[3].x - corners[2].x, corners[3].y - corners[2].y));
+    let d3 = Vec2::new_from_point(p3- c);
+    let d3 = Vec2::dot_product(d3, d3);
+
+    let p4 = corners[1] + project(Vec2::new_from_point(corners[0] - c), Vec2::new(corners[3].x - corners[1].x, corners[3].y - corners[1].y));
+    let d4 = Vec2::new_from_point(p4 - c);
+    let d4 = Vec2::dot_product(d4, d4);
+
+    let r_2 = r.powi(2);
+
+    // println!("{}, {}", d2 <= r_2, point_on_line(p2, corners[0], corners[2]));
+    point1.set_position(p1);
+    point2.set_position(p2);
+    point3.set_position(p3);
+    point4.set_position(p4);
+    (d1 <= r_2 && point_on_line(p1, corners[1], corners[0])) || 
+    (d2 <= r_2 && point_on_line(p2, corners[2], corners[0])) ||
+    (d3 <= r_2 && point_on_line(p3, corners[3], corners[2])) ||
+    (d4 <= r_2 && point_on_line(p4, corners[3], corners[1])) 
+
+}
+
+fn point_on_line(p: Point2, l1: Point2, l2: Point2) -> bool {
+
+    if l1.x != l2.x {
+        within(p.x, l1.x, l2.x)
+    } else {
+        within(p.y, l1.y, l2.y)
+    }
+
+}
+
+fn within(p: f64, q: f64, r: f64) -> bool{
+    (q <= p && p <= r) || (r <= p && p <= q)
 }
 
 fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool {
