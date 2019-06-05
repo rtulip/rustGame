@@ -3,7 +3,7 @@
 
 A survival tower defense game made in rust.
 
-![Game demo](images/game_demo_v0.1.0.gif)
+![Game demo](images/game_demo_v0.2.0.gif)
 
 ## Install
 
