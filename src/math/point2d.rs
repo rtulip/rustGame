@@ -61,7 +61,7 @@ mod point2d_tests{
         let p2 = Point2{x: -2.5, y: 0.7};
 
         assert_eq!(5.5, (p1-p2).x);
-        assert_eq!(4.3, (p1+p2).y);
+        assert_eq!(4.3, (p1-p2).y);
     }
 
     #[test]
