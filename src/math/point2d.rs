@@ -40,3 +40,39 @@ impl std::ops::Mul<Point2> for f64 {
 
     }
 }
+
+#[cfg(test)]
+mod point2d_tests{
+
+    use super::Point2;
+
+    #[test]
+    fn test_add_point() {
+        let p1 = Point2{x: 3.0, y: 5.0};
+        let p2 = Point2{x: -2.5, y: 0.7};
+
+        assert_eq!(0.5, (p1+p2).x);
+        assert_eq!(5.7, (p1+p2).y);
+    }
+
+    #[test]
+    fn test_sub_point() {
+        let p1 = Point2{x: 3.0, y: 5.0};
+        let p2 = Point2{x: -2.5, y: 0.7};
+
+        assert_eq!(5.5, (p1-p2).x);
+        assert_eq!(4.3, (p1+p2).y);
+    }
+
+    #[test]
+    fn test_mul_point() {
+        let c = 1.5;
+        let p = Point2{x: 3.0, y: 5.0};
+
+        assert_eq!(4.5, (c*p).x);
+        assert_eq!(7.5, (c*p).y);
+        assert_eq!(4.5, (p*c).x);
+        assert_eq!(7.5, (p*c).y);
+    }
+
+}
