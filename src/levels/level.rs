@@ -283,4 +283,94 @@ impl Level {
 
 }
 
+#[cfg(test)]
+mod level_tests{
+
+    #[test]
+    fn test_level_generation(){
+        use super::Level;
+        use crate::levels::map::MapIdx;
+        use crate::entity::tile::TileVariant;
+        use crate::math::random::create_seed;
+
+        let seed = create_seed(true);
+        let lvl = Level::new(seed);
+        
+        // Check that all tiles are walls, floors, or spawners
+        for h in 0..lvl.height {
+            for w in 0..lvl.width {
+
+                assert!(
+                    if let Some(tile) = lvl.map.get(&MapIdx::new(w, h)) {
+                        match tile.variant {
+                            TileVariant::Wall => true,
+                            TileVariant::Floor => true,
+                            TileVariant::Spawner => true,
+                            _ => false
+                        }
+                    } else {
+                        false
+                    }
+                );
+
+            }
+        }
+
+        // Check that all the edges are walls
+        for h in 0..lvl.height {
+
+            assert!(
+                if let Some(tile) = lvl.map.get(&MapIdx::new(0, h)) {
+                    match tile.variant {
+                        TileVariant::Wall => true,
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            );
+
+            assert!(
+                if let Some(tile) = lvl.map.get(&MapIdx::new(lvl.width - 1, h)) {
+                    match tile.variant {
+                        TileVariant::Wall => true,
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            );
+
+        }
+
+        for w in 0..lvl.width {
+
+            assert!(
+                if let Some(tile) = lvl.map.get(&MapIdx::new(w, 0)) {
+                    match tile.variant {
+                        TileVariant::Wall => true,
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            );
+
+            assert!(
+                if let Some(tile) = lvl.map.get(&MapIdx::new(w, lvl.height-1)) {
+                    match tile.variant {
+                        TileVariant::Wall => true,
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            );
+
+        }
+
+    }
+
+}
+
 
