@@ -6,7 +6,7 @@ use crate::game::consts::{
     WINDOW_WIDTH,
 };
 
-use piston::window::WindowSettings;
+use piston::WindowSettings;
 use piston::event_loop::{Events, EventSettings};
 use piston::input::RenderEvent;
 use glutin_window::GlutinWindow;
@@ -28,7 +28,7 @@ impl Game {
     pub fn new(seed: Seed) -> Self {
         Self { 
             opengl: OPEN_GL_VERSION,
-            window_settings: WindowSettings::new("Game", [WINDOW_WIDTH, WINDOW_HEIGHT]).opengl(OPEN_GL_VERSION).exit_on_esc(true),
+            window_settings: WindowSettings::new("Rust Game", [WINDOW_WIDTH, WINDOW_HEIGHT]).graphics_api(OPEN_GL_VERSION).exit_on_esc(true),
             controller: GameController::new(seed),
         }
     }
