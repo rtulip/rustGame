@@ -28,7 +28,7 @@ fn within(p: f64, q: f64, r: f64) -> bool{
 
 /// Function to see if two lines intersect. Lines are defined by two points, a
 /// start and an end point. Assumes that the lines are colinear.
-pub fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool {
+fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool {
 
     let p = vec![p1,p2];
     let q = vec![q1,q2];
@@ -67,7 +67,7 @@ pub fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool
 
 /// function to project a vector onto a line. The line is defined by another
 /// vector. 
-pub fn project(vec: Vec2, line: Vec2) -> Point2 {
+fn project(vec: Vec2, line: Vec2) -> Point2 {
 
     let norm = Vec2::new_unit(line.x, line.y);
     let c = Vec2::dot_product(vec, norm);
@@ -78,7 +78,7 @@ pub fn project(vec: Vec2, line: Vec2) -> Point2 {
 
 /// Finds the two points which are the farthest from each other from a list of
 /// points.
-pub fn find_extrema(points: Vec<Point2>) -> Vec<Point2>{
+fn find_extrema(points: Vec<Point2>) -> Vec<Point2>{
 
     let mut extremes = vec![points[0], points[0]];
     for i in 0..points.len() {
