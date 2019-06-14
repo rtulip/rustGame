@@ -81,7 +81,7 @@ pub fn circle_intersection(c: Point2, r: f64, corners: Vec<Point2>) -> bool {
 pub fn project(vec: Vec2, line: Vec2) -> Point2 {
 
     let norm = Vec2::new_unit(line.x, line.y);
-    let c = Vec2::dot_product(vec, norm) / Vec2::dot_product(norm, norm);
+    let c = Vec2::dot_product(vec, norm);
 
     Point2{x: norm.x * -c, y: norm.y * -c}
 
