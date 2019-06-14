@@ -1,4 +1,4 @@
-use crate::math::{Point2, circle_rect_intersect, rect_rect_intersect, circle_circle_intersect};
+use crate::math::{Point2, collision};
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
@@ -341,14 +341,14 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
         if let Some(s2_corners) = s2.get_corners() {
             
             // Check rect-rect collision.
-            rect_rect_intersect(s1_corners, s2_corners)
+            collision::rect_rect_intersect(s1_corners, s2_corners)
             
         } else {
 
             // Check for circle-rect collision.
             match s2.shape {
                 ShapeVariant::Circle{size: _s, radius: r} => {
-                    circle_rect_intersect(s2.center_point(), r, s1_corners)
+                    collision::circle_rect_intersect(s2.center_point(), r, s1_corners)
                 },
                 _ => false
             }
@@ -362,7 +362,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
             // Check for circle-rect collision.
             match s1.shape {
                 ShapeVariant::Circle{size: _s, radius: r} => {
-                    circle_rect_intersect(s1.center_point(), r, s2_corners)
+                    collision::circle_rect_intersect(s1.center_point(), r, s2_corners)
                 },
                 _ => false
             }
@@ -372,7 +372,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
             // Check for circle-circle collision.
             match [s1.shape, s2.shape] {
                 [ShapeVariant::Circle{size: _s1, radius: r1}, ShapeVariant::Circle{size: _s2, radius: r2}] => {
-                    circle_circle_intersect(s1.center_point(), r1, s2.center_point(), r2)
+                    collision::circle_circle_intersect(s1.center_point(), r1, s2.center_point(), r2)
                 },
                 _ => false
             }
