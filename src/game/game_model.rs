@@ -35,15 +35,11 @@ use crate::game::consts::{
 /// Tiles which are above a threshold are considered for spawning. Once all the
 /// candidate spaces are found, one is chosen at random. 
 /// 
-/// If no spawnable space is found for the Beacon, the program panics.
-/// 
 /// ## Player
 /// 
 /// The spawn point of the player depends on the location of the Beacon. Each
 /// Tile::Floor in an area surrounding the Beacon is a candidate spawning 
 /// space. Once all candidate spaces have been found, one is chosen at random.
-/// 
-/// If no spawnable space is found for the Player, the program panics.  
 /// 
 /// ## Spawners
 /// 
@@ -117,8 +113,6 @@ impl GameModel {
 
     /// Chooses a spawn point randomly from any Tile::Floor spaces surrounding
     /// the input Beacon.
-    /// 
-    /// If no spawnable space is found the program will panic.
     fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> Option<MapIdx> {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
@@ -145,9 +139,7 @@ impl GameModel {
     }
 
     /// Finds an open space to spawn the beacon. To be sufficiently open there 
-    /// must be at least threshold more Floors than Walls in a surrounding area
-    /// 
-    /// If no spawnable spaces are found, the program panics.
+    /// must be at least threshold more Floors than Walls in a surrounding area.
     fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> Option<MapIdx> {
         
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();

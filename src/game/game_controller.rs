@@ -83,7 +83,6 @@ impl GameController {
             None
         }
         
-
     }
 
     /// Parses the event for cursor position, Keyboard presses and keyboard
