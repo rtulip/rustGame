@@ -209,10 +209,6 @@ fn test_pathfinding(){
     println!("floor_idx_1: {:?}", floor_idx_1);
     println!("floor_idx_2: {:?}", floor_idx_2);
     
-    if let Some(_path) = pathfind(&lvl.map, &wall_idx, &floor_idx_1){
-        panic!("Found path starting from a wall")
-    }
-
     // test pathfinding from floor to wall
     if let Some(_path) = pathfind(&lvl.map, &floor_idx_1, &wall_idx) {
         panic!("Found path from a floor into a wall")

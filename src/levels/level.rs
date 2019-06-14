@@ -112,9 +112,9 @@ impl Level {
             }
         }
         
+        map = Level::fill_edge(map, LEVEL_WIDTH, LEVEL_HEIGHT);
         // Fill untraversable space with walls
         map = Level::fill_walls(map, LEVEL_WIDTH, LEVEL_HEIGHT);
-        map = Level::fill_edge(map, LEVEL_WIDTH, LEVEL_HEIGHT);
         Level {map: map, width: LEVEL_WIDTH, height: LEVEL_HEIGHT, rng: rng}
 
     }
