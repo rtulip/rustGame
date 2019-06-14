@@ -175,3 +175,90 @@ pub fn circle_circle_intersect(c1: Point2, r1: f64, c2: Point2, r2: f64) -> bool
     d < (r1 + r2).powi(2)
 
 }
+
+#[cfg(test)]
+mod collision_tests {
+
+    #[test]
+    fn test_within() {
+        use super::within;
+
+        assert!(!within(-1.0, 0.0, 2.0));
+        assert!(within(0.0, 0.0, 2.0));
+        assert!(within(1.0, 0.0, 2.0));
+        assert!(within(2.0, 0.0, 2.0));
+        assert!(!within(3.0, 0.0, 2.0));
+
+    }
+
+    #[test]
+    fn test_point_on_line() {
+        use super::point_on_line;
+        use crate::math::Point2;
+
+        let l1 = Point2 {
+            x: 0.0,
+            y: 0.0,
+        };
+
+        let l2 = Point2 {
+            x: 4.0,
+            y: 2.0,
+        };
+
+        assert!(!point_on_line(Point2{x: -2.0, y: -1.0}, l1, l2));
+        assert!(point_on_line(Point2{x: 0.0, y: 0.0}, l1, l2));
+        assert!(point_on_line(Point2{x: 2.0, y: 1.0}, l1, l2));
+        assert!(point_on_line(Point2{x: 4.0, y: 2.0}, l1, l2));
+        assert!(!point_on_line(Point2{x: 6.0, y: 3.0}, l1, l2));
+        
+        let l1 = Point2 {
+            x: 0.0,
+            y: 0.0,
+        };
+
+        let l2 = Point2 {
+            x: 0.0,
+            y: 2.0,
+        };
+
+        assert!(!point_on_line(Point2{x: 0.0, y: -1.0}, l1, l2));
+        assert!(point_on_line(Point2{x: 0.0, y: 0.0}, l1, l2));
+        assert!(point_on_line(Point2{x: 0.0, y: 1.0}, l1, l2));
+        assert!(point_on_line(Point2{x: 0.0, y: 2.0}, l1, l2));
+        assert!(!point_on_line(Point2{x: 0.0, y: 3.0}, l1, l2));
+        
+    }
+
+    #[test]
+    fn test_line_intersection() {
+
+        use super::line_intersection;
+        use crate::math::Point2; 
+
+        let line = [Point2{x: 0.0, y: 0.0}, Point2{x: 4.0, y: 2.0}];
+
+        let l = [Point2{x: -6.0, y: -3.0}, Point2{x: -2.0, y: -1.0}];
+        assert!(!line_intersection(l[0], l[1], line[0], line[1]));
+
+        let l = [Point2{x: -4.0, y: -2.0}, Point2{x: 0.0, y: 0.0}];
+        assert!(line_intersection(l[0], l[1], line[0], line[1]));
+
+        let l = [Point2{x: -2.0, y: 1.0}, Point2{x: 2.0, y: 1.0}];
+        assert!(line_intersection(l[0], l[1], line[0], line[1]));
+
+        let l = [Point2{x: 0.0, y: 0.0}, Point2{x: 4.0, y: 2.0}];
+        assert!(line_intersection(l[0], l[1], line[0], line[1]));
+
+        let l = [Point2{x: 2.0, y: 1.0}, Point2{x: 6.0, y: 3.0}];
+        assert!(line_intersection(l[0], l[1], line[0], line[1]));
+
+        let l = [Point2{x: 4.0, y: 2.0}, Point2{x: 8.0, y: 4.0}];
+        assert!(line_intersection(l[0], l[1], line[0], line[1]));
+
+        let l = [Point2{x: 6.0, y: 3.0}, Point2{x: 10.0, y: 5.0}];
+        assert!(!line_intersection(l[0], l[1], line[0], line[1]));
+
+    }
+
+}
