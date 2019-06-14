@@ -1,4 +1,5 @@
 pub mod random;
+pub mod collision;
 mod vector2d;
 mod point2d;
 
