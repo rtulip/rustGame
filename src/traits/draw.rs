@@ -1,4 +1,4 @@
-use crate::math::{Point2, Vec2, circle_rect_intersect, rect_rect_intersect, circle_circle_intersect};
+use crate::math::{Point2, circle_rect_intersect, rect_rect_intersect, circle_circle_intersect};
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
@@ -380,5 +380,5 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
         }
 
     }
-    
+
 }
