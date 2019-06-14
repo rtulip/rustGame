@@ -1,4 +1,4 @@
-use crate::math::{Point2, Vec2};
+use crate::math::{Point2, Vec2, point_on_line};
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
@@ -470,20 +470,6 @@ fn circle_intersection(c: Point2, r: f64, corners: Vec<Point2>) -> bool {
     (d3 <= r_2 && point_on_line(p3, corners[3], corners[2])) ||
     (d4 <= r_2 && point_on_line(p4, corners[3], corners[1])) 
 
-}
-
-fn point_on_line(p: Point2, l1: Point2, l2: Point2) -> bool {
-
-    if l1.x != l2.x {
-        within(p.x, l1.x, l2.x)
-    } else {
-        within(p.y, l1.y, l2.y)
-    }
-
-}
-
-fn within(p: f64, q: f64, r: f64) -> bool{
-    (q <= p && p <= r) || (r <= p && p <= q)
 }
 
 fn line_intersection(p1: Point2, p2: Point2, q1: Point2, q2: Point2) -> bool {
