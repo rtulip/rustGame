@@ -1,5 +1,6 @@
 use crate::game::GameController;
-use crate::math::random::Seed;
+use crate::math::random;
+use crate::input;
 use crate::game::consts::{
     OPEN_GL_VERSION,
     WINDOW_HEIGHT,
@@ -25,12 +26,33 @@ pub struct Game {
 
 impl Game {
     
-    pub fn new(seed: Seed) -> Self {
-        Self { 
+    pub fn new() -> Self {
+        
+        // Parse command line for input commands
+        let config = input::handle_init_input();
+        // Create the seed used for the run
+        let mut seed = random::create_seed(config.debug);
+        let mut controller: GameController;
+        loop {
+
+            if let Some(c) = GameController::new(seed) {
+                controller = c;
+                break;
+            } else if config.debug {
+                panic!("Failed to create game controller with debug flag");
+            } else {
+                seed = random::create_seed(false);
+                println!("Had to reroll seed");
+            }
+
+        }
+
+        Self {
             opengl: OPEN_GL_VERSION,
             window_settings: WindowSettings::new("Rust Game", [WINDOW_WIDTH, WINDOW_HEIGHT]).graphics_api(OPEN_GL_VERSION).exit_on_esc(true),
-            controller: GameController::new(seed),
+            controller: controller,
         }
+
     }
 
     /// A function to start the game loop.
