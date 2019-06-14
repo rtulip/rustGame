@@ -1,16 +1,16 @@
 [package]
 name = "rust_game"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["robbie"]
 edition = "2018"
 
 [dependencies]
-rand_chacha = "0.1.1"
-rand_core = "0.4.0"
+rand_chacha = "0.2.0"
+rand_core = "0.5.0"
 rand = "0.6.5"
-piston = "0.43.0"
-pistoncore-glutin_window = "0.55.0"
+piston = "0.46.0"
+pistoncore-glutin_window = "0.59.0"
 piston2d-graphics = "0.32.0"
-piston2d-opengl_graphics = "0.62.0"
+piston2d-opengl_graphics = "0.65.0"
 pathfinding = "1.1.12"
 

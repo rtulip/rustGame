@@ -62,26 +62,27 @@ impl GameController {
     
     /// Creates a new GameController. The GameModel will start with 2 spawning
     /// spaces created. 
-    pub fn new(seed: Seed) -> Self {
+    pub fn new(seed: Seed) -> Option<Self> {
         
         let view = GameView::new();
-        let mut model = GameModel::new(seed);
-        let cursor_pos = Point2 {x: 0.0, y: 0.0};
-        let keys_pressed = HashSet::new();
-        let keys_locked = HashSet::new();
+        if let Some(model) = GameModel::new(seed) {
+            let cursor_pos = Point2 {x: 0.0, y: 0.0};
+            let keys_pressed = HashSet::new();
+            let keys_locked = HashSet::new();
 
-        model.create_spawner();
-        model.create_spawner();
+            Some(Self {
+                model: model, 
+                view: view, 
+                state: GameState::Running, 
+                cursor_pos: cursor_pos, 
+                keys_pressed: keys_pressed,
+                keys_locked: keys_locked,
+            })
 
-        Self {
-            model: model, 
-            view: view, 
-            state: GameState::Running, 
-            cursor_pos: cursor_pos, 
-            keys_pressed: keys_pressed,
-            keys_locked: keys_locked,
+        } else {
+            None
         }
-
+        
     }
 
     /// Parses the event for cursor position, Keyboard presses and keyboard

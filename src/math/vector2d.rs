@@ -58,3 +58,40 @@ impl Vec2 {
     }
 }
 
+#[cfg(test)]
+mod vector2d_tests{
+    
+    use super::Vec2;
+
+    // the acceptable amount of error
+    const EPSILON: f64 = 0.03;
+    
+    #[test]
+    fn test_normalize(){
+        let v = Vec2::new_unit(3.0, 4.0);
+        let u = Vec2::new(3.0/5.0, 4.0/5.0);
+        assert!(EPSILON > (u.x-v.x).abs());
+        assert!(EPSILON > (u.y-v.y).abs());
+    }
+
+    #[test]
+    fn test_dot_product(){
+        let v1 = Vec2::new(3.0, 4.0);
+        let v2 = Vec2::new(-0.5, 0.5);
+        let val = 3.0 * -0.5 + 4.0 * 0.5;
+        assert_eq!(val, Vec2::dot_product(v1, v2));
+    }
+
+    #[test]
+    fn test_normal_unit(){
+        let v = Vec2::new(3.0, 4.0);
+        let v = v.normal_unit();
+        let u = Vec2::new(4.0/5.0, -3.0/5.0);
+
+        assert!(EPSILON > (u.x-v.x).abs());
+        assert!(EPSILON > (u.y-v.y).abs());
+
+    }
+    
+
+}
