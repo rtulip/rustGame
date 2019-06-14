@@ -85,8 +85,8 @@ fn find_extrema(points: Vec<Point2>) -> Vec<Point2>{
             let line_seg = Vec2::new_from_point(line_seg);
 
             if Vec2::dot_product(d,d) > Vec2::dot_product(line_seg, line_seg) {
-                extremes[0] = extremes[i];
-                extremes[1] = extremes[j];
+                extremes[0] = points[i];
+                extremes[1] = points[j];
             }
         }
     }
@@ -274,6 +274,24 @@ mod collision_tests {
         println!("p: {:?}", p);
         assert!(p.x == 1.0 && p.y == 0.0);
 
+    }
+
+    #[test]
+    fn test_find_extrema() {
+
+        use super::find_extrema;
+        use crate::math::Point2;
+
+        let points = vec![
+            Point2{x: -2.0, y: -1.0},
+            Point2{x: 0.0, y: 0.0},
+            Point2{x: 2.0, y: 1.0},
+            Point2{x: 4.0, y: 2.0}
+        ];
+
+        let extremes = find_extrema(points);
+        assert!(extremes[0].x == -2.0 && extremes[0].y == -1.0);
+        assert!(extremes[1].x == 4.0 && extremes[1].y == 2.0);
     }
 
 }
