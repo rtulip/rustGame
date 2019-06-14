@@ -1,4 +1,4 @@
-use crate::math::{Point2, Vec2, line_intersection, circle_intersection, project, find_extrema};
+use crate::math::{Point2, Vec2, line_intersection, circle_rect_intersect, project, find_extrema};
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
@@ -376,7 +376,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
 
             match s2.shape {
                 ShapeVariant::Circle{size: _s, radius: r} => {
-                    circle_intersection(s2.center_point(), r, s1_corners)
+                    circle_rect_intersect(s2.center_point(), r, s1_corners)
                 },
                 _ => false
             }
@@ -389,7 +389,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
 
             match s1.shape {
                 ShapeVariant::Circle{size: _s, radius: r} => {
-                    circle_intersection(s1.center_point(), r, s2_corners)
+                    circle_rect_intersect(s1.center_point(), r, s2_corners)
                 },
                 _ => false
             }
