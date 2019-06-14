@@ -1,6 +1,5 @@
 use crate::math::{Point2, Vec2};
 
-
 /// Function to see if a point lies on a line. The line is defined by two 
 /// points, a start and an end, l1 and l2. 
 fn point_on_line(p: Point2, l1: Point2, l2: Point2) -> bool {
@@ -18,7 +17,7 @@ fn point_on_line(p: Point2, l1: Point2, l2: Point2) -> bool {
 }
 
 /// Function to see if a value p lies within a range [p,q].
-fn within(p: f64, q: f64, r: f64) -> bool{
+fn within(p: f64, q: f64, r: f64) -> bool {
     (q <= p && p <= r) || (r <= p && p <= q)
 }
 
