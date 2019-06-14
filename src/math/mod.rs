@@ -90,8 +90,8 @@ pub fn project(vec: Vec2, line: Vec2) -> Point2 {
 pub fn find_extrema(points: Vec<Point2>) -> Vec<Point2>{
 
     let mut extremes = vec![points[0], points[0]];
-    for i in 0..4 {
-        for j in i..4 {
+    for i in 0..points.len() {
+        for j in i..points.len() {
             let d = points[i] - points[j];
             let d = Vec2::new_from_point(d);
 
