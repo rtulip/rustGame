@@ -345,6 +345,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
             
         } else {
 
+            // Check for circle-rect collision.
             match s2.shape {
                 ShapeVariant::Circle{size: _s, radius: r} => {
                     circle_rect_intersect(s2.center_point(), r, s1_corners)
@@ -358,6 +359,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
         
         if let Some(s2_corners) = s2.get_corners() {
 
+            // Check for circle-rect collision.
             match s1.shape {
                 ShapeVariant::Circle{size: _s, radius: r} => {
                     circle_rect_intersect(s1.center_point(), r, s2_corners)
@@ -367,6 +369,7 @@ pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
 
         } else {
             
+            // Check for circle-circle collision.
             match [s1.shape, s2.shape] {
                 [ShapeVariant::Circle{size: _s1, radius: r1}, ShapeVariant::Circle{size: _s2, radius: r2}] => {
 

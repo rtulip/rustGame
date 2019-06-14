@@ -129,6 +129,8 @@ pub fn circle_rect_intersect(c: Point2, r: f64, corners: Vec<Point2>) -> bool {
 
 }
 
+/// Function to see if two rectangles are colliding. The rectangles are each
+/// defined by a list of four corners. 
 pub fn rect_rect_intersect(corners1: Vec<Point2>, corners2: Vec<Point2>) -> bool {
 
     let mut proj_x1: Vec<Point2> = Vec::new();
