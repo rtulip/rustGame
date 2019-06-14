@@ -75,35 +75,51 @@ impl GameModel {
     /// will convert a MapIdx into a Point2. This is required for creating the
     /// Player position since find_player_spawn() returns a MapIdx instead of a
     /// Point2. 
-    pub fn new(seed: Seed) -> Self {
+    pub fn new(seed: Seed) -> Option<Self> {
         let level = Level::new(seed);
         let mut rng = from_seed(seed);
-        let beacon_spawn = GameModel::find_beacon_spawn(&level, &mut rng);
-        let beacon = Beacon::new(beacon_spawn);
-        let player_spawn = GameModel::find_player_spawn(&level, &beacon, &mut rng);
-        let player = Player::new( map_idx_to_point2(player_spawn));
-        let enemies: Vec<Enemy> = Vec::new();
-        let spawners: Vec<MapIdx> = Vec::new();
-        let resources: Vec<Resource> = Vec::new();
-        let towers: Vec<Tower> = Vec::new();
-        Self {
-            level: level,
-            player: player,
-            beacon: beacon,
-            enemies: enemies,
-            max_enemies: 15,
-            spawners: spawners,
-            resources: resources,
-            towers: towers,
-            rng: rng
+        if let Some(beacon_spawn) = GameModel::find_beacon_spawn(&level, &mut rng){
+            
+            let beacon = Beacon::new(beacon_spawn);
+            if let Some(player_spawn) = GameModel::find_player_spawn(&level, &beacon, &mut rng) {
+
+                let player = Player::new( map_idx_to_point2(player_spawn));
+                let enemies: Vec<Enemy> = Vec::new();
+                let spawners: Vec<MapIdx> = Vec::new();
+                let resources: Vec<Resource> = Vec::new();
+                let towers: Vec<Tower> = Vec::new();
+                let mut model = Self {
+                    level: level,
+                    player: player,
+                    beacon: beacon,
+                    enemies: enemies,
+                    max_enemies: 15,
+                    spawners: spawners,
+                    resources: resources,
+                    towers: towers,
+                    rng: rng
+                };
+
+                model.create_spawner();
+                model.create_spawner();
+
+                Some(model)
+
+            } else {
+                None
+            }
+            
+        } else {
+            None
         }
+        
     }
 
     /// Chooses a spawn point randomly from any Tile::Floor spaces surrounding
     /// the input Beacon.
     /// 
     /// If no spawnable space is found the program will panic.
-    fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> MapIdx {
+    fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> Option<MapIdx> {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
         for h in beacon.idx.x-10..beacon.idx.y+11 {
@@ -119,12 +135,12 @@ impl GameModel {
         }
 
         if spawnable_spaces.len() == 0 {
-            panic!("No spawnable spaces!");
+            None
+        } else {
+            let idx = next_u32(rng) as usize % spawnable_spaces.len();
+            let idx = spawnable_spaces.remove(idx);
+            Some(idx)
         }
-
-        let idx = next_u32(rng) as usize % spawnable_spaces.len();
-        let idx = spawnable_spaces.remove(idx);
-        idx
 
     }
 
@@ -132,7 +148,7 @@ impl GameModel {
     /// must be at least threshold more Floors than Walls in a surrounding area
     /// 
     /// If no spawnable spaces are found, the program panics.
-    fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> MapIdx {
+    fn find_beacon_spawn(level: &Level, rng: &mut RNG) -> Option<MapIdx> {
         
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
         let threshold = 30;
@@ -159,13 +175,14 @@ impl GameModel {
         }
 
         if spawnable_spaces.len() == 0 {
-            panic!("No spawnable spaces!");
+            None
+        } else {
+            let idx = next_u32(rng) as usize % spawnable_spaces.len();
+            let idx = spawnable_spaces.remove(idx);
+            Some(idx)
         }
 
-        let idx = next_u32(rng) as usize % spawnable_spaces.len();
-        let idx = spawnable_spaces.remove(idx);
-        idx
-
+        
     } 
 
     /// Has a chance of creating a new spawner
