@@ -47,8 +47,9 @@ use crate::game::consts::{
 /// 
 /// ```
 /// extern crate rust_game;
-/// use rust_game::misc::random::Seed
-/// use rust_game::level::{Level, MapIdx};
+/// use rust_game::math::random::Seed;
+/// use rust_game::levels::Level;
+/// use rust_game::levels::map::{MapIdx, pathfind};
 /// 
 /// fn main() {
 ///     
@@ -63,7 +64,9 @@ use crate::game::consts::{
 ///     let start = MapIdx::new(5,5);
 ///     let target = MapIdx::new(10,3);
 /// 
-///     let (path, cost) = level.pathfind(&start, &target);
+///     if let Some((path, cost)) = pathfind(&level.map, &start, &target){
+///         // do something
+///     }
 /// 
 /// }
 /// ```
@@ -279,5 +282,3 @@ impl Level {
     }
 
 }
-
-

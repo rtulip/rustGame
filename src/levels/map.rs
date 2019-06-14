@@ -7,18 +7,18 @@ use std::collections::HashMap;
 /// # Example 
 /// ```
 /// extern crate rust_game;
-/// use rust_game::Level::MapIdx;
+/// use rust_game::levels::map::MapIdx;
 /// 
 /// // create an index for the point (5,3)
 /// fn main() {
 ///     let idx = MapIdx::new(5, 3);
-///     assert_eq(idx.x, 5);
-///     assert_eq(idx.y, 3);
+///     assert_eq!(idx.x, 5);
+///     assert_eq!(idx.y, 3);
 /// 
 ///     // The new function doesn't need to be used
 ///     let idx = MapIdx {x: 5, y: 3};
-///     assert_eq(idx.x, 5);
-///     assert_eq(idx.y, 3);
+///     assert_eq!(idx.x, 5);
+///     assert_eq!(idx.y, 3);
 /// }
 /// ```
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
