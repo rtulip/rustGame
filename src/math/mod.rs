@@ -169,3 +169,14 @@ pub fn rect_rect_intersect(corners1: Vec<Point2>, corners2: Vec<Point2>) -> bool
     line_intersection(corners2[0], corners2[1], ls_y2[0], ls_y2[1])
 
 }
+
+/// Function to see if two circles are colliding. Each circle is defined by a
+/// center point and a radius.
+pub fn circle_circle_intersect(c1: Point2, r1: f64, c2: Point2, r2: f64) -> bool {
+
+    let d = Vec2::new_from_point(c1 - c2);
+    let d = Vec2::dot_product(d, d);
+
+    d < (r1 + r2).powi(2)
+
+}
