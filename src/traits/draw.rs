@@ -1,4 +1,4 @@
-use crate::math::{Point2, Vec2, line_intersection, circle_rect_intersect, project, find_extrema};
+use crate::math::{Point2, Vec2, circle_rect_intersect, rect_rect_intersect};
 use crate::game::consts::PI;
 pub use graphics::{Rectangle, Context, Graphics};
 use graphics::Transformed;
@@ -331,47 +331,18 @@ impl Draw for GenericShape {
     }
 }
 
+/// Function which checks if two generic shapes are colliding.
 pub fn check_collision(s1: GenericShape, s2: GenericShape) -> bool {
     
+    // See if shape1 is a rect
     if let Some(s1_corners) = s1.get_corners() {
 
+        // See if shape2 is a rect
         if let Some(s2_corners) = s2.get_corners() {
             
-            let mut proj_x1: Vec<Point2> = Vec::new();
-            let mut proj_y1: Vec<Point2> = Vec::new();
-            let mut proj_x2: Vec<Point2> = Vec::new();
-            let mut proj_y2: Vec<Point2> = Vec::new();
-
-            let line = Vec2::new(s1_corners[1].x - s1_corners[0].x, s1_corners[1].y - s1_corners[0].y);
-            let norm = line.normal_unit();
-            for point in s2_corners.iter() {
-                let v = Vec2::new_from_point(s1_corners[0] - *point);
-                let py = s1_corners[0] + project(v, line);
-                let px = s1_corners[0] + project(v, norm);
-                proj_y1.push(px);
-                proj_x1.push(py);
-            }
-
-            let line = Vec2::new(s2_corners[2].x - s2_corners[0].x, s2_corners[2].y - s2_corners[0].y);
-            let norm = line.normal_unit();
-            for point in s1_corners.iter() {
-                let v = Vec2::new_from_point(s2_corners[0] - *point);
-                let py = s2_corners[0] + project(v, line);
-                let px = s2_corners[0] + project(v, norm);
-                proj_y2.push(px);
-                proj_x2.push(py);
-            }
-
-            let ls_x1 = find_extrema(proj_x1);
-            let ls_y1 = find_extrema(proj_y1);
-            let ls_x2 = find_extrema(proj_x2);
-            let ls_y2 = find_extrema(proj_y2);
-
-            line_intersection(s1_corners[0], s1_corners[1], ls_x1[0], ls_x1[1]) &&
-            line_intersection(s1_corners[0], s1_corners[2], ls_y1[0], ls_y1[1]) &&
-            line_intersection(s2_corners[0], s2_corners[2], ls_x2[0], ls_x2[1]) &&
-            line_intersection(s2_corners[0], s2_corners[1], ls_y2[0], ls_y2[1]) 
-
+            // Check rect-rect collision.
+            rect_rect_intersect(s1_corners, s2_corners)
+            
         } else {
 
             match s2.shape {
