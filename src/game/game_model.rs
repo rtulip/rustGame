@@ -119,6 +119,10 @@ impl GameModel {
         for h in beacon.idx.y-5..beacon.idx.y+5 {
             for w in beacon.idx.x-5..beacon.idx.x+5 {
                 if let Some(tile) = level.map.get(&MapIdx::new(w,h)) {
+                    if beacon.idx.x == w && beacon.idx.y == h {
+                        continue
+                    }
+                    
                     match tile.variant {
                         TileVariant::Floor => spawnable_spaces.push(MapIdx::new(w,h)),
                         _ => (),
