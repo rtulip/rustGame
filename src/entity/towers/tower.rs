@@ -21,6 +21,7 @@ use crate::game::consts::{
 pub enum TowerState {
     Ready,
     Attacking,
+    Waiting(f64),
 }
 
 /// A struct describing the towers in the game. 
@@ -128,6 +129,14 @@ impl Entity for Tower {
         match self.state {
             TowerState::Attacking => {
                 self.bullet.tick(dt);
+            },
+            TowerState::Waiting(t) => {
+                if t-dt <= 0.0 {
+                    self.change_state(TowerState::Ready);
+                } else {
+                    self.change_state(TowerState::Waiting(t-dt));
+                }
+               
             }
             _ => (),
         }
