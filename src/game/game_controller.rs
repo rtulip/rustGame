@@ -5,15 +5,19 @@ use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::traits::draw::check_collision;
 use crate::entity::player;
+use crate::entity::enemy::EnemyState;
 use crate::entity::tile::TileVariant;
 use crate::entity::towers::tower::TowerState;
-use crate::levels::map::MapIdx;
+use crate::levels::map::{MapIdx, pathfind};
 use crate::game::consts::{
     point2_to_map_idx,
     map_idx_to_point2,
     TILE_SIZE,
     PLAYER_SIZE,
+    PLAYER_TRACKING_DIST,
+    BEACON_TRACKING_DIST,
     TOWER_ATTACK_COOLDOWN,
+    ENEMY_PATH_REFRESH_FRQ
 };
 
 use std::collections::HashSet;
@@ -246,6 +250,53 @@ impl GameController {
             if check_collision(self.model.player.shape, enemy.shape) {
                 to_remove.push((i,false));
                 self.model.player.damage();
+            }            
+            if check_collision(self.model.player.shape.get_surrounding_area(PLAYER_TRACKING_DIST), enemy.shape) &&
+               !check_collision(self.model.beacon.shape.get_surrounding_area(BEACON_TRACKING_DIST), enemy.shape) {
+                
+                if let Some(path) = pathfind(
+                    &self.model.level.map,
+                    &point2_to_map_idx(enemy.shape.center_point()), 
+                    &point2_to_map_idx(self.model.player.shape.center_point()),
+                ) {
+                    let mut enemy_path: Vec<Point2> = Vec::new();
+                    for idx in path.0 {
+                        enemy_path.push(map_idx_to_point2(idx));
+                    }
+                    
+                    match enemy.state {
+                        EnemyState::Beacon => {
+                            enemy.change_state(EnemyState::Player(ENEMY_PATH_REFRESH_FRQ));
+                            enemy.path = enemy_path;
+                        }, 
+                        EnemyState::Player(t) if t <= 0.0 => {
+                            enemy.change_state(EnemyState::Player(ENEMY_PATH_REFRESH_FRQ));
+                            enemy.path = enemy_path;
+                        }, 
+                        _ => (),
+                    }
+
+                } 
+
+            } else {
+                match enemy.state {
+                    EnemyState::Player(_t) => {
+                        if let Some(path) = pathfind(
+                            &self.model.level.map,
+                            &point2_to_map_idx(enemy.shape.center_point()), 
+                            &point2_to_map_idx(self.model.beacon.shape.center_point()),
+                        ) {
+                            let mut enemy_path: Vec<Point2> = Vec::new();
+                            for idx in path.0 {
+                                enemy_path.push(map_idx_to_point2(idx));
+                            }
+                            enemy.change_state(EnemyState::Beacon);
+                            enemy.path = enemy_path;
+                            enemy.update_path();
+                        }
+                    },
+                    _ => (),
+                }
             }
 
             match self.model.player.state {

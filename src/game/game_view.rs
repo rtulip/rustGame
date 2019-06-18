@@ -58,10 +58,7 @@ impl GameView {
                 model.player.attack.shape.draw(c,g);
             },
             _ => (),
-        }
-
-
-        
+        } 
     }
 
     /// Draws the GameModel's Beacon

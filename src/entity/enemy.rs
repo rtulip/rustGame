@@ -1,4 +1,5 @@
-use crate::traits::{entity, state};
+use crate::traits::entity;
+use crate::traits::state::State;
 use crate::traits::draw::{GenericShape,ShapeVariant};
 use crate::math::{Vec2, Point2};
 use crate::game::consts::{
@@ -13,7 +14,7 @@ use crate::game::consts::{
 /// Player state, the Enemy will pathfind towards the Player
 pub enum EnemyState {
     Beacon,
-    Player,
+    Player(f64),
 }
 
 /// A structure to describe the Enemy game component. They'll try to hunt down
@@ -44,21 +45,30 @@ impl Enemy {
         }
     }
 
+    pub fn update_path(&mut self) {
+        if self.path.len() > 0 {
+            self.direction = Vec2::new_unit_from_point(self.path[0] - self.shape.get_position());
+        }
+    }
+
+}
+
+impl State for Enemy {
+    type StateEnum = EnemyState;
+    fn change_state(&mut self, new_state: Self::StateEnum) {
+        self.state = new_state;
+    }
 }
 
 impl entity::Entity for Enemy {
     fn tick(&mut self, dt: f64) {
+        
         if self.path.len() > 0 {
-            let mut dist = self.path[0] - self.shape.get_position();
-            if (dist.x).abs() + (dist.y).abs() < 5.0 {
+            let dist = self.path[0] - self.shape.get_position();
+            if (dist.x).abs() + (dist.y).abs() < 7.0 {
                 self.path.remove(0);
-                if self.path.len() > 0 {
-                    dist = self.path[0] - self.shape.get_position();
-                } else {
-                    return;
-                }
+                self.update_path();
             }
-            self.direction = Vec2::new_unit_from_point(dist);
             let delta = Point2 { 
                 x: self.direction.x * ENEMY_SPEED * dt, 
                 y: self.direction.y * ENEMY_SPEED * dt
@@ -66,12 +76,13 @@ impl entity::Entity for Enemy {
             self.shape.update(delta, None);
         }
         
+        match self.state {
+            EnemyState::Player(t) => {
+                self.change_state(EnemyState::Player(t-dt));
+            },
+            _ => (),
+        }
+
     }
 }
 
-impl state::State for Enemy {
-    type StateEnum = EnemyState;
-    fn change_state(&mut self, new_state: Self::StateEnum) {
-        self.state = new_state;
-    }
-}
