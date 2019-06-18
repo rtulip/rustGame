@@ -116,9 +116,13 @@ impl GameModel {
     fn find_player_spawn(level: &Level, beacon: &Beacon, rng: &mut RNG) -> Option<MapIdx> {
 
         let mut spawnable_spaces: Vec<MapIdx> = Vec::new();
-        for h in beacon.idx.x-10..beacon.idx.y+11 {
-            for w in beacon.idx.x-10..beacon.idx.y+11 {
+        for h in beacon.idx.y-5..beacon.idx.y+5 {
+            for w in beacon.idx.x-5..beacon.idx.x+5 {
                 if let Some(tile) = level.map.get(&MapIdx::new(w,h)) {
+                    if beacon.idx.x == w && beacon.idx.y == h {
+                        continue
+                    }
+                    
                     match tile.variant {
                         TileVariant::Floor => spawnable_spaces.push(MapIdx::new(w,h)),
                         _ => (),
