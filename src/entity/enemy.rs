@@ -62,6 +62,7 @@ impl State for Enemy {
 
 impl entity::Entity for Enemy {
     fn tick(&mut self, dt: f64) {
+        
         if self.path.len() > 0 {
             let dist = self.path[0] - self.shape.get_position();
             if (dist.x).abs() + (dist.y).abs() < 7.0 {
@@ -81,7 +82,6 @@ impl entity::Entity for Enemy {
             },
             _ => (),
         }
-
 
     }
 }
