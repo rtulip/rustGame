@@ -49,6 +49,7 @@ impl GameView {
     /// Player's sword is drawn as well.
     fn draw_player<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         // Draw the player
+        model.player.shape.get_surrounding_area(50.0).draw(c, g);
         model.player.shape.draw(c, g);
         model.player.health_bar.draw(c, g);
         model.player.damage_bar.draw(c, g);

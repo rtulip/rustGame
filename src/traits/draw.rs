@@ -296,7 +296,7 @@ impl GenericShape {
                 size: radius*2.0,
                 radius: radius
             }, 
-            [0.0,0.0,0.0,1.0], 
+            [0.4,0.4,0.4,0.2], 
             self.center_point() - Point2{x: radius, y: radius}
         )
 

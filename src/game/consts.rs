@@ -44,7 +44,7 @@ pub const RESOURCE_COLOR: Color = BEACON_COLOR;
 pub const BEACON_SIZE: f64 = 18.0;
 pub const BEACON_COLOR: Color = [0.88, 0.68, 0.1, 1.0];
 pub const BEACON_ROTATION_SPEED: f64 = 2.0 * PI;
-pub const BEACON_STARTING_HEALTH: i32 = 10;
+pub const BEACON_STARTING_HEALTH: i32 = 1000;
 
 pub const TOWER_COLOR: Color = [0.33, 0.33, 0.33, 1.0];
 pub const TOWER_SIZE: f64 = PLAYER_SIZE;
