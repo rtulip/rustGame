@@ -45,6 +45,12 @@ impl Enemy {
         }
     }
 
+    pub fn update_path(&mut self) {
+        if self.path.len() > 0 {
+            self.direction = Vec2::new_unit_from_point(self.path[0] - self.shape.get_position());
+        }
+    }
+
 }
 
 impl State for Enemy {
@@ -57,15 +63,10 @@ impl State for Enemy {
 impl entity::Entity for Enemy {
     fn tick(&mut self, dt: f64) {
         if self.path.len() > 0 {
-            let mut dist = self.path[0] - self.shape.get_position();
+            let dist = self.path[0] - self.shape.get_position();
             if (dist.x).abs() + (dist.y).abs() < 7.0 {
                 self.path.remove(0);
-                if self.path.len() > 0 {
-                    dist = self.path[0] - self.shape.get_position();
-                    self.direction = Vec2::new_unit_from_point(dist);
-                } else {
-                    return;
-                }
+                self.update_path();
             }
             let delta = Point2 { 
                 x: self.direction.x * ENEMY_SPEED * dt, 

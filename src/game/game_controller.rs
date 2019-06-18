@@ -1,6 +1,6 @@
 use crate::game::{GameModel, GameView};
 use crate::math::random::Seed;
-use crate::math::{Point2,Vec2};
+use crate::math::Point2;
 use crate::traits::entity::Entity;
 use crate::traits::state::State;
 use crate::traits::draw::check_collision;
@@ -14,7 +14,10 @@ use crate::game::consts::{
     map_idx_to_point2,
     TILE_SIZE,
     PLAYER_SIZE,
+    PLAYER_TRACKING_DIST,
+    BEACON_TRACKING_DIST,
     TOWER_ATTACK_COOLDOWN,
+    ENEMY_PATH_REFRESH_FRQ
 };
 
 use std::collections::HashSet;
@@ -248,7 +251,9 @@ impl GameController {
                 to_remove.push((i,false));
                 self.model.player.damage();
             }            
-            if check_collision(self.model.player.shape.get_surrounding_area(50.0), enemy.shape) {
+            if check_collision(self.model.player.shape.get_surrounding_area(PLAYER_TRACKING_DIST), enemy.shape) &&
+               !check_collision(self.model.beacon.shape.get_surrounding_area(BEACON_TRACKING_DIST), enemy.shape) {
+                
                 if let Some(path) = pathfind(
                     &self.model.level.map,
                     &point2_to_map_idx(enemy.shape.center_point()), 
@@ -261,17 +266,18 @@ impl GameController {
                     
                     match enemy.state {
                         EnemyState::Beacon => {
-                            enemy.change_state(EnemyState::Player(0.1));
+                            enemy.change_state(EnemyState::Player(ENEMY_PATH_REFRESH_FRQ));
                             enemy.path = enemy_path;
                         }, 
                         EnemyState::Player(t) if t <= 0.0 => {
-                            enemy.change_state(EnemyState::Player(0.1));
+                            enemy.change_state(EnemyState::Player(ENEMY_PATH_REFRESH_FRQ));
                             enemy.path = enemy_path;
                         }, 
                         _ => (),
                     }
 
                 } 
+
             } else {
                 match enemy.state {
                     EnemyState::Player(_t) => {
@@ -286,6 +292,7 @@ impl GameController {
                             }
                             enemy.change_state(EnemyState::Beacon);
                             enemy.path = enemy_path;
+                            enemy.update_path();
                         }
                     },
                     _ => (),
