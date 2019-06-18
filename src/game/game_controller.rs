@@ -13,6 +13,7 @@ use crate::game::consts::{
     map_idx_to_point2,
     TILE_SIZE,
     PLAYER_SIZE,
+    TOWER_ATTACK_COOLDOWN,
 };
 
 use std::collections::HashSet;
@@ -297,20 +298,20 @@ impl GameController {
                     if let Some(tile) = self.model.level.map.get(&point2_to_map_idx(tower.bullet.shape.center_point())) {
                         match tile.variant {
                             TileVariant::Wall => {
-                                tower.change_state(TowerState::Ready);
+                                tower.change_state(TowerState::Waiting(TOWER_ATTACK_COOLDOWN));
                                 continue;
                             },
                             _ => (),
                         }
                     } else {
-                        tower.change_state(TowerState::Ready);
+                        tower.change_state(TowerState::Waiting(TOWER_ATTACK_COOLDOWN));
                         continue;
                     }
                     
                     for (i,enemy) in self.model.enemies.iter().enumerate().rev() {
                         if check_collision(tower.bullet.shape, enemy.shape){
                             to_remove.push(i);
-                               tower.change_state(TowerState::Ready);
+                               tower.change_state(TowerState::Waiting(TOWER_ATTACK_COOLDOWN));
                         }
                     }
 
