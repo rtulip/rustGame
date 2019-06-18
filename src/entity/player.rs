@@ -2,16 +2,13 @@ use crate::entity::attack::Attack;
 use crate::math::Vec2;
 use crate::math::Point2;
 use crate::traits::draw::{GenericShape, ShapeVariant};
-use crate::traits::{entity, state};
+use crate::traits::{entity, state, health};
 use crate::game::consts::{
     PLAYER_SIZE, 
     PLAYER_RADIUS, 
     PLAYER_COLOR, 
     PLAYER_SPEED, 
     PLAYER_STARTING_HEALTH,
-    HEALTH_BAR_HEIGHT,
-    HEALTH_COLOR,
-    DAMAGE_COLOR,
     PI,
 };
 
@@ -32,10 +29,8 @@ pub enum PlayerState{
 /// the logic surrounding how to update itself.
 pub struct Player {
     pub shape: GenericShape,
-    pub health_bar: GenericShape,
-    pub damage_bar: GenericShape,
+    pub health_bar: health::HealthBar,
     pub attack: Attack,
-    pub health: i32,
     pub state: PlayerState,
     pub direction: Vec2,
     pub resources: i32,
@@ -54,24 +49,14 @@ impl Player {
                 PLAYER_COLOR,
                 start_position
             ),
-            health_bar: GenericShape::new(
-                ShapeVariant::Rect{
-                    width: PLAYER_SIZE,
-                    height: HEALTH_BAR_HEIGHT,
-                }, 
-                HEALTH_COLOR,
-                start_position + Point2{x: 0.0, y: PLAYER_SIZE + HEALTH_BAR_HEIGHT * 1.2}
-            ),
-            damage_bar: GenericShape::new(
-                ShapeVariant::Rect{
-                    width: 0.0,
-                    height: HEALTH_BAR_HEIGHT,
-                }, 
-                DAMAGE_COLOR,
-                start_position + Point2{x: 0.0, y: PLAYER_SIZE + HEALTH_BAR_HEIGHT * 1.2}
+            health_bar: health::HealthBar::new(
+                PLAYER_STARTING_HEALTH, 
+                start_position, 
+                PLAYER_SIZE, 
+                PLAYER_SIZE,
+                None
             ),
             attack: Attack::new(), 
-            health: PLAYER_STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: Vec2::new_unit(0.0, 1.0),
             resources: 0,
@@ -92,7 +77,6 @@ impl Player {
                 };
                 self.shape.update(delta, None);
                 self.health_bar.update(delta, None);
-                self.damage_bar.update(delta, None);
             },
             _ => {}
         }
@@ -127,23 +111,7 @@ impl Player {
     }
 
     pub fn damage(&mut self) {
-        self.health -= 1;
-        self.health_bar = GenericShape::new(
-            ShapeVariant::Rect{
-                width: PLAYER_SIZE * self.health as f64 / PLAYER_STARTING_HEALTH as f64,
-                height: HEALTH_BAR_HEIGHT 
-            }, 
-            HEALTH_COLOR,
-            self.health_bar.get_position(),
-        );
-        self.damage_bar = GenericShape::new(
-            ShapeVariant::Rect{
-                width: PLAYER_SIZE * (PLAYER_STARTING_HEALTH - self.health) as f64 / PLAYER_STARTING_HEALTH as f64,
-                height: HEALTH_BAR_HEIGHT 
-            }, 
-            DAMAGE_COLOR,
-            self.health_bar.get_position() + Point2{x: PLAYER_SIZE * self.health as f64 / PLAYER_STARTING_HEALTH as f64, y: 0.0}
-        );
+        self.health_bar.damage();
     }
 
 }

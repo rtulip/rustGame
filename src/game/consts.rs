@@ -57,11 +57,14 @@ pub const TOWER_CANNON_COLOR: Color = PLAYER_ATTACK_COLOR;
 pub const TOWER_CANNON_WIDTH: f64 = TOWER_SIZE;
 pub const TOWER_CANNON_HEIGHT: f64 = TOWER_SIZE / 3.0;
 pub const TOWER_ATTACK_COOLDOWN: f64 = 0.5;
+pub const TOWER_STARTING_HEALTH: i32 = 5;
+
 pub const BULLET_WIDTH: f64 = TOWER_SIZE / 2.0;
 pub const BULLET_HEIGHT: f64 = TOWER_CANNON_HEIGHT * 0.75;
 pub const BULLET_COLOR: Color = [0.0, 0.0, 0.0, 1.0];
 pub const BULLET_SPEED: f64 = ENEMY_SPEED * 2.0;
 
+pub const HEALTH_BAR_WIDTH: f64 = TILE_SIZE;
 pub const HEALTH_BAR_HEIGHT: f64 = 5.0;
 pub const HEALTH_COLOR: Color = [0.0, 1.0, 0.0, 1.0];
 pub const DAMAGE_COLOR: Color = [1.0, 0.0, 0.0, 1.0];

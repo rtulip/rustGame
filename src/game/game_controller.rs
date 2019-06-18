@@ -194,12 +194,10 @@ impl GameController {
                                 let delta = Point2{x: min_move, y: 0.0};
                                 self.model.player.shape.update(delta, None);
                                 self.model.player.health_bar.update(delta, None);
-                                self.model.player.damage_bar.update(delta, None);
                             } else {
                                 let delta = Point2{x: 0.0, y: min_move};
                                 self.model.player.shape.update(delta, None);
                                 self.model.player.health_bar.update(delta, None);
-                                self.model.player.damage_bar.update(delta, None);
                             }
                         }
                         _ => (),
@@ -321,9 +319,9 @@ impl GameController {
         }
 
         //Check Gamestate to see if GameOver.
-        if self.model.beacon.health == 0 || self.model.player.health == 0{
+        if self.model.beacon.health_bar.health == 0 || self.model.player.health_bar.health == 0{
             println!("Game Over!");
-            println!("Player Health: {}, Beacon Health: {}",self.model.player.health, self.model.beacon.health);
+            println!("Player Health: {}, Beacon Health: {}",self.model.player.health_bar.health, self.model.beacon.health_bar.health);
             self.change_state(GameState::Finished);
         }
 
