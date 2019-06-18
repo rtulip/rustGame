@@ -1,6 +1,7 @@
 use crate::math::Point2;
 use crate::math::Vec2;
 use crate::traits::draw::{Draw, Context, Graphics, GenericShape, ShapeVariant};
+use crate::traits::health::HealthBar;
 use crate::traits::state::State;
 use crate::traits::entity::Entity;
 use crate::entity::towers::bullet::Bullet;
@@ -12,6 +13,7 @@ use crate::game::consts::{
     TOWER_CANNON_HEIGHT,
     TOWER_CANNON_COLOR,
     TOWER_RANGE,
+    TOWER_STARTING_HEALTH,
     BULLET_HEIGHT,
 };
 
@@ -28,6 +30,7 @@ pub enum TowerState {
 pub struct Tower {
     pub base_shape: GenericShape,
     pub cannon_shape: GenericShape,
+    pub healh_bar: HealthBar,
     pub range: f64,
     pub state: TowerState,
     pub bullet: Bullet
@@ -62,6 +65,13 @@ impl Tower {
         Self {
             cannon_shape:cannon_shape,
             base_shape: base_shape,
+            healh_bar: HealthBar::new(
+                TOWER_STARTING_HEALTH,
+                position,
+                TOWER_SIZE,
+                TOWER_SIZE,
+                None
+            ),
             range: TOWER_RANGE,
             state: TowerState::Ready,
             bullet: Bullet::new(
@@ -84,6 +94,7 @@ impl Draw for Tower {
     fn draw<G: Graphics>(&self, c: &Context, g: &mut G){
         self.base_shape.draw(c, g);
         self.cannon_shape.draw(c, g);
+        self.healh_bar.draw(c, g);
         match self.state {
             TowerState::Attacking => {
                 self.bullet.shape.draw(c, g);
