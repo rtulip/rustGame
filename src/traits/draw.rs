@@ -289,6 +289,19 @@ impl GenericShape {
         self.offset
     }
 
+    pub fn get_surrounding_area(&self, radius: f64) -> GenericShape {
+
+        GenericShape::new(
+            ShapeVariant::Circle{
+                size: radius*2.0,
+                radius: radius
+            }, 
+            [0.0,0.0,0.0,1.0], 
+            self.center_point() - Point2{x: radius, y: radius}
+        )
+
+    }
+
 }
 
 impl Draw for GenericShape {
