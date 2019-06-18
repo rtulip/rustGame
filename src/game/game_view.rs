@@ -51,7 +51,6 @@ impl GameView {
         // Draw the player
         model.player.shape.draw(c, g);
         model.player.health_bar.draw(c, g);
-        model.player.damage_bar.draw(c, g);
         // Draw the player's attack anmiation if in Active state. 
         match model.player.state {
             PlayerState::Attacking => {
