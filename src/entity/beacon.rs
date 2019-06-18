@@ -1,4 +1,4 @@
-use crate::traits::entity;
+use crate::traits::{entity, health};
 use crate::traits::draw::{GenericShape, ShapeVariant};
 use crate::levels::map::MapIdx;
 use crate::math::Point2;
@@ -7,9 +7,6 @@ use crate::game::consts::{
     BEACON_COLOR,
     BEACON_STARTING_HEALTH,
     BEACON_ROTATION_SPEED,
-    HEALTH_BAR_HEIGHT,
-    HEALTH_COLOR,
-    DAMAGE_COLOR,
     map_idx_to_point2
 };
 
@@ -20,9 +17,7 @@ use crate::game::consts::{
 pub struct Beacon {
     pub idx: MapIdx,
     pub shape: GenericShape,
-    pub health_bar: GenericShape,
-    pub damage_bar: GenericShape,
-    pub health: i32,
+    pub health_bar: health::HealthBar,
     pub rotation: f64,
 }
 
@@ -49,64 +44,27 @@ impl Beacon {
              y: -BEACON_SIZE / 2.0,
         });
 
-        let mut health_bar = GenericShape::new(
-            ShapeVariant::Rect{
-                width: BEACON_SIZE,
-                height: HEALTH_BAR_HEIGHT 
-            }, 
-            HEALTH_COLOR,
-            shape.get_position() + Point2{x: 0.0, y: BEACON_SIZE + HEALTH_BAR_HEIGHT * 2.0}
+        let health_bar = health::HealthBar::new(
+            BEACON_STARTING_HEALTH,
+            shape.get_position(),
+            BEACON_SIZE,
+            BEACON_SIZE,
+            Some(Point2{
+                x: -BEACON_SIZE / 2.0,
+                y: -BEACON_SIZE / 2.0,
+            })
         );
-        health_bar.set_offset(Point2{
-             x: -BEACON_SIZE / 2.0,
-             y: -BEACON_SIZE / 2.0,
-        });
-        let mut damage_bar = GenericShape::new(
-            ShapeVariant::Rect{
-                width: 0.0,
-                height: HEALTH_BAR_HEIGHT 
-            }, 
-            DAMAGE_COLOR,
-            shape.get_position() + Point2{x: 0.0, y: BEACON_SIZE + HEALTH_BAR_HEIGHT * 2.0}
-        );
-        damage_bar.set_offset(Point2{
-             x: -BEACON_SIZE / 2.0,
-             y: -BEACON_SIZE / 2.0,
-        });
         Self {
             idx: pos,
             shape: shape,
             health_bar: health_bar,
-            damage_bar: damage_bar,
-            health: BEACON_STARTING_HEALTH,
             rotation: 0.0
         }
     }
 
     pub fn damage(&mut self) {
-        self.health -= 1;
-        if let Some(offset) = self.shape.get_offset(){
-            self.health_bar = GenericShape::new(
-                ShapeVariant::Rect{
-                    width: BEACON_SIZE * self.health as f64 / BEACON_STARTING_HEALTH as f64,
-                    height: HEALTH_BAR_HEIGHT 
-                }, 
-                HEALTH_COLOR,
-                self.shape.get_position() + Point2{x: 0.0, y: BEACON_SIZE + HEALTH_BAR_HEIGHT * 2.0}
-            );
-            self.health_bar.set_offset(offset);
-            self.damage_bar = GenericShape::new(
-                ShapeVariant::Rect{
-                    width: BEACON_SIZE * (BEACON_STARTING_HEALTH - self.health) as f64 / BEACON_STARTING_HEALTH as f64,
-                    height: HEALTH_BAR_HEIGHT 
-                }, 
-                DAMAGE_COLOR,
-                self.shape.get_position() + Point2{x: BEACON_SIZE * self.health as f64 / BEACON_STARTING_HEALTH as f64, y:  BEACON_SIZE + HEALTH_BAR_HEIGHT * 2.0}
-            );
-            self.damage_bar.set_offset(offset);
-        }
         
-        
+        self.health_bar.damage();
 
     }
 }

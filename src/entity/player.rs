@@ -9,9 +9,6 @@ use crate::game::consts::{
     PLAYER_COLOR, 
     PLAYER_SPEED, 
     PLAYER_STARTING_HEALTH,
-    HEALTH_BAR_HEIGHT,
-    HEALTH_COLOR,
-    DAMAGE_COLOR,
     PI,
 };
 
@@ -34,7 +31,6 @@ pub struct Player {
     pub shape: GenericShape,
     pub health_bar: health::HealthBar,
     pub attack: Attack,
-    pub health: i32,
     pub state: PlayerState,
     pub direction: Vec2,
     pub resources: i32,
@@ -57,10 +53,10 @@ impl Player {
                 PLAYER_STARTING_HEALTH, 
                 start_position, 
                 PLAYER_SIZE, 
-                PLAYER_SIZE
+                PLAYER_SIZE,
+                None
             ),
             attack: Attack::new(), 
-            health: PLAYER_STARTING_HEALTH,
             state: PlayerState::Stationary,
             direction: Vec2::new_unit(0.0, 1.0),
             resources: 0,

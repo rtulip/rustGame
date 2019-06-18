@@ -64,7 +64,6 @@ impl GameView {
     fn draw_beacon<G: Graphics>(&self, model: &GameModel, c: &Context, g: &mut G) {
         model.beacon.shape.draw(c, g);
         model.beacon.health_bar.draw(c, g);
-        model.beacon.damage_bar.draw(c, g);
     }
 
     /// Draws each enemy in the GameModel enemy list
