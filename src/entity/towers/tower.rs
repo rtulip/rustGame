@@ -113,7 +113,6 @@ impl State for Tower {
                     });
                     self.bullet.shape.set_rotation(rot);
                 }
-                
             },
             _ => ()
         }
