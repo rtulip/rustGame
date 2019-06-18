@@ -874,7 +874,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "rust_game"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "pathfinding 1.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston 0.46.0 (registry+https://github.com/rust-lang/crates.io-index)",
