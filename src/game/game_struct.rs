@@ -32,7 +32,7 @@ impl Game {
         let config = input::handle_init_input();
         // Create the seed used for the run
         let mut seed = random::create_seed(config.debug);
-        let mut controller: GameController;
+        let controller: GameController;
         loop {
 
             if let Some(c) = GameController::new(seed) {
