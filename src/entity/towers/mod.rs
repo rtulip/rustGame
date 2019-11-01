@@ -1,2 +1,2 @@
-pub mod tower;
 pub mod bullet;
+pub mod tower;

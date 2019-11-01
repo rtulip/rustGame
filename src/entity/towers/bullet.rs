@@ -1,13 +1,8 @@
-use crate::traits::draw::{GenericShape, ShapeVariant};
-use crate::traits::entity::Entity;
+use crate::game::consts::{BULLET_COLOR, BULLET_HEIGHT, BULLET_SPEED, BULLET_WIDTH};
 use crate::math::Point2;
 use crate::math::Vec2;
-use crate::game::consts::{
-    BULLET_WIDTH,
-    BULLET_HEIGHT,
-    BULLET_COLOR,
-    BULLET_SPEED
-};
+use crate::traits::draw::{GenericShape, ShapeVariant};
+use crate::traits::entity::Entity;
 
 /// A structure to represent a bullet fired from a tower.
 pub struct Bullet {
@@ -20,26 +15,25 @@ impl Bullet {
     pub fn new(position: Point2, direction: Vec2) -> Self {
         Self {
             shape: GenericShape::new(
-                ShapeVariant::Rect{
+                ShapeVariant::Rect {
                     width: BULLET_WIDTH,
                     height: BULLET_HEIGHT,
-                }, 
-                BULLET_COLOR, 
+                },
+                BULLET_COLOR,
                 position,
             ),
             direction: direction,
         }
     }
-
 }
 
 impl Entity for Bullet {
     /// Moves the bullet forward every tick.
     fn tick(&mut self, dt: f64) {
-        let delta = Point2{
+        let delta = Point2 {
             x: self.direction.x * BULLET_SPEED * dt,
             y: self.direction.y * BULLET_SPEED * dt,
         };
-        self.shape.update(delta,None);
+        self.shape.update(delta, None);
     }
 }
